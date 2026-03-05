@@ -807,6 +807,864 @@ small, .small-text {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ── Shared Tab Header ── */
+.tab-header {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--charcoal);
+  padding: 16px 20px 12px;
+}
+
+.tab-section-label {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--charcoal);
+  padding: 4px 16px 8px;
+}
+
+/* ── Health Tab ── */
+.care-team-card {
+  background: var(--white);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 0 16px 14px;
+}
+
+.care-team-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.care-team-info-label {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 13px;
+  color: var(--blue);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+
+.care-team-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.care-team-detail {
+  font-size: 14px;
+  color: var(--gray-text);
+}
+
+.care-team-avatar {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 50%;
+  background: var(--blue-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.care-team-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.care-team-btn {
+  flex: 1;
+  min-height: 48px;
+  border: 1.5px solid var(--blue);
+  color: var(--blue);
+  background: transparent;
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 4px;
+}
+
+.care-team-btn:hover {
+  background: var(--blue-light);
+}
+
+.care-team-next {
+  font-size: 13px;
+  color: var(--gray-text);
+  font-style: italic;
+}
+
+/* Action items horizontal scroll */
+.action-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 16px 12px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.action-scroll::-webkit-scrollbar { display: none; }
+
+.action-item {
+  background: var(--white);
+  border-radius: 10px;
+  padding: 10px 14px;
+  min-width: fit-content;
+  white-space: nowrap;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  text-align: left;
+  transition: box-shadow 0.2s;
+}
+
+.action-item:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.action-item-border-purple { border-left: 3px solid var(--purple); }
+.action-item-border-blue { border-left: 3px solid var(--blue); }
+.action-item-border-red { border-left: 3px solid var(--red); }
+
+.action-item-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--charcoal);
+}
+
+.action-item-sub {
+  font-size: 12px;
+  color: var(--gray-text);
+  margin-top: 2px;
+}
+
+/* Lab cards grid */
+.lab-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 16px 16px;
+}
+
+.lab-card {
+  background: var(--white);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 14px;
+  padding: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.1s;
+}
+
+.lab-card:hover {
+  border-color: var(--purple);
+}
+
+.lab-card:active {
+  transform: scale(0.97);
+}
+
+.lab-metric {
+  font-size: 13px;
+  color: var(--gray-text);
+}
+
+.lab-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--charcoal);
+  line-height: 1.3;
+}
+
+.lab-value-sm {
+  font-size: 18px;
+}
+
+.lab-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 700;
+  margin: 4px 0;
+}
+
+.lab-status-green { color: var(--green); }
+.lab-status-amber { color: var(--amber); }
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-green { background: var(--green); }
+.dot-amber { background: var(--amber); }
+
+.lab-bar-track {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-input);
+  border-radius: 2px;
+  margin: 6px 0;
+}
+
+.lab-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+
+.bar-amber { background: var(--amber); }
+
+.lab-tap {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--red);
+}
+
+/* Medication items */
+.med-list {
+  padding: 0 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.med-item {
+  display: flex;
+  align-items: center;
+  background: var(--white);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 12px;
+  padding: 14px;
+  gap: 12px;
+  min-height: 56px;
+}
+
+.med-emoji {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.med-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.med-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.med-detail {
+  font-size: 14px;
+  color: var(--gray-text);
+}
+
+.med-badge {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--red);
+  background: var(--red-light);
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* Auth card */
+.auth-card {
+  display: flex;
+  align-items: center;
+  background: var(--white);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 14px;
+  padding: 14px;
+  margin: 0 16px 14px;
+  gap: 10px;
+}
+
+.auth-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.auth-text {
+  flex: 1;
+  font-size: 15px;
+  color: var(--gray-text);
+}
+
+.auth-link {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--red);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+/* Health explorer card */
+.health-explorer-card {
+  background: var(--purple-light);
+  border: 1.5px solid rgba(89,44,130,0.25);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 0 16px 16px;
+  cursor: pointer;
+  display: block;
+  width: calc(100% - 32px);
+  text-align: left;
+  font-family: inherit;
+}
+
+.health-explorer-card:hover {
+  border-color: var(--purple);
+}
+
+.health-explorer-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--purple);
+}
+
+.health-explorer-desc {
+  font-size: 14px;
+  color: var(--gray-text);
+  margin: 4px 0;
+}
+
+.health-explorer-link {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--red);
+}
+
+/* ── Benefits Tab ── */
+.benefit-card {
+  background: var(--white);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 0 16px 12px;
+}
+
+.benefit-label {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+.benefit-label-blue { color: var(--blue); }
+.benefit-label-red { color: var(--red); }
+
+.benefit-value {
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.benefit-value-blue { color: var(--blue); }
+.benefit-value-red { color: var(--red); }
+
+.benefit-value-sm {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.benefit-sub {
+  font-size: 14px;
+  color: var(--gray-text);
+}
+
+.benefit-bar-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-input);
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+.benefit-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.bar-blue { background: var(--blue); }
+.bar-red { background: var(--red); }
+.bar-green { background: var(--green); }
+
+.benefit-note {
+  font-size: 14px;
+  color: var(--gray-text);
+  margin-top: 6px;
+}
+
+.benefit-outline-btn {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 50px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+  padding: 10px 16px;
+}
+
+.benefit-outline-btn-blue {
+  border: 1.5px solid var(--blue);
+  color: var(--blue);
+}
+
+.benefit-outline-btn-blue:hover { background: var(--blue-light); }
+
+.benefit-outline-btn-red {
+  border: 1.5px solid var(--red);
+  color: var(--red);
+}
+
+.benefit-outline-btn-red:hover { background: var(--red-light); }
+
+.benefit-divider {
+  border: none;
+  border-top: 1px solid var(--gray-mid);
+  margin: 12px 0;
+}
+
+.claim-status-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.claim-status-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.claim-status-detail {
+  font-size: 13px;
+  color: var(--amber);
+}
+
+.benefit-card-highlight {
+  background: var(--blue-light);
+  border: 1.5px solid rgba(0,160,221,0.2);
+}
+
+/* ID Card */
+.id-card-row {
+  display: flex;
+  align-items: center;
+  background: var(--white);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 14px;
+  padding: 14px;
+  margin: 0 16px 14px;
+  gap: 12px;
+  cursor: pointer;
+  min-height: 56px;
+  font-family: inherit;
+}
+
+.id-card-row:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.id-emoji {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.id-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.id-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.id-number {
+  font-size: 14px;
+  color: var(--gray-text);
+}
+
+.id-chevron {
+  color: var(--gray-mid);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* Plan highlights */
+.plan-card {
+  background: var(--white);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 0 16px 14px;
+}
+
+.plan-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bg-input);
+  font-size: 15px;
+  color: var(--charcoal);
+}
+
+.plan-row:last-of-type {
+  border-bottom: none;
+}
+
+.plan-check {
+  color: var(--green);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.plan-docs-link {
+  display: block;
+  padding-top: 12px;
+  border-top: 1px solid var(--bg-input);
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--red);
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  min-height: 44px;
+}
+
+/* Quick tools grid */
+.quick-tools-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 16px 14px;
+}
+
+.quick-tool-card {
+  background: var(--white);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  min-height: 64px;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  border: 1.5px solid var(--gray-mid);
+  font-family: inherit;
+  text-align: left;
+  transition: border-color 0.2s;
+}
+
+.quick-tool-card:hover {
+  border-color: var(--red);
+}
+
+.quick-tool-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.quick-tool-sub {
+  font-size: 12px;
+  color: var(--gray-text);
+  margin-top: 2px;
+}
+
+/* Recent claims */
+.claim-row {
+  display: flex;
+  align-items: center;
+  background: var(--white);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 12px;
+  padding: 14px;
+  margin: 0 16px 14px;
+  gap: 10px;
+  min-height: 56px;
+}
+
+.claim-emoji {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.claim-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.claim-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.claim-detail {
+  font-size: 14px;
+  color: var(--gray-text);
+}
+
+.claim-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.claim-amount {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.claim-badge {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--amber);
+  background: var(--amber-bg);
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+/* ── Profile Tab ── */
+.profile-member-card {
+  background: var(--charcoal);
+  border-radius: 14px;
+  padding: 18px;
+  margin: 0 16px 14px;
+}
+
+.profile-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.profile-plan {
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+}
+
+.profile-details {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.profile-detail-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.profile-detail-label {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+}
+
+.profile-detail-value {
+  font-size: 14px;
+  color: rgba(255,255,255,0.95);
+  font-weight: 700;
+}
+
+/* Prefs card */
+.prefs-card {
+  background: var(--white);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 0 16px 14px;
+}
+
+.pref-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  min-height: 48px;
+}
+
+.pref-row:first-child {
+  border-bottom: 1px solid var(--bg-input);
+}
+
+.pref-label {
+  font-size: 14px;
+  color: var(--gray-text);
+}
+
+.pref-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gray-text);
+}
+
+.pref-value-green {
+  color: var(--green);
+}
+
+/* Snapshot CTA */
+.snapshot-cta {
+  border: 2px dashed var(--gray-mid);
+  border-radius: 14px;
+  padding: 18px;
+  margin: 0 16px 14px;
+  text-align: center;
+  cursor: pointer;
+  min-height: 56px;
+  background: transparent;
+  font-family: inherit;
+  width: calc(100% - 32px);
+}
+
+.snapshot-cta:hover {
+  border-color: var(--red);
+}
+
+.snapshot-cta-text {
+  font-size: 15px;
+  color: var(--gray-text);
+}
+
+.snapshot-cta-link {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--red);
+  display: block;
+  margin-top: 4px;
+}
+
+/* Snapshot completed card */
+.snapshot-card {
+  background: var(--white);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.snapshot-label {
+  font-size: 13px;
+  color: var(--gray-text);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.snapshot-dots {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.snapshot-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.snapshot-dot-filled {
+  background: var(--red);
+  color: var(--white);
+}
+
+.snapshot-dot-empty {
+  background: var(--bg-input);
+  color: var(--gray-text);
+}
+
+.snapshot-great-day {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--charcoal);
+  line-height: 1.5;
+}
+
+/* Account links card */
+.account-card {
+  background: var(--white);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 14px;
+  margin: 0 16px 14px;
+  overflow: hidden;
+}
+
+.account-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--bg-input);
+  cursor: pointer;
+  min-height: 48px;
+  font-size: 15px;
+  color: var(--charcoal);
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+}
+
+.account-row:last-child {
+  border-bottom: none;
+}
+
+.account-row:hover {
+  background: var(--gray-bg);
+}
+
+.account-chevron {
+  color: var(--gray-mid);
+  font-size: 18px;
+  flex-shrink: 0;
+}
 </style>
 </head>
 <body>
@@ -994,9 +1852,285 @@ small, .small-text {
           </div>
         </div>
       </div>
-      <div class="tab-view" id="tab-health"></div>
-      <div class="tab-view" id="tab-benefits"></div>
-      <div class="tab-view" id="tab-profile"></div>
+      <div class="tab-view" id="tab-health">
+        <!-- 1. Header -->
+        <div class="tab-header">Your Health</div>
+
+        <!-- 2. Care Team -->
+        <div class="care-team-card">
+          <div class="care-team-top">
+            <div>
+              <div class="care-team-info-label">YOUR CARE TEAM</div>
+              <div class="care-team-name">Dr. Sarah Wagle</div>
+              <div class="care-team-detail">Primary Care · Devoted Medical Group</div>
+            </div>
+            <div class="care-team-avatar">👩‍⚕️</div>
+          </div>
+          <div class="care-team-buttons">
+            <button class="care-team-btn" onclick="sendPrompt('I want to send a message to my care team')">Message your team</button>
+            <button class="care-team-btn" onclick="sendPrompt('Help me prepare for my appointment with Dr. Wagle on March 4')">Prepare for visit</button>
+          </div>
+          <div class="care-team-next">Next visit: March 4, 10:00am</div>
+        </div>
+
+        <!-- 3. Action Items -->
+        <div class="tab-section-label">Action Items</div>
+        <div class="action-scroll">
+          <button class="action-item action-item-border-purple" onclick="sendPrompt('Help me with my Health Connections Checklist')">
+            <div class="action-item-title">📋 Complete your checklist</div>
+            <div class="action-item-sub">3 of 8 done</div>
+          </button>
+          <button class="action-item action-item-border-blue" onclick="sendPrompt('I want to log my blood pressure')">
+            <div class="action-item-title">🩺 Log blood pressure</div>
+            <div class="action-item-sub">Last: Feb 10</div>
+          </button>
+          <button class="action-item action-item-border-red" onclick="sendPrompt('Help me finish my appointment intake for Dr. Wagle')">
+            <div class="action-item-title">📝 Finish visit intake</div>
+            <div class="action-item-sub">For Mar 4 visit</div>
+          </button>
+        </div>
+
+        <!-- 4. Recent Labs -->
+        <div class="tab-section-label">Recent Labs · <span style="font-size:13px;color:var(--gray-text);font-weight:400;">Feb 10, 2026</span></div>
+        <div class="lab-grid">
+          <button class="lab-card" onclick="sendPrompt('What does my HbA1c of 6.8% mean for my diabetes?')">
+            <div class="lab-metric">HbA1c</div>
+            <div class="lab-value">6.8%</div>
+            <div class="lab-status lab-status-green"><span class="status-dot dot-green"></span>Improved</div>
+            <div class="lab-bar-track"><div class="lab-bar-fill bar-amber" style="width:68%"></div></div>
+            <div class="lab-tap">Tap to understand →</div>
+          </button>
+          <button class="lab-card" onclick="sendPrompt('What does my eGFR of 58 mean for my kidneys?')">
+            <div class="lab-metric">eGFR</div>
+            <div class="lab-value">58 mL/min</div>
+            <div class="lab-status lab-status-amber"><span class="status-dot dot-amber"></span>Needs attention</div>
+            <div class="lab-bar-track"><div class="lab-bar-fill bar-amber" style="width:58%"></div></div>
+            <div class="lab-tap">Tap to understand →</div>
+          </button>
+          <button class="lab-card" onclick="sendPrompt('What does my LDL cholesterol of 112 mean?')">
+            <div class="lab-metric">LDL Cholesterol</div>
+            <div class="lab-value">112 mg/dL</div>
+            <div class="lab-status lab-status-amber"><span class="status-dot dot-amber"></span>Borderline high</div>
+            <div class="lab-bar-track"><div class="lab-bar-fill bar-amber" style="width:56%"></div></div>
+            <div class="lab-tap">Tap to understand →</div>
+          </button>
+          <button class="lab-card" onclick="sendPrompt('What does a blood pressure of 138/84 mean?')">
+            <div class="lab-metric">Blood Pressure</div>
+            <div class="lab-value lab-value-sm">138/84</div>
+            <div class="lab-status lab-status-amber"><span class="status-dot dot-amber"></span>Elevated</div>
+            <div class="lab-bar-track"><div class="lab-bar-fill bar-amber" style="width:63%"></div></div>
+            <div class="lab-tap">Tap to understand →</div>
+          </button>
+        </div>
+
+        <!-- 5. Medications -->
+        <div class="tab-section-label">Medications</div>
+        <div class="med-list">
+          <div class="med-item">
+            <span class="med-emoji">💊</span>
+            <div class="med-body">
+              <div class="med-name">Metformin 500mg</div>
+              <div class="med-detail">Twice daily · Last filled Jan 15</div>
+            </div>
+            <span class="med-badge" onclick="sendPrompt('I need to refill my metformin')">Refill soon</span>
+          </div>
+          <div class="med-item">
+            <span class="med-emoji">💊</span>
+            <div class="med-body">
+              <div class="med-name">Lisinopril 10mg</div>
+              <div class="med-detail">Once daily</div>
+            </div>
+          </div>
+          <div class="med-item">
+            <span class="med-emoji">💊</span>
+            <div class="med-body">
+              <div class="med-name">Atorvastatin 20mg</div>
+              <div class="med-detail">Once daily</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Authorizations -->
+        <div class="tab-section-label">Authorizations</div>
+        <div class="auth-card">
+          <span class="auth-icon">✅</span>
+          <span class="auth-text">No pending authorizations</span>
+          <button class="auth-link" onclick="sendPrompt('Show me my authorization history')">View history →</button>
+        </div>
+
+        <!-- 7. Health Explorer -->
+        <button class="health-explorer-card" onclick="sendPrompt('I want to explore my health record')">
+          <div class="health-explorer-title">🔬 Explore My Health Record</div>
+          <div class="health-explorer-desc">Have a private AI conversation about any of your health data</div>
+          <div class="health-explorer-link">Start exploring →</div>
+        </button>
+      </div>
+      <div class="tab-view" id="tab-benefits">
+        <!-- 1. Header -->
+        <div class="tab-header">Your Benefits</div>
+
+        <!-- 2. Spending Cards -->
+        <div class="tab-section-label">Your Allowances</div>
+
+        <!-- Food & Home Card -->
+        <div class="benefit-card">
+          <div class="benefit-label benefit-label-blue">FOOD &amp; HOME CARD</div>
+          <div class="benefit-value benefit-value-blue">$125</div>
+          <div class="benefit-sub">remaining this month</div>
+          <div class="benefit-bar-track"><div class="benefit-bar-fill bar-blue" style="width:62.5%"></div></div>
+          <div class="benefit-note">$200 monthly · Resets March 1</div>
+          <button class="benefit-outline-btn benefit-outline-btn-blue" onclick="sendPrompt('How much do I have left on my food and home card and what can I buy with it?')">Check balance or find eligible items →</button>
+        </div>
+
+        <!-- Wellness Bucks -->
+        <div class="benefit-card">
+          <div class="benefit-label benefit-label-red">WELLNESS BUCKS</div>
+          <div class="benefit-value benefit-value-red">$155</div>
+          <div class="benefit-sub">remaining of $200 annual allowance</div>
+          <div class="benefit-bar-track"><div class="benefit-bar-fill bar-green" style="width:77.5%"></div></div>
+          <hr class="benefit-divider">
+          <div class="claim-status-row">
+            <span class="status-dot dot-amber" style="margin-top:5px"></span>
+            <div>
+              <div class="claim-status-text">Yoga mat — $45</div>
+              <div class="claim-status-detail">In Progress · Submitted Feb 20</div>
+            </div>
+          </div>
+          <button class="benefit-outline-btn benefit-outline-btn-red" onclick="sendPrompt('Tell me about my Wellness Bucks balance and what I can use them for')">Ask about Wellness Bucks →</button>
+        </div>
+
+        <!-- OTC -->
+        <div class="benefit-card benefit-card-highlight">
+          <div class="benefit-label benefit-label-blue">OTC ALLOWANCE · Q1 2026</div>
+          <div class="benefit-value-sm" style="color:var(--charcoal)">$100</div>
+          <div class="benefit-sub">Full balance available · Resets quarterly</div>
+          <div class="benefit-bar-track"><div class="benefit-bar-fill bar-blue" style="width:100%"></div></div>
+          <div style="font-size:13px;color:var(--gray-text);margin-top:6px">Vitamins, bandages, pain relief, and more</div>
+        </div>
+
+        <!-- 3. ID Card -->
+        <button class="id-card-row" onclick="sendPrompt('Show me my member ID card')">
+          <span class="id-emoji">🪪</span>
+          <div class="id-body">
+            <div class="id-title">Your Member ID Card</div>
+            <div class="id-number">DVH-2024-78432</div>
+          </div>
+          <span class="id-chevron">›</span>
+        </button>
+
+        <!-- 4. Plan Highlights -->
+        <div class="tab-section-label">Your Plan</div>
+        <div class="plan-card">
+          <div class="plan-row"><span class="plan-check">✓</span> $0 primary care copay</div>
+          <div class="plan-row"><span class="plan-check">✓</span> $0 telehealth visits</div>
+          <div class="plan-row"><span class="plan-check">✓</span> Dental, vision &amp; hearing covered</div>
+          <div class="plan-row"><span class="plan-check">✓</span> Prescription drug coverage included</div>
+          <div class="plan-row"><span class="plan-check">✓</span> $0 virtual urgent care</div>
+          <div class="plan-row"><span class="plan-check">✓</span> Fitness &amp; wellness programs</div>
+          <button class="plan-docs-link" onclick="sendPrompt('Show me my plan documents')">View full plan documents →</button>
+        </div>
+
+        <!-- 5. Quick Tools -->
+        <div class="tab-section-label">Quick Tools</div>
+        <div class="quick-tools-grid">
+          <button class="quick-tool-card" onclick="sendPrompt('Help me find an in-network provider')">
+            <div class="quick-tool-title">🔍 Find a Provider</div>
+            <div class="quick-tool-sub">In-network search</div>
+          </button>
+          <button class="quick-tool-card" onclick="sendPrompt('I want to check if a prescription drug is covered by my plan')">
+            <div class="quick-tool-title">💊 Drug Lookup</div>
+            <div class="quick-tool-sub">Check coverage</div>
+          </button>
+          <button class="quick-tool-card" onclick="sendPrompt('I want to submit a reimbursement')">
+            <div class="quick-tool-title">💰 Submit Reimbursement</div>
+            <div class="quick-tool-sub">Get paid back</div>
+          </button>
+          <button class="quick-tool-card" onclick="sendPrompt('Show me my billing and payment history')">
+            <div class="quick-tool-title">📄 Billing &amp; Payments</div>
+            <div class="quick-tool-sub">Statements</div>
+          </button>
+        </div>
+
+        <!-- 6. Recent Claims -->
+        <div class="tab-section-label">Recent Claims</div>
+        <div class="claim-row">
+          <span class="claim-emoji">🧘</span>
+          <div class="claim-body">
+            <div class="claim-title">Yoga Mat</div>
+            <div class="claim-detail">Wellness Bucks · Feb 20, 2026</div>
+          </div>
+          <div class="claim-right">
+            <div class="claim-amount">$45.00</div>
+            <span class="claim-badge">In Progress</span>
+          </div>
+        </div>
+      </div>
+      <div class="tab-view" id="tab-profile">
+        <!-- 1. Header -->
+        <div class="tab-header">Your Profile</div>
+
+        <!-- 2. Member card -->
+        <div class="profile-member-card">
+          <div class="profile-name" id="profile-name-display">Rebecca Chen</div>
+          <div class="profile-plan">Devoted Health Medicare Advantage (HMO)</div>
+          <div class="profile-details">
+            <div class="profile-detail-row">
+              <span class="profile-detail-label">Member ID</span>
+              <span class="profile-detail-value">DVH-2024-78432</span>
+            </div>
+            <div class="profile-detail-row">
+              <span class="profile-detail-label">Primary Care</span>
+              <span class="profile-detail-value">Dr. Sarah Wagle</span>
+            </div>
+            <div class="profile-detail-row">
+              <span class="profile-detail-label">Next visit</span>
+              <span class="profile-detail-value">Mar 4, 2026</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Preferences -->
+        <div class="tab-section-label">Preferences</div>
+        <div class="prefs-card" id="prefs-card">
+          <div class="pref-row">
+            <span class="pref-label">Paperless delivery</span>
+            <span class="pref-value" id="pref-paperless">Not set</span>
+          </div>
+          <div class="pref-row">
+            <span class="pref-label">Health sharing auth</span>
+            <span class="pref-value" id="pref-sharing">Not set up</span>
+          </div>
+        </div>
+
+        <!-- 4. Snapshot section -->
+        <div id="profile-snapshot-section">
+          <button class="snapshot-cta" onclick="openOnboarding()">
+            <div class="snapshot-cta-text">Complete your profile to personalize your experience</div>
+            <span class="snapshot-cta-link">Set up now →</span>
+          </button>
+        </div>
+
+        <!-- 5. Quick Links -->
+        <div class="tab-section-label">Account</div>
+        <div class="account-card">
+          <button class="account-row" onclick="sendPrompt('Show me my mail from Devoted')">
+            <span>📬 Mail from Devoted</span>
+            <span class="account-chevron">›</span>
+          </button>
+          <button class="account-row" onclick="sendPrompt('I want to manage who can access my health information')">
+            <span>🔒 Share My Information</span>
+            <span class="account-chevron">›</span>
+          </button>
+          <button class="account-row" onclick="sendPrompt('I want to go paperless')">
+            <span>📱 Go Paperless</span>
+            <span class="account-chevron">›</span>
+          </button>
+          <button class="account-row" style="cursor:default">
+            <span>🌐 Language: English</span>
+            <span class="account-chevron">›</span>
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Bottom Nav -->
@@ -1026,6 +2160,14 @@ small, .small-text {
 let currentTab = 'home';
 let demoMode = true;
 let apiKey = '';
+
+// Profile / onboarding state (set by onboarding flow in Prompt 5)
+let onboardingComplete = false;
+let preferredName = 'Rebecca';
+let eDeliveryConsent = null;
+let healthSharingAuth = null;
+let qualityOfLifeScore = null;
+let greatDayDescription = null;
 
 // ── Tab Switching ──
 const navItems = document.querySelectorAll('.nav-item');
@@ -1103,6 +2245,72 @@ function talkToPerson() { console.log('talk to person'); }
 function openOnboarding() { console.log('open onboarding'); }
 function openHistoryScreen() { console.log('open history'); }
 function openPastConversation(id) { console.log('open past:', id); }
+
+// ── Render Profile Tab ──
+function renderProfileTab() {
+  // Name display
+  const nameEl = document.getElementById('profile-name-display');
+  if (onboardingComplete && preferredName && preferredName !== 'Rebecca') {
+    nameEl.textContent = 'Rebecca Chen (' + preferredName + ')';
+  } else {
+    nameEl.textContent = 'Rebecca Chen';
+  }
+
+  // Paperless pref
+  const paperlessEl = document.getElementById('pref-paperless');
+  if (onboardingComplete && eDeliveryConsent === true) {
+    paperlessEl.textContent = 'Enrolled';
+    paperlessEl.className = 'pref-value pref-value-green';
+  } else if (onboardingComplete && eDeliveryConsent === false) {
+    paperlessEl.textContent = 'Paper mail';
+    paperlessEl.className = 'pref-value';
+  } else {
+    paperlessEl.textContent = 'Not set';
+    paperlessEl.className = 'pref-value';
+  }
+
+  // Health sharing pref
+  const sharingEl = document.getElementById('pref-sharing');
+  if (onboardingComplete && healthSharingAuth && healthSharingAuth !== 'skip') {
+    sharingEl.textContent = healthSharingAuth;
+    sharingEl.className = 'pref-value pref-value-green';
+  } else if (onboardingComplete && healthSharingAuth === 'skip') {
+    sharingEl.textContent = 'Skipped';
+    sharingEl.className = 'pref-value';
+  } else {
+    sharingEl.textContent = 'Not set up';
+    sharingEl.className = 'pref-value';
+  }
+
+  // Snapshot section
+  const snapshotSection = document.getElementById('profile-snapshot-section');
+  if (onboardingComplete && qualityOfLifeScore) {
+    let dotsHtml = '';
+    for (let i = 1; i <= 10; i++) {
+      if (i <= qualityOfLifeScore) {
+        dotsHtml += '<span class="snapshot-dot snapshot-dot-filled">' + i + '</span>';
+      } else {
+        dotsHtml += '<span class="snapshot-dot snapshot-dot-empty">' + i + '</span>';
+      }
+    }
+    snapshotSection.innerHTML =
+      '<div class="tab-section-label" style="padding-left:0">Your MyDevoted Snapshot</div>' +
+      '<div class="snapshot-card">' +
+        '<div class="snapshot-label">QUALITY OF LIFE SCORE</div>' +
+        '<div class="snapshot-dots">' + dotsHtml + '</div>' +
+        '<div class="snapshot-label">WHAT A GREAT DAY LOOKS LIKE</div>' +
+        '<div class="snapshot-great-day">' + (greatDayDescription || '') + '</div>' +
+      '</div>';
+    snapshotSection.style.margin = '0 16px 14px';
+  } else {
+    snapshotSection.innerHTML =
+      '<button class="snapshot-cta" onclick="openOnboarding()">' +
+        '<div class="snapshot-cta-text">Complete your profile to personalize your experience</div>' +
+        '<span class="snapshot-cta-link">Set up now →</span>' +
+      '</button>';
+    snapshotSection.style.margin = '';
+  }
+}
 
 // ── Home Input: Enter to submit + chips hide/show ──
 document.getElementById('home-input').addEventListener('keydown', (e) => {
