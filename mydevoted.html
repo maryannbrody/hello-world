@@ -1665,6 +1665,451 @@ small, .small-text {
   font-size: 18px;
   flex-shrink: 0;
 }
+
+/* ── Conversation Screen ── */
+#conv-screen {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--gray-bg);
+  z-index: 60;
+  border-radius: 40px;
+}
+
+#conv-screen.open {
+  display: flex;
+}
+
+.conv-spacer {
+  height: 54px;
+  flex-shrink: 0;
+}
+
+.conv-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--gray-mid);
+  flex-shrink: 0;
+  gap: 10px;
+}
+
+.back-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.back-btn:hover {
+  background: var(--gray-mid);
+}
+
+.back-btn svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.conv-header-info {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  align-items: center;
+}
+
+.conv-agent-avatar {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  background: var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.conv-agent-name {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.conv-agent-sub {
+  font-size: 13px;
+  color: var(--gray-text);
+}
+
+/* Messages area */
+#conv-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+#conv-messages::-webkit-scrollbar { display: none; }
+
+/* Message animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* User message */
+.msg-row.user {
+  display: flex;
+  flex-direction: row-reverse;
+  animation: fadeInUp 0.25s ease;
+}
+
+.msg-row.user .msg-bubble {
+  background: var(--red);
+  color: var(--white);
+  border-radius: 18px;
+  border-bottom-right-radius: 4px;
+  padding: 14px 16px;
+  max-width: 82%;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* AI message */
+.msg-row.ai {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  animation: fadeInUp 0.25s ease;
+}
+
+.msg-avatar {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.msg-bubble-wrap {
+  max-width: 82%;
+}
+
+.msg-row.ai .msg-bubble {
+  background: var(--white);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 18px;
+  border-bottom-left-radius: 4px;
+  padding: 14px 16px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--charcoal);
+}
+
+/* Markdown inside AI bubbles */
+.msg-bubble p { margin-bottom: 8px; }
+.msg-bubble p:last-child { margin-bottom: 0; }
+.msg-bubble h3 { font-size: 17px; font-weight: 700; margin: 10px 0 5px; }
+.msg-bubble h4 { font-size: 17px; font-weight: 700; margin: 8px 0 4px; }
+.msg-bubble ul { padding-left: 0; list-style: none; margin: 6px 0; }
+.msg-bubble ul li { padding: 3px 0 3px 16px; position: relative; }
+.msg-bubble ul li::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+  position: absolute;
+  left: 0;
+  top: 11px;
+}
+.msg-bubble ol { padding-left: 20px; margin: 6px 0; }
+.msg-bubble ol li { padding: 3px 0; margin-bottom: 4px; }
+.msg-bubble hr { border: none; border-top: 1px solid var(--gray-mid); margin: 10px 0; }
+
+/* Loading state */
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+.loading-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  animation: fadeInUp 0.25s ease;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.loading-label {
+  font-size: 13px;
+  color: var(--gray-text);
+  font-style: italic;
+}
+
+.loading-bubble {
+  background: var(--white);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 18px;
+  border-bottom-left-radius: 4px;
+  padding: 14px 16px;
+  display: flex;
+  gap: 6px;
+}
+
+.loading-bubble .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  animation: bounce 1.2s infinite;
+}
+
+.loading-bubble .dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-bubble .dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* Error message */
+.error-msg {
+  text-align: center;
+  font-size: 15px;
+  color: var(--red);
+  background: var(--red-light);
+  border-radius: 12px;
+  padding: 12px 16px;
+  border: 1.5px solid rgba(240,75,36,0.3);
+}
+
+/* Suggested reply chips */
+#conv-suggested-replies {
+  padding: 8px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#conv-suggested-replies.hidden {
+  display: none;
+}
+
+.suggested-chip {
+  background: var(--white);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 20px;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  color: var(--charcoal);
+}
+
+.suggested-chip:hover {
+  border-color: var(--red);
+  background: var(--red-light);
+}
+
+.suggested-chip.navigate {
+  color: var(--red);
+  font-weight: 600;
+}
+
+/* Talk to person link in conv */
+.conv-talk-person {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--gray-text);
+  padding: 8px 16px;
+  text-align: center;
+  width: 100%;
+  min-height: 44px;
+}
+
+.conv-talk-person:hover {
+  color: var(--charcoal);
+}
+
+/* Mode indicator */
+.conv-mode-indicator {
+  text-align: center;
+  padding: 4px 16px 8px;
+  font-size: 13px;
+  color: var(--gray-text);
+}
+
+/* Conversation input area */
+#conv-live-input {
+  padding: 10px 12px 12px;
+  border-top: 1.5px solid var(--gray-mid);
+  flex-shrink: 0;
+  background: var(--white);
+}
+
+#conv-live-input.hidden {
+  display: none;
+}
+
+.conv-input-wrap {
+  display: flex;
+  align-items: center;
+  background: var(--bg-input);
+  border-radius: 50px;
+  min-height: 56px;
+  padding: 10px 10px 10px 18px;
+  gap: 8px;
+  border: 2px solid transparent;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.conv-input-wrap:focus-within {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(240,75,36,0.12);
+}
+
+#conv-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--charcoal);
+  outline: none;
+  min-width: 0;
+}
+
+#conv-input::placeholder {
+  color: #999;
+}
+
+.conv-send-btn {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 50%;
+  background: var(--red);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.conv-send-btn:hover {
+  background: var(--red-dark);
+}
+
+.conv-send-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--white);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Continue button area */
+#conv-continue-btn-area {
+  padding: 10px 16px 14px;
+  background: var(--white);
+  border-top: 1.5px solid var(--gray-mid);
+}
+
+#conv-continue-btn-area.hidden {
+  display: none;
+}
+
+#conv-continue-btn {
+  width: 100%;
+  min-height: 56px;
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#conv-continue-btn:hover {
+  background: var(--red-dark);
+}
+
+/* Navigation transition overlay */
+.nav-transition-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  border-radius: 40px;
+}
+
+.nav-transition-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nav-transition-card {
+  background: white;
+  border-radius: 20px;
+  padding: 28px 36px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+
+.nav-transition-icon { font-size: 32px; }
+.nav-transition-label { font-size: 15px; font-weight: 600; color: var(--charcoal); }
+.nav-transition-dots { display: flex; gap: 6px; margin-top: 4px; }
+.nav-transition-dots .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); animation: bounce 1.2s infinite; }
+.nav-transition-dots .dot:nth-child(2) { animation-delay: 0.2s; }
+.nav-transition-dots .dot:nth-child(3) { animation-delay: 0.4s; }
 </style>
 </head>
 <body>
@@ -2133,6 +2578,49 @@ small, .small-text {
       </div>
     </div>
 
+    <!-- Conversation Screen Overlay -->
+    <div id="conv-screen">
+      <div class="conv-spacer"></div>
+      <div class="conv-header">
+        <button class="back-btn" onclick="closeConvScreen()">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="conv-header-info">
+          <div class="conv-agent-avatar" id="conv-agent-avatar">♥</div>
+          <div>
+            <div class="conv-agent-name" id="conv-agent-name">MyDevoted AI</div>
+            <div class="conv-agent-sub" id="conv-agent-sub">Your health companion</div>
+          </div>
+        </div>
+      </div>
+      <div id="conv-messages"></div>
+      <div id="conv-suggested-replies" class="hidden"></div>
+      <button class="conv-talk-person" id="conv-talk-to-person" onclick="talkToPerson()">👤 Talk to a person</button>
+      <div class="conv-mode-indicator" id="conv-mode-indicator">Chatting with MyDevoted AI</div>
+      <div id="conv-live-input">
+        <div class="conv-input-wrap">
+          <input type="text" id="conv-input" placeholder="Ask me anything…">
+          <button class="conv-send-btn" onclick="handleConvSubmit()">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+          </button>
+        </div>
+      </div>
+      <div id="conv-continue-btn-area" class="hidden">
+        <button id="conv-continue-btn" onclick="continueConversation()">Continue this conversation →</button>
+      </div>
+    </div>
+
+    <!-- Navigation Transition Overlay -->
+    <div class="nav-transition-overlay" id="nav-transition">
+      <div class="nav-transition-card">
+        <div class="nav-transition-icon" id="nav-transition-icon">💳</div>
+        <div class="nav-transition-label" id="nav-transition-label">Opening…</div>
+        <div class="nav-transition-dots">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Bottom Nav -->
     <div class="bottom-nav">
       <button class="nav-item active" data-tab="home" aria-label="Home">
@@ -2157,9 +2645,13 @@ small, .small-text {
 
 <script>
 // ── State ──
-let currentTab = 'home';
-let demoMode = true;
 let apiKey = '';
+let demoMode = true;
+let conversationHistory = [];
+let isLoading = false;
+let currentAgent = null;
+let currentTab = 'home';
+let isCheckInConversation = false;
 
 // Profile / onboarding state (set by onboarding flow in Prompt 5)
 let onboardingComplete = false;
@@ -2169,21 +2661,440 @@ let healthSharingAuth = null;
 let qualityOfLifeScore = null;
 let greatDayDescription = null;
 
+// ── Utilities ──
+function escHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── Markdown Renderer ──
+function renderMarkdown(rawText) {
+  const lines = rawText.split('\n');
+  let html = '';
+  let inUl = false;
+  let inOl = false;
+
+  function closeLists() {
+    if (inUl) { html += '</ul>'; inUl = false; }
+    if (inOl) { html += '</ol>'; inOl = false; }
+  }
+
+  function inlineFormat(text) {
+    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    return text;
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    if (line.match(/^#{1,2}\s/)) {
+      closeLists();
+      const level = line.startsWith('## ') ? 4 : 3;
+      const text = line.replace(/^#{1,2}\s/, '');
+      html += '<h' + level + '>' + inlineFormat(text) + '</h' + level + '>';
+      continue;
+    }
+
+    if (line.match(/^---+$/)) {
+      closeLists();
+      html += '<hr>';
+      continue;
+    }
+
+    const ulMatch = line.match(/^[\-\*]\s+(.*)/);
+    if (ulMatch) {
+      if (inOl) { html += '</ol>'; inOl = false; }
+      if (!inUl) { html += '<ul>'; inUl = true; }
+      html += '<li>' + inlineFormat(ulMatch[1]) + '</li>';
+      continue;
+    }
+
+    const olMatch = line.match(/^\d+\.\s+(.*)/);
+    if (olMatch) {
+      if (inUl) { html += '</ul>'; inUl = false; }
+      if (!inOl) { html += '<ol>'; inOl = true; }
+      html += '<li>' + inlineFormat(olMatch[1]) + '</li>';
+      continue;
+    }
+
+    closeLists();
+
+    if (line.trim() === '') {
+      continue;
+    }
+
+    html += '<p>' + inlineFormat(line) + '</p>';
+  }
+
+  closeLists();
+  return html;
+}
+
+// ── Demo Responses ──
+const DEMO_RESPONSES = [
+  {
+    match: t => /reimbursement|claim status/.test(t),
+    agent: 'BENEFITS',
+    text: `# Yoga Mat Claim — $45
+
+**Status:** In Progress
+
+Your yoga mat reimbursement of $45 was submitted on February 20 through your Wellness Bucks benefit. Claims typically take 5-7 business days to process.
+
+Here's what to expect:
+- The Wellness Bucks team reviews receipts and eligibility
+- Once approved, the $45 will be marked as used from your annual allowance
+- You'll have **$155 remaining** of your $200 Wellness Bucks for the year
+
+If this isn't resolved by the end of the week, I can help you follow up with the team. Yoga mats are a great investment in your wellness — nice choice, Rebecca.`,
+    replies: [
+      { label: "Take me to my Benefits →", action: "navigate", value: "benefits" },
+      { label: "What else can I use Wellness Bucks for?", action: "message", value: "What else can I use Wellness Bucks for?" }
+    ]
+  },
+  {
+    match: t => /recent labs|labs mean/.test(t),
+    agent: 'HEALTH_DATA',
+    text: `Here's a plain-language walk through your recent lab results from February 10:
+
+## HbA1c — 6.8%
+This is your average blood sugar over the past 2-3 months. Your previous result was 7.2%, so **this is a meaningful improvement.** For most people managing type 2 diabetes, a target under 7-8% is the goal — you're right in that range.
+
+## eGFR — 58 mL/min
+This measures how well your kidneys are filtering. At 58, they're working at about 60% of typical capacity. This is being monitored but isn't urgent — it's common alongside diabetes and blood pressure management.
+
+## LDL Cholesterol — 112 mg/dL
+This is "borderline high" — optimal is under 100. Your atorvastatin is specifically working on this, and it's keeping things in a manageable range.
+
+## Blood Pressure — 138/84
+Slightly elevated. The lisinopril you're taking targets this directly, and it also helps protect your kidneys — doing double duty.
+
+---
+
+Overall, the trend is positive. Your A1c improvement is the highlight. Is there one you'd like to understand more deeply?`,
+    replies: [
+      { label: "Take me to my Health →", action: "navigate", value: "health" },
+      { label: "Help me prepare for Dr. Wagle", action: "message", value: "Help me prepare questions for my appointment with Dr. Wagle" }
+    ]
+  },
+  {
+    match: t => /tired|fatigue|exhausted/.test(t),
+    agent: 'HEALTH_COACH',
+    text: `That's worth paying attention to, Rebecca. Feeling tired is one of those things that's easy to brush off, but your body might be telling you something important.
+
+Before I share anything from your health data, I'm curious — **when you say tired, what does it feel like for you?**
+
+There's a real difference between:
+- **Body heavy** — like your muscles are drained, even after rest
+- **Mind foggy** — hard to focus, unmotivated, mentally slow
+- **Something else** — like you just can't catch up on sleep
+
+The reason I ask is that your recent labs have some things worth connecting to this conversation — but the right connection depends on what *kind* of tired you're feeling.
+
+What resonates most?`,
+    replies: [
+      { label: "It's more physical", action: "message", value: "It's more physical — my body feels heavy" },
+      { label: "It's more mental", action: "message", value: "It's more mental — I feel foggy and unmotivated" }
+    ]
+  },
+  {
+    match: t => /hba1c|a1c/.test(t),
+    agent: 'HEALTH_DATA',
+    text: `Your HbA1c of **6.8%** is essentially a 2-3 month report card on your blood sugar levels. Here's what it means:
+
+**The number:** 6.8% corresponds to an estimated average blood glucose of about 148 mg/dL over the past few months.
+
+**The change:** You improved from 7.2% to 6.8% — that's a meaningful drop. In diabetes management, even small changes in A1c translate to real reductions in long-term risk.
+
+**The target:** For most people managing type 2 diabetes, doctors aim for under 7-8%. At 6.8%, you're solidly within that range.
+
+**What's working:** Your metformin is doing its part, but improvements like this aren't accidents. Whatever you've been doing with meals, movement, or routines — it's showing up in the numbers.
+
+This is genuinely good news, Rebecca. Dr. Wagle will likely want to talk about how to sustain it.`,
+    replies: [
+      { label: "Take me to my Health →", action: "navigate", value: "health" },
+      { label: "Help me prepare for Dr. Wagle", action: "message", value: "Help me prepare questions for my appointment with Dr. Wagle" }
+    ]
+  },
+  {
+    match: t => /egfr|kidney/.test(t),
+    agent: 'HEALTH_DATA',
+    text: `Your eGFR of **58 mL/min** measures how well your kidneys are filtering waste from your blood. Here's what to know:
+
+**What 58 means:** Your kidneys are working at roughly 60% of typical capacity. In medical terms, this is classified as Stage 3a chronic kidney disease — which sounds alarming, but it's actually quite common in people managing both diabetes and blood pressure.
+
+**What it doesn't mean:** This isn't an emergency. It doesn't mean your kidneys are failing or that dialysis is on the horizon. Many people live at this level for years or decades.
+
+**What helps most:** The two biggest levers for protecting your kidneys are managing blood sugar (your A1c is trending well at 6.8%) and controlling blood pressure (your lisinopril is specifically chosen for kidney protection — it's doing double duty).
+
+**The goal:** Keep it stable. Your care team is monitoring this at regular intervals, and the current treatment plan is designed around this.
+
+Want to talk about what to ask Dr. Wagle on March 4?`,
+    replies: [
+      { label: "Take me to my Health →", action: "navigate", value: "health" },
+      { label: "Help me prepare for Dr. Wagle", action: "message", value: "Help me prepare questions for my appointment with Dr. Wagle" }
+    ]
+  },
+  {
+    match: t => /ldl|cholesterol/.test(t),
+    agent: 'HEALTH_DATA',
+    text: `Your LDL cholesterol of **112 mg/dL** is what doctors call "borderline high." Here's the context:
+
+**The target:** For most people, optimal LDL is under 100 mg/dL. With diabetes as a factor, some doctors aim even lower. At 112, you're close but not quite there yet.
+
+**What's working:** Your atorvastatin 20mg is specifically targeting this. Without it, this number would likely be higher. The medication is doing meaningful work.
+
+**What else helps:**
+- Reducing saturated fat (red meat, full-fat dairy, fried foods)
+- Adding soluble fiber (oats, beans, fruits)
+- Regular movement — even walking helps with cholesterol
+
+The good news is this isn't in a danger zone, and it's actively being managed. Dr. Wagle may want to discuss whether the current atorvastatin dose is enough or if adjustments would help.`,
+    replies: [
+      { label: "Take me to my Health →", action: "navigate", value: "health" },
+      { label: "What about my blood pressure?", action: "message", value: "What does a blood pressure of 138/84 mean?" }
+    ]
+  },
+  {
+    match: t => /blood pressure/.test(t),
+    agent: 'HEALTH_DATA',
+    text: `Your blood pressure of **138/84** breaks down into two numbers:
+
+- **138 (systolic)** — the pressure when your heart beats. Normal is under 120; yours is in the "Stage 1 hypertension" range.
+- **84 (diastolic)** — the pressure between beats. This is just slightly above the normal threshold of 80.
+
+**Is this a crisis?** No. But it matters because elevated blood pressure over time accelerates two things that are especially important for you: kidney decline and cardiovascular risk. With diabetes in the picture, keeping BP controlled is extra valuable.
+
+**What's being done:** Your lisinopril 10mg is targeting this directly. It's also protecting your kidneys — one medication doing double duty.
+
+**Non-medication levers:**
+- Reducing sodium (aim for under 2,300mg/day)
+- Regular walks — even 15-20 minutes helps
+- Stress management and sleep quality
+
+Dr. Wagle may want to discuss whether the current dose is enough on March 4.`,
+    replies: [
+      { label: "Take me to my Health →", action: "navigate", value: "health" },
+      { label: "Tell me about my kidneys", action: "message", value: "What does my eGFR of 58 mean for my kidneys?" }
+    ]
+  },
+  {
+    match: t => /wellness bucks/.test(t),
+    agent: 'BENEFITS',
+    text: `Here's your Wellness Bucks summary, Rebecca:
+
+**Balance:** $155 remaining of your $200 annual allowance
+
+**Used so far:** $45 for a yoga mat (currently processing — submitted Feb 20)
+
+**What Wellness Bucks cover:**
+- Fitness equipment (dumbbells, resistance bands, yoga mats)
+- Gym or fitness center memberships
+- Exercise classes (yoga, swimming, tai chi)
+- Wellness apps and programs
+
+This is an annual benefit, so you have until the end of 2026 to use the remaining $155. There's no rush, but it's worth thinking about what would support your health goals.
+
+**Also good to know:** You have a separate **OTC benefit of $100 per quarter** (currently untouched for Q1 2026). That covers vitamins, over-the-counter medications, bandages, and similar items — it's a different benefit from Wellness Bucks.`,
+    replies: [
+      { label: "Take me to my Benefits →", action: "navigate", value: "benefits" },
+      { label: "What qualifies for OTC?", action: "message", value: "What qualifies for the OTC benefit?" }
+    ]
+  },
+  {
+    match: t => /metformin|refill/.test(t),
+    agent: 'HEALTH_DATA',
+    text: `Your metformin refill is coming due, Rebecca.
+
+**Current prescription:** Metformin 500mg, twice daily
+**Last filled:** January 15 — so you're likely running low
+
+Here are your options for refilling:
+
+- **Pharmacy pickup** — Call or visit your usual pharmacy. With your Devoted plan, metformin is typically $0 copay.
+- **Mail order (90-day supply)** — More convenient and you won't have to remember monthly. Often the best option for medications you take regularly.
+- **Connect with your care team** — If you want Dr. Wagle's office to handle it, I can help you send a message.
+
+Metformin is a key part of managing your blood sugar — your A1c improvement to 6.8% shows it's working well alongside whatever else you've been doing.
+
+Which would you like to do?`,
+    replies: [
+      { label: "Set up mail order", action: "message", value: "Help me set up mail order for my prescriptions" },
+      { label: "Take me to my Health →", action: "navigate", value: "health" }
+    ]
+  },
+  {
+    match: t => /appointment|dr\.?\s*wagle|prepare.*visit|matters most.*appointment/.test(t),
+    agent: 'HEALTH_COACH',
+    text: `Your appointment with Dr. Wagle is coming up on **March 4 at 10:00am** — let's make the most of it.
+
+Rather than giving you a generic checklist, I want to ask you something first: **What's been on your mind most about your health lately?**
+
+Sometimes the thing that's quietly nagging at you is the most important thing to bring up — even if it doesn't feel "medical enough." Appointments go better when you lead with what matters to *you*, not just what the numbers say.
+
+That said, your recent labs do give some great conversation starters:
+- Your A1c improved (good news worth discussing)
+- Kidney function is stable but worth monitoring
+- Blood pressure is slightly elevated
+
+**But what matters most to you going into this visit?** I can help you draft specific questions once I know what's on your mind.`,
+    replies: [
+      { label: "Draft questions for Dr. Wagle", action: "message", value: "Help me draft specific questions for Dr. Wagle based on my recent labs" },
+      { label: "Take me to my Health →", action: "navigate", value: "health" }
+    ]
+  },
+  {
+    match: t => /scared|worried|afraid|anxious|nervous/.test(t),
+    agent: 'HEALTH_DATA',
+    text: `That fear makes complete sense, Rebecca. When you see a number that says your kidneys aren't working at full capacity, it's natural to feel worried.
+
+Let me put your eGFR of 58 in context:
+
+**What it means:** Your kidneys are working at about 60% of typical capacity. The medical term is "mildly to moderately reduced kidney function."
+
+**What it doesn't mean:**
+- It's not getting rapidly worse — your care team is tracking this
+- It's not heading toward dialysis — many people stay at this level for years
+- Nothing was missed — this is being actively monitored and treated
+
+**What's protecting you right now:**
+- Lisinopril specifically protects kidney function
+- Your improving A1c (6.8%) reduces further kidney stress
+- Blood pressure management is the other key lever
+
+Your care team knows about this and has built your treatment plan around it. You're already doing the right things.
+
+Would you like me to help you draft a question about your kidneys for Dr. Wagle before your March 4 visit? Sometimes naming the worry out loud to your doctor makes it feel more manageable.`,
+    replies: [
+      { label: "Draft a question for Dr. Wagle", action: "message", value: "Help me draft a question about my kidneys for Dr. Wagle" },
+      { label: "Talk to a person", action: "message", value: "I'd like to talk to a person" }
+    ]
+  },
+  {
+    match: t => /food.*(home|card)|grocery|meal/.test(t),
+    agent: 'BENEFITS',
+    text: `Here's your Food & Home Card balance, Rebecca:
+
+**Remaining this month:** $125 of $200
+**Resets:** March 1 (monthly)
+
+Your Food & Home Card works like a debit card at participating grocery stores. It covers:
+- Fresh fruits and vegetables
+- Dairy, eggs, and proteins
+- Whole grains and cereals
+- Household essentials (cleaning supplies, paper products)
+
+**Tips for using it:**
+- Check the approved items list before shopping — not everything in the store qualifies
+- It works at checkout just like a regular debit card
+- The balance resets monthly, so there's no rollover — use it or lose it
+
+You've used $75 so far this month. With $125 remaining, that's plenty for a good grocery run.`,
+    replies: [
+      { label: "Take me to my Benefits →", action: "navigate", value: "benefits" },
+      { label: "Where can I use my card?", action: "message", value: "Where can I use my food and home card?" }
+    ]
+  },
+  {
+    match: t => /protein/.test(t),
+    agent: 'HEALTH_COACH',
+    text: `Great question, Rebecca — especially with managing blood sugar in the picture.
+
+Protein is one of the most helpful tools for blood sugar stability. Unlike carbs, protein doesn't cause spikes — it gives you steady energy and helps you feel full longer. It's also important for maintaining muscle strength, which matters more as we get older.
+
+**General guidance** for most people is about 0.8-1g of protein per kilogram of body weight daily, but this can vary based on activity level, kidney function, and other factors.
+
+Rather than prescribing a number, I'm curious: **What does a typical day of eating look like for you?**
+
+Understanding your current patterns helps me give better guidance. For example:
+- Are you getting protein at breakfast, or mostly later in the day?
+- Do you tend toward meat, plant-based proteins, or a mix?
+
+Protein and blood sugar management are closely connected — this is worth exploring together. I can also help you draft a nutrition question for Dr. Wagle's visit on March 4.`,
+    replies: [
+      { label: "What foods help with blood sugar?", action: "message", value: "What foods help with managing blood sugar?" },
+      { label: "Help me prepare for Dr. Wagle", action: "message", value: "Help me prepare questions for my appointment with Dr. Wagle" }
+    ]
+  },
+  {
+    match: t => /checklist|health connections/.test(t),
+    agent: 'HEALTH_COACH',
+    text: `The Health Connections Checklist helps Devoted get to know you and your health goals better, Rebecca. It's how we personalize your experience and make sure your care team has the full picture.
+
+**Your progress:** 3 of 8 items completed
+
+The remaining items cover things like:
+- Sharing more about your health history
+- Setting your communication preferences
+- Identifying your personal health goals
+- Connecting with your care team
+
+Each one takes just a couple of minutes, and you can do them at your own pace. There's no pressure to finish everything at once.
+
+**Would you like to continue where you left off**, or would you prefer to talk through any of these together first? Some people find it helpful to think out loud about their health goals before writing them down.`,
+    replies: [
+      { label: "Continue the checklist", action: "message", value: "Let's continue where I left off on the checklist" },
+      { label: "What's left to do?", action: "message", value: "What items are left on my Health Connections Checklist?" }
+    ]
+  },
+  {
+    match: t => /id card|member.*(id|card)/.test(t),
+    agent: 'BENEFITS',
+    text: `Here's your member information, Rebecca:
+
+- **Member ID:** DVH-2024-78432
+- **Plan:** Devoted Health Medicare Advantage (HMO)
+- **Primary Care:** Dr. Sarah Wagle
+- **Group:** DVH-MA-2024
+
+In the full app, this screen would display your digital ID card that you can show at any provider's office or pharmacy. It works just like carrying the physical card.
+
+**Tip:** Many providers and pharmacies can look you up with just your Member ID number — keep DVH-2024-78432 handy.
+
+Would you like to share this information with a provider or pharmacy?`,
+    replies: [
+      { label: "Take me to my Benefits →", action: "navigate", value: "benefits" }
+    ]
+  },
+  {
+    match: () => true,
+    agent: 'HEALTH_DATA',
+    text: `I'd be happy to help with that, Rebecca.
+
+In this demo, my knowledge is focused on the highlighted health and benefits flows. To experience the full AI assistant with open-ended conversation, you can switch to **Live Mode** using the toggle above and enter an API key.
+
+In the meantime, here are some things I can help with right now:
+- **Your labs** — Ask about your A1c, eGFR, cholesterol, or blood pressure
+- **Your medications** — Metformin refill, or questions about what you're taking
+- **Your appointment** — Help preparing for Dr. Wagle on March 4
+- **Your benefits** — Wellness Bucks, Food & Home Card, OTC allowance
+- **How you're feeling** — Share what's on your mind about your health
+
+Is there something specific about your health or benefits I can help with?`,
+    replies: []
+  }
+];
+
 // ── Tab Switching ──
 const navItems = document.querySelectorAll('.nav-item');
 const tabViews = document.querySelectorAll('.tab-view');
+
+function switchTab(tabName) {
+  currentTab = tabName;
+  navItems.forEach(n => n.classList.remove('active'));
+  tabViews.forEach(v => v.classList.remove('active'));
+  const targetNav = document.querySelector('.nav-item[data-tab="' + tabName + '"]');
+  if (targetNav) targetNav.classList.add('active');
+  document.getElementById('tab-' + tabName).classList.add('active');
+}
 
 navItems.forEach(item => {
   item.addEventListener('click', () => {
     const tab = item.dataset.tab;
     if (tab === currentTab) return;
-    currentTab = tab;
-
-    navItems.forEach(n => n.classList.remove('active'));
-    item.classList.add('active');
-
-    tabViews.forEach(v => v.classList.remove('active'));
-    document.getElementById('tab-' + tab).classList.add('active');
+    switchTab(tab);
   });
 });
 
@@ -2223,6 +3134,7 @@ function saveApiKey() {
 
 // ── Reset Demo ──
 function resetDemo() {
+  closeConvScreen();
   currentTab = 'home';
   navItems.forEach(n => n.classList.remove('active'));
   navItems[0].classList.add('active');
@@ -2230,25 +3142,190 @@ function resetDemo() {
   document.getElementById('tab-home').classList.add('active');
 }
 
-// ── Home Tab Functions ──
+// ── Core Message Functions ──
 function handleHomeSubmit() {
   const input = document.getElementById('home-input');
-  if (input.value.trim()) {
-    sendPrompt(input.value.trim());
-    input.value = '';
-    document.getElementById('prompt-chips').classList.remove('hidden');
-  }
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  document.getElementById('prompt-chips').classList.remove('hidden');
+  sendMessage(text);
 }
 
-function sendPrompt(text) { console.log('send:', text); }
-function talkToPerson() { console.log('talk to person'); }
+function sendPrompt(text) {
+  document.getElementById('home-input').value = '';
+  document.getElementById('prompt-chips').classList.remove('hidden');
+  sendMessage(text);
+}
+
+function handleConvSubmit() {
+  const input = document.getElementById('conv-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  sendMessage(text);
+}
+
+function sendMessage(text) {
+  hideSuggestedReplies();
+  if (demoMode) {
+    sendDemoMessage(text);
+    return;
+  }
+  // Live mode will be added in Prompt 4B
+  alert('Please switch to Demo Mode, or wait for Live Mode to be added.');
+}
+
+async function sendDemoMessage(text) {
+  if (isLoading) return;
+  showConvScreen();
+  showConvLiveInput();
+  appendUserBubble(text);
+  isLoading = true;
+  const loadingEl = appendLoadingBubble();
+  scrollConvToBottom();
+  await delay(400);
+  const t = text.toLowerCase();
+  const demo = DEMO_RESPONSES.find(r => r.match(t));
+  await delay(800);
+  loadingEl.remove();
+  appendAiBubble(demo.text);
+  if (demo.replies && demo.replies.length) showSuggestedReplies(demo.replies);
+  scrollConvToBottom();
+  isLoading = false;
+}
+
+// ── Conversation Screen Management ──
+function showConvScreen() {
+  document.getElementById('conv-screen').classList.add('open');
+}
+
+function closeConvScreen() {
+  document.getElementById('conv-screen').classList.remove('open');
+  hideSuggestedReplies();
+  conversationHistory = [];
+  isCheckInConversation = false;
+  document.getElementById('conv-messages').innerHTML = '';
+  resetConvHeader();
+}
+
+function showConvLiveInput() {
+  document.getElementById('conv-live-input').classList.remove('hidden');
+  document.getElementById('conv-continue-btn-area').classList.add('hidden');
+}
+
+function resetConvHeader() {
+  document.getElementById('conv-agent-avatar').textContent = '♥';
+  document.getElementById('conv-agent-avatar').style.background = 'var(--red)';
+  document.getElementById('conv-agent-name').textContent = 'MyDevoted AI';
+  document.getElementById('conv-agent-sub').textContent = 'Your health companion';
+  document.getElementById('conv-mode-indicator').innerHTML = 'Chatting with MyDevoted AI';
+}
+
+// ── Bubble Helpers ──
+function appendUserBubble(text) {
+  const msgs = document.getElementById('conv-messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = '<div class="msg-bubble">' + escHtml(text) + '</div>';
+  msgs.appendChild(row);
+}
+
+function appendAiBubble(text) {
+  const msgs = document.getElementById('conv-messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row ai';
+  row.innerHTML =
+    '<div class="msg-avatar" style="background:var(--red)">♥</div>' +
+    '<div class="msg-bubble-wrap">' +
+      '<div class="msg-bubble">' + renderMarkdown(text) + '</div>' +
+    '</div>';
+  msgs.appendChild(row);
+}
+
+function appendLoadingBubble() {
+  const msgs = document.getElementById('conv-messages');
+  const row = document.createElement('div');
+  row.className = 'loading-row';
+  row.innerHTML =
+    '<div class="msg-avatar" style="background:var(--red)">♥</div>' +
+    '<div class="loading-content">' +
+      '<div class="loading-label">Thinking…</div>' +
+      '<div class="loading-bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>' +
+    '</div>';
+  msgs.appendChild(row);
+  return row;
+}
+
+function appendError(msg) {
+  const msgs = document.getElementById('conv-messages');
+  const el = document.createElement('div');
+  el.className = 'error-msg';
+  el.textContent = msg;
+  msgs.appendChild(el);
+}
+
+function scrollConvToBottom() {
+  const msgs = document.getElementById('conv-messages');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ── Suggested Reply Chips ──
+function showSuggestedReplies(replies) {
+  if (!replies || !replies.length) return;
+  const container = document.getElementById('conv-suggested-replies');
+  container.innerHTML = '';
+  container.classList.remove('hidden');
+  replies.forEach(reply => {
+    const btn = document.createElement('button');
+    btn.className = 'suggested-chip' + (reply.action === 'navigate' ? ' navigate' : '');
+    btn.textContent = reply.label;
+    btn.onclick = () => {
+      if (reply.action === 'navigate') {
+        navigateWithTransition(reply.value);
+      } else {
+        hideSuggestedReplies();
+        sendMessage(reply.value);
+      }
+    };
+    container.appendChild(btn);
+  });
+  scrollConvToBottom();
+}
+
+function hideSuggestedReplies() {
+  const container = document.getElementById('conv-suggested-replies');
+  if (!container) return;
+  container.innerHTML = '';
+  container.classList.add('hidden');
+}
+
+// ── Navigation Transitions ──
+async function navigateWithTransition(tabName) {
+  const icons = { home: '🏠', health: '🩺', benefits: '💳', profile: '👤' };
+  const labels = { home: 'Going home…', health: 'Opening your health…', benefits: 'Opening your benefits…', profile: 'Opening your profile…' };
+  const overlay = document.getElementById('nav-transition');
+  document.getElementById('nav-transition-icon').textContent = icons[tabName] || '📋';
+  document.getElementById('nav-transition-label').textContent = labels[tabName] || 'Opening…';
+  overlay.classList.add('visible');
+  await delay(200);
+  closeConvScreen();
+  switchTab(tabName);
+  await delay(1200);
+  overlay.classList.remove('visible');
+}
+
+// ── Stub Functions ──
+function talkToPerson() {
+  sendMessage("I'd like to talk to a person");
+}
 function openOnboarding() { console.log('open onboarding'); }
 function openHistoryScreen() { console.log('open history'); }
 function openPastConversation(id) { console.log('open past:', id); }
+function continueConversation() { console.log('continue conversation'); }
 
 // ── Render Profile Tab ──
 function renderProfileTab() {
-  // Name display
   const nameEl = document.getElementById('profile-name-display');
   if (onboardingComplete && preferredName && preferredName !== 'Rebecca') {
     nameEl.textContent = 'Rebecca Chen (' + preferredName + ')';
@@ -2256,7 +3333,6 @@ function renderProfileTab() {
     nameEl.textContent = 'Rebecca Chen';
   }
 
-  // Paperless pref
   const paperlessEl = document.getElementById('pref-paperless');
   if (onboardingComplete && eDeliveryConsent === true) {
     paperlessEl.textContent = 'Enrolled';
@@ -2269,7 +3345,6 @@ function renderProfileTab() {
     paperlessEl.className = 'pref-value';
   }
 
-  // Health sharing pref
   const sharingEl = document.getElementById('pref-sharing');
   if (onboardingComplete && healthSharingAuth && healthSharingAuth !== 'skip') {
     sharingEl.textContent = healthSharingAuth;
@@ -2282,7 +3357,6 @@ function renderProfileTab() {
     sharingEl.className = 'pref-value';
   }
 
-  // Snapshot section
   const snapshotSection = document.getElementById('profile-snapshot-section');
   if (onboardingComplete && qualityOfLifeScore) {
     let dotsHtml = '';
@@ -2312,7 +3386,7 @@ function renderProfileTab() {
   }
 }
 
-// ── Home Input: Enter to submit + chips hide/show ──
+// ── Event Listeners ──
 document.getElementById('home-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     e.preventDefault();
@@ -2327,6 +3401,17 @@ document.getElementById('home-input').addEventListener('input', (e) => {
   } else {
     chips.classList.remove('hidden');
   }
+});
+
+document.getElementById('conv-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handleConvSubmit();
+  }
+});
+
+document.getElementById('conv-input').addEventListener('input', () => {
+  hideSuggestedReplies();
 });
 
 // ── Keyboard Shortcut: Cmd/Ctrl+D ──
