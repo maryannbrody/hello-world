@@ -637,10 +637,10 @@ small, .small-text {
   align-items: center;
   background: var(--white);
   border-radius: 14px;
-  padding: 14px;
+  padding: 12px;
   margin-bottom: 10px;
   cursor: pointer;
-  border: none;
+  border: 1.5px solid var(--gray-mid);
   width: 100%;
   text-align: left;
   font-family: inherit;
@@ -902,6 +902,11 @@ small, .small-text {
   font-size: 13px;
   color: var(--gray-text);
   font-style: italic;
+}
+
+/* Balance strip on home screen */
+.balance-strip {
+  padding: 10px 0 0;
 }
 
 /* Action items horizontal scroll */
@@ -2806,9 +2811,6 @@ small, .small-text {
         <button class="header-icon-btn" aria-label="Language">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/></svg>
         </button>
-        <button class="header-icon-btn" aria-label="Menu">
-          <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-        </button>
       </div>
     </div>
 
@@ -2834,7 +2836,60 @@ small, .small-text {
         <!-- 3. Talk to person -->
         <button class="talk-person-link" onclick="talkToPerson()">Or talk to a person →</button>
 
-        <!-- 4. Prompt chips -->
+        <!-- 4. Balance widget -->
+        <div class="balance-strip">
+          <div class="action-scroll">
+            <button class="action-item action-item-border-blue" onclick="switchTab('benefits')">
+              <div class="action-item-title">Food & Home</div>
+              <div class="action-item-sub">$125 left</div>
+            </button>
+            <button class="action-item action-item-border-red" onclick="switchTab('benefits')">
+              <div class="action-item-title">Wellness Bucks</div>
+              <div class="action-item-sub">$155 left</div>
+            </button>
+            <button class="action-item action-item-border-blue" onclick="switchTab('benefits')">
+              <div class="action-item-title">OTC</div>
+              <div class="action-item-sub">$100 left</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 5. Needs your attention -->
+        <div class="attention-section">
+          <div class="section-header">Recent Activity</div>
+
+          <!-- Card 1: Onboarding -->
+          <button class="attention-card" id="onboard-card" onclick="openOnboarding()">
+            <div class="card-icon card-icon-purple">🌟</div>
+            <div class="card-body">
+              <div class="card-label card-label-purple">Get Started</div>
+              <div class="card-title">Complete your Health Connections Checklist</div>
+              <div class="card-subtitle">Takes about 2 minutes · Tap to begin</div>
+            </div>
+          </button>
+
+          <!-- Card 2: Claim -->
+          <button class="attention-card" onclick="switchTab('benefits')">
+            <div class="card-icon card-icon-red">💳</div>
+            <div class="card-body">
+              <div class="card-label card-label-red">Reimbursement</div>
+              <div class="card-title">Yoga Mat Claim — $45</div>
+              <div class="card-subtitle">In Progress · Received Feb 20 · Tap to review</div>
+            </div>
+          </button>
+
+          <!-- Card 3: Appointment -->
+          <button class="attention-card" onclick="switchTab('health')">
+            <div class="card-icon card-icon-blue">📅</div>
+            <div class="card-body">
+              <div class="card-label card-label-blue">Appointment</div>
+              <div class="card-title">Dr. Wagle — Primary Care</div>
+              <div class="card-subtitle">March 4, 10:00am · Tap to prepare</div>
+            </div>
+          </button>
+        </div>
+
+        <!-- 6. Prompt chips -->
         <div class="prompt-chips" id="prompt-chips">
           <div class="prompt-chips-label">You could ask:</div>
           <button class="prompt-chip" onclick="sendPrompt('How much do I have left on my food and home card?')">
@@ -2845,47 +2900,6 @@ small, .small-text {
           </button>
           <button class="prompt-chip" onclick="sendPrompt('How much protein should I eat?')">
             <span class="prompt-chip-emoji">🌱</span>How much protein should I eat?
-          </button>
-        </div>
-
-        <!-- 5. Needs your attention -->
-        <div class="attention-section">
-          <div class="section-header">Recent Activity</div>
-
-          <!-- Card 1: Onboarding -->
-          <button class="attention-card" id="onboard-card" onclick="openOnboarding()">
-            <div class="card-accent card-accent-purple"></div>
-            <div class="card-icon card-icon-purple">🌟</div>
-            <div class="card-body">
-              <div class="card-label card-label-purple">Get Started</div>
-              <div class="card-title">Complete your Health Connections Checklist</div>
-              <div class="card-subtitle">Takes about 2 minutes · Tap to begin</div>
-            </div>
-            <div class="card-chevron">›</div>
-          </button>
-
-          <!-- Card 2: Claim -->
-          <button class="attention-card" onclick="switchTab('benefits')">
-            <div class="card-accent card-accent-red"></div>
-            <div class="card-icon card-icon-red">💳</div>
-            <div class="card-body">
-              <div class="card-label card-label-red">Reimbursement</div>
-              <div class="card-title">Yoga Mat Claim — $45</div>
-              <div class="card-subtitle">In Progress · Received Feb 20 · Tap to review</div>
-            </div>
-            <div class="card-chevron">›</div>
-          </button>
-
-          <!-- Card 3: Appointment -->
-          <button class="attention-card" onclick="switchTab('health')">
-            <div class="card-accent card-accent-blue"></div>
-            <div class="card-icon card-icon-blue">📅</div>
-            <div class="card-body">
-              <div class="card-label card-label-blue">Appointment</div>
-              <div class="card-title">Dr. Wagle — Primary Care</div>
-              <div class="card-subtitle">March 4, 10:00am · Tap to prepare</div>
-            </div>
-            <div class="card-chevron">›</div>
           </button>
         </div>
 
@@ -2907,7 +2921,7 @@ small, .small-text {
             <div class="history-row" onclick="openPastConversation(2)">
               <div class="history-avatar" style="background: var(--purple-light);">🔬</div>
               <div class="history-body">
-                <div class="history-date">Yesterday</div>
+                <div class="history-date">Feb 27</div>
                 <div class="history-title">What does my eGFR result mean?</div>
                 <div class="history-preview">Rebecca asked about kidney function...</div>
               </div>
@@ -3373,7 +3387,7 @@ const PAST_CONVERSATIONS = [
     ]
   },
   {
-    id: 'past-1', agent: 'HEALTH_DATA', date: 'Yesterday', topic: 'What does my eGFR result mean?',
+    id: 'past-1', agent: 'HEALTH_DATA', date: 'Feb 27', topic: 'What does my eGFR result mean?',
     preview: 'Rebecca asked about kidney function...',
     avatarBg: 'var(--purple-light)', avatarEmoji: '🔬',
     turns: [
