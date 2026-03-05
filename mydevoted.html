@@ -1957,15 +1957,15 @@ small, .small-text {
 }
 
 .msg-row.user .msg-bubble {
-  background: var(--red);
+  background: var(--charcoal);
   color: var(--white);
   border-radius: 18px;
-  border-bottom-right-radius: 4px;
-  padding: 14px 16px;
+  border-bottom-right-radius: 6px;
+  padding: 12px 16px;
   max-width: 82%;
   font-weight: 500;
-  font-size: 16px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.55;
 }
 
 /* AI message */
@@ -1995,13 +1995,79 @@ small, .small-text {
 
 .msg-row.ai .msg-bubble {
   background: var(--white);
-  border: 1.5px solid var(--gray-mid);
+  border: 1px solid #E8E3DE;
   border-radius: 18px;
-  border-bottom-left-radius: 4px;
-  padding: 14px 16px;
-  font-size: 16px;
-  line-height: 1.7;
+  border-top-left-radius: 6px;
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.55;
   color: var(--charcoal);
+}
+
+/* Embedded component cards in chat */
+.embedded-card {
+  background: white;
+  border: 1px solid #E8E3DE;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 4px;
+  transition: all 0.2s ease;
+}
+
+.embedded-card:hover {
+  border-color: var(--red);
+  box-shadow: 0 2px 12px rgba(240, 75, 36, 0.08);
+}
+
+.embedded-card-header {
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.embedded-card-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--gray-text);
+}
+
+.embedded-card-action {
+  font-size: 11px;
+  color: var(--red);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.embedded-card-body {
+  padding: 0 14px 14px;
+}
+
+.embedded-amount {
+  font-family: 'Libre Franklin', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.embedded-detail {
+  font-size: 12px;
+  color: var(--gray-text);
+  margin-top: 2px;
+}
+
+.embedded-progress {
+  height: 4px;
+  background: #eee;
+  border-radius: 2px;
+  margin-top: 10px;
+}
+
+.embedded-progress-fill {
+  height: 100%;
+  border-radius: 2px;
 }
 
 /* Markdown inside AI bubbles */
@@ -2052,10 +2118,10 @@ small, .small-text {
 
 .loading-bubble {
   background: var(--white);
-  border: 1.5px solid var(--gray-mid);
+  border: 1px solid #E8E3DE;
   border-radius: 18px;
-  border-bottom-left-radius: 4px;
-  padding: 14px 16px;
+  border-top-left-radius: 6px;
+  padding: 12px 16px;
   display: flex;
   gap: 6px;
 }
@@ -2096,7 +2162,7 @@ small, .small-text {
 
 .suggested-chip {
   background: var(--white);
-  border: 1.5px solid var(--gray-mid);
+  border: 1px solid #E8E3DE;
   border-radius: 20px;
   padding: 10px 16px;
   font-family: inherit;
@@ -2634,8 +2700,8 @@ small, .small-text {
 /* ── Handoff Card ── */
 .handoff-card {
   background: var(--white);
-  border: 1.5px solid var(--gray-mid);
-  border-radius: 16px;
+  border: 1px solid #E8E3DE;
+  border-radius: 12px;
   padding: 20px;
   margin: 0 4px;
   text-align: center;
@@ -3592,7 +3658,41 @@ function escHtml(s) {
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // ── Markdown Renderer ──
+const EMBED_CARDS = {
+  'food-card': `<div class="embedded-card">
+    <div class="embedded-card-header">
+      <span class="embedded-card-label">Food &amp; Home Card</span>
+      <span class="embedded-card-action" onclick="switchTab('benefits')">View transactions →</span>
+    </div>
+    <div class="embedded-card-body">
+      <div class="embedded-amount" style="color:var(--blue)">$125</div>
+      <div class="embedded-detail">of $200 monthly · Resets March 1</div>
+      <div class="embedded-progress"><div class="embedded-progress-fill" style="width:62.5%;background:var(--blue)"></div></div>
+    </div>
+  </div>`,
+  'a1c-card': `<div class="embedded-card">
+    <div class="embedded-card-header">
+      <span class="embedded-card-label">HbA1c · Feb 10</span>
+      <span class="embedded-card-action" onclick="switchTab('health')">View all labs →</span>
+    </div>
+    <div class="embedded-card-body">
+      <div class="embedded-amount">6.8% <span style="font-size:14px;color:var(--green);font-weight:600">↓ improved</span></div>
+      <div class="embedded-detail">Previous: 7.2% · Target: under 7-8%</div>
+      <div class="embedded-progress"><div class="embedded-progress-fill" style="width:68%;background:var(--green)"></div></div>
+    </div>
+  </div>`
+};
+
 function renderMarkdown(rawText) {
+  // Extract embedded card tokens as placeholders, expand after parsing
+  const embeds = {};
+  let embedIdx = 0;
+  rawText = rawText.replace(/\{\{EMBED:([a-z0-9-]+)\}\}/g, (match, id) => {
+    const placeholder = '%%EMBED_' + (embedIdx++) + '%%';
+    embeds[placeholder] = EMBED_CARDS[id] || '';
+    return placeholder;
+  });
+
   const lines = rawText.split('\n');
   let html = '';
   let inUl = false;
@@ -3652,6 +3752,13 @@ function renderMarkdown(rawText) {
   }
 
   closeLists();
+
+  // Expand embedded card placeholders
+  Object.keys(embeds).forEach(key => {
+    html = html.replace('<p>' + key + '</p>', embeds[key]);
+    html = html.replace(key, embeds[key]);
+  });
+
   return html;
 }
 
@@ -3683,7 +3790,11 @@ If this isn't resolved by the end of the week, I can help you follow up with the
     text: `Here's a plain-language walk through your recent lab results from February 10:
 
 ## HbA1c — 6.8%
-This is your average blood sugar over the past 2-3 months. Your previous result was 7.2%, so **this is a meaningful improvement.** For most people managing type 2 diabetes, a target under 7-8% is the goal — you're right in that range.
+This is your average blood sugar over the past 2-3 months. Your previous result was 7.2%, so **this is a meaningful improvement.**
+
+{{EMBED:a1c-card}}
+
+For most people managing type 2 diabetes, a target under 7-8% is the goal — you're right in that range.
 
 ## eGFR — 58 mL/min
 This measures how well your kidneys are filtering. At 58, they're working at about 60% of typical capacity. This is being monitored but isn't urgent — it's common alongside diabetes and blood pressure management.
@@ -3898,23 +4009,13 @@ Would you like me to help you draft a question about your kidneys for Dr. Wagle 
   {
     match: t => /food.*(home|card)|grocery|meal/.test(t),
     agent: 'BENEFITS',
-    text: `Here's your Food & Home Card balance, Rebecca:
+    text: `You have **$125 remaining** this month. Here's your live balance:
 
-**Remaining this month:** $125 of $200
-**Resets:** March 1 (monthly)
+{{EMBED:food-card}}
 
-Your Food & Home Card works like a debit card at participating grocery stores. It covers:
-- Fresh fruits and vegetables
-- Dairy, eggs, and proteins
-- Whole grains and cereals
-- Household essentials (cleaning supplies, paper products)
+You can use it at most grocery stores for approved food items and household essentials — fresh fruits and vegetables, dairy, proteins, whole grains, and cleaning supplies.
 
-**Tips for using it:**
-- Check the approved items list before shopping — not everything in the store qualifies
-- It works at checkout just like a regular debit card
-- The balance resets monthly, so there's no rollover — use it or lose it
-
-You've used $75 so far this month. With $125 remaining, that's plenty for a good grocery run.`,
+The balance resets monthly on March 1, so there's no rollover — use it or lose it. You've spent $75 so far this month, which means you're pacing well.`,
     replies: [
       { label: "Take me to my Benefits →", action: "navigate", value: "benefits" },
       { label: "Where can I use my card?", action: "message", value: "Where can I use my food and home card?" }
