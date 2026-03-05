@@ -556,6 +556,7 @@ small, .small-text {
   text-align: center;
   padding: 10px 20px 4px;
   font-size: 14px;
+  font-weight: 500;
   color: var(--gray-text);
   cursor: pointer;
   background: none;
@@ -596,8 +597,8 @@ small, .small-text {
   align-items: center;
   width: 100%;
   background: var(--white);
-  border: 1.5px solid var(--gray-mid);
-  border-radius: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
   min-height: 56px;
   padding: 10px 16px;
   font-family: inherit;
@@ -606,12 +607,14 @@ small, .small-text {
   cursor: pointer;
   text-align: left;
   margin-bottom: 8px;
-  transition: border-color 0.2s, background 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
 }
 
 .prompt-chip:hover {
   border-color: var(--red);
   background: var(--red-light);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .prompt-chip-emoji {
@@ -628,6 +631,7 @@ small, .small-text {
 .section-header {
   font-family: 'Libre Franklin', Arial, sans-serif;
   font-size: 14px;
+  font-weight: 600;
   color: var(--gray-text);
   margin-bottom: 10px;
 }
@@ -635,21 +639,28 @@ small, .small-text {
 .attention-card {
   display: flex;
   align-items: center;
-  background: var(--white);
-  border-radius: 14px;
-  padding: 12px;
-  margin-bottom: 10px;
+  background: #F5F0EB;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
   cursor: pointer;
-  border: 1.5px solid var(--gray-mid);
+  border: none;
   width: 100%;
   text-align: left;
   font-family: inherit;
   min-height: 56px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
   transition: box-shadow 0.2s;
 }
 
 .attention-card:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Clinical/action card: checklist gets purple left border on white */
+#onboard-card {
+  background: var(--white);
+  border-left: 4px solid var(--purple);
 }
 
 .card-accent {
@@ -739,7 +750,7 @@ small, .small-text {
   border: none;
   font-family: inherit;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--red);
   cursor: pointer;
   min-height: 44px;
@@ -828,10 +839,11 @@ small, .small-text {
 /* ── Health Tab ── */
 .care-team-card {
   background: var(--white);
-  border: 1.5px solid var(--gray-mid);
-  border-radius: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
   padding: 16px;
-  margin: 0 16px 14px;
+  margin: 0 16px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
 }
 
 .care-team-top {
@@ -877,13 +889,13 @@ small, .small-text {
 .care-team-buttons {
   display: flex;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 16px;
 }
 
 .care-team-btn {
   flex: 1;
   min-height: 48px;
-  border: 1.5px solid var(--blue);
+  border: 2px solid var(--blue);
   color: var(--blue);
   background: transparent;
   border-radius: 50px;
@@ -922,19 +934,20 @@ small, .small-text {
 
 .action-item {
   background: var(--white);
-  border-radius: 10px;
-  padding: 10px 14px;
+  border-radius: 8px;
+  padding: 12px 14px;
   min-width: fit-content;
   white-space: nowrap;
   cursor: pointer;
   border: none;
   font-family: inherit;
   text-align: left;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
   transition: box-shadow 0.2s;
 }
 
 .action-item:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .action-item-border-purple { border-left: 3px solid var(--purple); }
@@ -957,17 +970,18 @@ small, .small-text {
 .lab-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 16px;
   padding: 0 16px 16px;
 }
 
 .lab-card {
   background: var(--white);
-  border: 1.5px solid var(--gray-mid);
-  border-radius: 14px;
-  padding: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
   cursor: pointer;
-  transition: border-color 0.2s, transform 0.1s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  transition: border-color 0.2s, transform 0.1s, box-shadow 0.2s;
 }
 
 .lab-card:hover {
@@ -1033,27 +1047,28 @@ small, .small-text {
 
 .lab-tap {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--red);
 }
 
 /* Medication items */
 .med-list {
-  padding: 0 16px 14px;
+  padding: 0 16px 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
 }
 
 .med-item {
   display: flex;
   align-items: center;
   background: var(--white);
-  border: 1.5px solid var(--gray-mid);
-  border-radius: 12px;
-  padding: 14px;
-  gap: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  gap: 16px;
   min-height: 56px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
 }
 
 .med-emoji {
@@ -1093,11 +1108,12 @@ small, .small-text {
   display: flex;
   align-items: center;
   background: var(--white);
-  border: 1.5px solid var(--gray-mid);
-  border-radius: 14px;
-  padding: 14px;
-  margin: 0 16px 14px;
-  gap: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 16px 16px;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
 }
 
 .auth-icon {
@@ -1113,7 +1129,7 @@ small, .small-text {
 
 .auth-link {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--red);
   background: none;
   border: none;
@@ -1128,8 +1144,8 @@ small, .small-text {
 /* Health explorer card */
 .health-explorer-card {
   background: var(--purple-light);
-  border: 1.5px solid rgba(89,44,130,0.25);
-  border-radius: 14px;
+  border: 1px solid rgba(89,44,130,0.25);
+  border-radius: 8px;
   padding: 16px;
   margin: 0 16px 16px;
   cursor: pointer;
@@ -1137,6 +1153,7 @@ small, .small-text {
   width: calc(100% - 32px);
   text-align: left;
   font-family: inherit;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
 }
 
 .health-explorer-card:hover {
@@ -1157,17 +1174,18 @@ small, .small-text {
 
 .health-explorer-link {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--red);
 }
 
 /* ── Benefits Tab ── */
 .benefit-card {
   background: var(--white);
-  border: 1.5px solid var(--gray-mid);
-  border-radius: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
   padding: 16px;
-  margin: 0 16px 12px;
+  margin: 0 16px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
 }
 
 .benefit-label {
@@ -1238,14 +1256,14 @@ small, .small-text {
 }
 
 .benefit-outline-btn-blue {
-  border: 1.5px solid var(--blue);
+  border: 2px solid var(--blue);
   color: var(--blue);
 }
 
 .benefit-outline-btn-blue:hover { background: var(--blue-light); }
 
 .benefit-outline-btn-red {
-  border: 1.5px solid var(--red);
+  border: 2px solid var(--red);
   color: var(--red);
 }
 
@@ -1276,7 +1294,7 @@ small, .small-text {
 
 .benefit-card-highlight {
   background: var(--blue-light);
-  border: 1.5px solid rgba(0,160,221,0.2);
+  border: 1px solid rgba(0,160,221,0.2);
 }
 
 /* ID Card */
@@ -1284,18 +1302,19 @@ small, .small-text {
   display: flex;
   align-items: center;
   background: var(--white);
-  border: 1.5px solid var(--gray-mid);
-  border-radius: 14px;
-  padding: 14px;
-  margin: 0 16px 14px;
-  gap: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 16px 16px;
+  gap: 16px;
   cursor: pointer;
   min-height: 56px;
   font-family: inherit;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
 }
 
 .id-card-row:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .id-emoji {
@@ -1328,10 +1347,11 @@ small, .small-text {
 /* Plan highlights */
 .plan-card {
   background: var(--white);
-  border: 1.5px solid var(--gray-mid);
-  border-radius: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
   padding: 16px;
-  margin: 0 16px 14px;
+  margin: 0 16px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
 }
 
 .plan-row {
@@ -1360,7 +1380,7 @@ small, .small-text {
   border-top: 1px solid var(--bg-input);
   margin-top: 4px;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--red);
   background: none;
   border-left: none;
@@ -1377,28 +1397,26 @@ small, .small-text {
 .quick-tools-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 0 16px 14px;
+  gap: 16px;
+  padding: 0 16px 16px;
 }
 
 .quick-tool-card {
   background: var(--white);
-  border: 1.5px solid var(--gray-mid);
-  border-radius: 12px;
-  padding: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
   cursor: pointer;
   min-height: 64px;
-  border-left: none;
-  border-right: none;
-  border-top: none;
-  border: 1.5px solid var(--gray-mid);
   font-family: inherit;
   text-align: left;
-  transition: border-color 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .quick-tool-card:hover {
   border-color: var(--red);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .quick-tool-title {
@@ -1418,12 +1436,13 @@ small, .small-text {
   display: flex;
   align-items: center;
   background: var(--white);
-  border: 1.5px solid var(--gray-mid);
-  border-radius: 12px;
-  padding: 14px;
-  margin: 0 16px 14px;
-  gap: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 16px 16px;
+  gap: 16px;
   min-height: 56px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
 }
 
 .claim-emoji {
@@ -1473,9 +1492,10 @@ small, .small-text {
 /* ── Profile Tab ── */
 .profile-member-card {
   background: var(--charcoal);
-  border-radius: 14px;
-  padding: 18px;
-  margin: 0 16px 14px;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 16px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
 }
 
 .profile-name {
@@ -1515,10 +1535,11 @@ small, .small-text {
 /* Prefs card */
 .prefs-card {
   background: var(--white);
-  border: 1.5px solid var(--gray-mid);
-  border-radius: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
   padding: 16px;
-  margin: 0 16px 14px;
+  margin: 0 16px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
 }
 
 .pref-row {
@@ -1551,9 +1572,9 @@ small, .small-text {
 /* Snapshot CTA */
 .snapshot-cta {
   border: 2px dashed var(--gray-mid);
-  border-radius: 14px;
-  padding: 18px;
-  margin: 0 16px 14px;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 16px 16px;
   text-align: center;
   cursor: pointer;
   min-height: 56px;
@@ -1573,7 +1594,7 @@ small, .small-text {
 
 .snapshot-cta-link {
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--red);
   display: block;
   margin-top: 4px;
@@ -1582,9 +1603,10 @@ small, .small-text {
 /* Snapshot completed card */
 .snapshot-card {
   background: var(--white);
-  border: 1.5px solid var(--gray-mid);
-  border-radius: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
   padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
 }
 
 .snapshot-label {
@@ -1632,10 +1654,11 @@ small, .small-text {
 /* Account links card */
 .account-card {
   background: var(--white);
-  border: 1.5px solid var(--gray-mid);
-  border-radius: 14px;
-  margin: 0 16px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  margin: 0 16px 16px;
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
 }
 
 .account-row {
@@ -2283,9 +2306,9 @@ small, .small-text {
 .ob-choice-btn {
   width: 100%;
   min-height: 52px;
-  border: 1.5px solid var(--gray-mid);
+  border: 1px solid #d1d5db;
   background: var(--white);
-  border-radius: 14px;
+  border-radius: 8px;
   font-family: inherit;
   font-size: 15px;
   font-weight: 600;
@@ -2293,7 +2316,8 @@ small, .small-text {
   cursor: pointer;
   padding: 12px 16px;
   text-align: left;
-  transition: border-color 0.2s, background 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
 }
 
 .ob-choice-btn:hover {
@@ -2471,7 +2495,7 @@ small, .small-text {
 
 .emergency-dismiss-btn {
   background: none;
-  border: 1.5px solid var(--gray-mid);
+  border: 2px solid var(--gray-mid);
   border-radius: 50px;
   font-family: inherit;
   font-size: 15px;
@@ -2539,7 +2563,7 @@ small, .small-text {
   width: 100%;
   min-height: 48px;
   background: transparent;
-  border: 1.5px solid var(--gray-mid);
+  border: 2px solid var(--gray-mid);
   border-radius: 50px;
   font-family: inherit;
   font-size: 15px;
