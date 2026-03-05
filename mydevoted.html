@@ -448,6 +448,365 @@ input:focus-visible {
 small, .small-text {
   font-size: 13px;
 }
+
+/* ── Home Tab ── */
+.greeting-section {
+  padding: 6px 20px 18px;
+}
+
+.greeting-headline {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--red);
+}
+
+/* Home input */
+.home-input-wrap {
+  margin: 0 20px;
+  display: flex;
+  align-items: center;
+  background: var(--bg-input);
+  border-radius: 50px;
+  min-height: 56px;
+  padding: 6px 6px 6px 16px;
+  border: 2px solid transparent;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.home-input-wrap:focus-within {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(240,75,36,0.12);
+}
+
+.home-mic-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  min-width: 36px;
+  min-height: 36px;
+}
+
+.home-mic-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: #999;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.home-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--charcoal);
+  outline: none;
+  padding: 0 8px;
+  min-width: 0;
+}
+
+.home-input::placeholder {
+  color: #999;
+}
+
+.home-send-btn {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  border-radius: 50%;
+  background: var(--red);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.home-send-btn:hover {
+  background: var(--red-dark);
+}
+
+.home-send-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: var(--white);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Talk to person link */
+.talk-person-link {
+  display: block;
+  text-align: center;
+  padding: 10px 20px 4px;
+  font-size: 14px;
+  color: var(--gray-text);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  width: 100%;
+  min-height: 44px;
+}
+
+.talk-person-link:hover {
+  color: var(--charcoal);
+}
+
+/* Prompt chips */
+.prompt-chips {
+  padding: 14px 20px 4px;
+  transition: opacity 0.25s, max-height 0.3s;
+  max-height: 400px;
+  overflow: visible;
+}
+
+.prompt-chips.hidden {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.prompt-chips-label {
+  font-size: 13px;
+  color: var(--gray-text);
+  margin-bottom: 8px;
+}
+
+.prompt-chip {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: var(--white);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 14px;
+  min-height: 56px;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--charcoal);
+  cursor: pointer;
+  text-align: left;
+  margin-bottom: 8px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.prompt-chip:hover {
+  border-color: var(--red);
+  background: var(--red-light);
+}
+
+.prompt-chip-emoji {
+  font-size: 20px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+/* Attention section */
+.attention-section {
+  padding: 18px 20px 4px;
+}
+
+.section-header {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 14px;
+  color: var(--gray-text);
+  margin-bottom: 10px;
+}
+
+.attention-card {
+  display: flex;
+  align-items: center;
+  background: var(--white);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  min-height: 56px;
+  transition: box-shadow 0.2s;
+}
+
+.attention-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.card-accent {
+  width: 4px;
+  align-self: stretch;
+  border-radius: 4px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.card-accent-purple { background: var(--purple); }
+.card-accent-red { background: var(--red); }
+.card-accent-blue { background: var(--blue); }
+
+.card-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.card-icon-purple { background: var(--purple-light); }
+.card-icon-red { background: var(--red-light); }
+.card-icon-blue { background: var(--blue-light); }
+
+.card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+
+.card-label-purple { color: var(--purple); }
+.card-label-red { color: var(--red); }
+.card-label-blue { color: var(--blue); }
+
+.card-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--charcoal);
+  line-height: 1.3;
+}
+
+.card-subtitle {
+  font-size: 14px;
+  color: var(--gray-text);
+  line-height: 1.4;
+}
+
+.card-chevron {
+  flex-shrink: 0;
+  margin-left: 8px;
+  color: var(--gray-mid);
+  font-size: 18px;
+}
+
+/* Recent conversations */
+.recent-section {
+  padding: 18px 20px 24px;
+}
+
+.recent-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.recent-header .section-header {
+  margin-bottom: 0;
+}
+
+.see-all-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--red);
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 56px;
+  display: flex;
+  align-items: center;
+}
+
+.see-all-btn:hover {
+  color: var(--red-dark);
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--bg-input);
+  cursor: pointer;
+  min-height: 56px;
+}
+
+.history-row:last-child {
+  border-bottom: none;
+}
+
+.history-row:hover .history-title {
+  color: var(--red);
+}
+
+.history-avatar {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.history-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-date {
+  font-size: 13px;
+  color: var(--gray-text);
+}
+
+.history-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--charcoal);
+  line-height: 1.3;
+  transition: color 0.2s;
+}
+
+.history-preview {
+  font-size: 14px;
+  color: var(--gray-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 </style>
 </head>
 <body>
@@ -526,7 +885,115 @@ small, .small-text {
 
     <!-- Tab Views -->
     <div class="tab-views">
-      <div class="tab-view active" id="tab-home"></div>
+      <div class="tab-view active" id="tab-home">
+        <!-- 1. Greeting -->
+        <div class="greeting-section">
+          <div class="greeting-headline" id="greeting-headline">Good morning, Rebecca!<br>What's on your<br>mind today?</div>
+        </div>
+
+        <!-- 2. Input box -->
+        <div class="home-input-wrap">
+          <button class="home-mic-btn" aria-label="Voice input">
+            <svg viewBox="0 0 24 24"><rect x="9" y="1" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </button>
+          <input type="text" class="home-input" id="home-input" placeholder="What's on your mind?">
+          <button class="home-send-btn" aria-label="Send" onclick="handleHomeSubmit()">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+          </button>
+        </div>
+
+        <!-- 3. Talk to person -->
+        <button class="talk-person-link" onclick="talkToPerson()">Or talk to a person →</button>
+
+        <!-- 4. Prompt chips -->
+        <div class="prompt-chips" id="prompt-chips">
+          <div class="prompt-chips-label">You could ask:</div>
+          <button class="prompt-chip" onclick="sendPrompt('How much do I have left on my food and home card?')">
+            <span class="prompt-chip-emoji">💳</span>How much is left on my food and home card?
+          </button>
+          <button class="prompt-chip" onclick="sendPrompt('What do my recent labs mean?')">
+            <span class="prompt-chip-emoji">🔬</span>What do my recent labs mean?
+          </button>
+          <button class="prompt-chip" onclick="sendPrompt('How much protein should I eat?')">
+            <span class="prompt-chip-emoji">🌱</span>How much protein should I eat?
+          </button>
+        </div>
+
+        <!-- 5. Needs your attention -->
+        <div class="attention-section">
+          <div class="section-header">What's happening between us?</div>
+
+          <!-- Card 1: Onboarding -->
+          <button class="attention-card" id="onboard-card" onclick="openOnboarding()">
+            <div class="card-accent card-accent-purple"></div>
+            <div class="card-icon card-icon-purple">🌟</div>
+            <div class="card-body">
+              <div class="card-label card-label-purple">Get Started</div>
+              <div class="card-title">Complete your Health Connections Checklist</div>
+              <div class="card-subtitle">Takes about 2 minutes · Tap to begin</div>
+            </div>
+            <div class="card-chevron">›</div>
+          </button>
+
+          <!-- Card 2: Claim -->
+          <button class="attention-card" onclick="sendPrompt('Tell me about my reimbursement claim status')">
+            <div class="card-accent card-accent-red"></div>
+            <div class="card-icon card-icon-red">💳</div>
+            <div class="card-body">
+              <div class="card-label card-label-red">Reimbursement</div>
+              <div class="card-title">Yoga Mat Claim — $45</div>
+              <div class="card-subtitle">In Progress · Received Feb 20 · Tap to review</div>
+            </div>
+            <div class="card-chevron">›</div>
+          </button>
+
+          <!-- Card 3: Appointment -->
+          <button class="attention-card" onclick="sendPrompt('I want to think about what matters most to me before my appointment with Dr. Patel on March 4')">
+            <div class="card-accent card-accent-blue"></div>
+            <div class="card-icon card-icon-blue">📅</div>
+            <div class="card-body">
+              <div class="card-label card-label-blue">Appointment</div>
+              <div class="card-title">Dr. Wagle — Primary Care</div>
+              <div class="card-subtitle">March 4, 10:00am · Tap to prepare</div>
+            </div>
+            <div class="card-chevron">›</div>
+          </button>
+        </div>
+
+        <!-- 6. Recent conversations -->
+        <div class="recent-section">
+          <div class="recent-header">
+            <div class="section-header">Recently Discussed</div>
+            <button class="see-all-btn" onclick="openHistoryScreen()">See all →</button>
+          </div>
+          <div id="home-history-rows">
+            <div class="history-row" onclick="openPastConversation(1)">
+              <div class="history-avatar" style="background: #dcfce7;">🌱</div>
+              <div class="history-body">
+                <div class="history-date">Feb 26</div>
+                <div class="history-title">Your A1c improved — and a check-in plan</div>
+                <div class="history-preview">We talked about your 6.8% result...</div>
+              </div>
+            </div>
+            <div class="history-row" onclick="openPastConversation(2)">
+              <div class="history-avatar" style="background: var(--purple-light);">🔬</div>
+              <div class="history-body">
+                <div class="history-date">Yesterday</div>
+                <div class="history-title">What does my eGFR result mean?</div>
+                <div class="history-preview">Rebecca asked about kidney function...</div>
+              </div>
+            </div>
+            <div class="history-row" onclick="openPastConversation(3)">
+              <div class="history-avatar" style="background: var(--red-light);">💳</div>
+              <div class="history-body">
+                <div class="history-date">Feb 23</div>
+                <div class="history-title">Yoga mat reimbursement</div>
+                <div class="history-preview">Your $45 claim was submitted...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="tab-view" id="tab-health"></div>
       <div class="tab-view" id="tab-benefits"></div>
       <div class="tab-view" id="tab-profile"></div>
@@ -620,6 +1087,39 @@ function resetDemo() {
   tabViews.forEach(v => v.classList.remove('active'));
   document.getElementById('tab-home').classList.add('active');
 }
+
+// ── Home Tab Functions ──
+function handleHomeSubmit() {
+  const input = document.getElementById('home-input');
+  if (input.value.trim()) {
+    sendPrompt(input.value.trim());
+    input.value = '';
+    document.getElementById('prompt-chips').classList.remove('hidden');
+  }
+}
+
+function sendPrompt(text) { console.log('send:', text); }
+function talkToPerson() { console.log('talk to person'); }
+function openOnboarding() { console.log('open onboarding'); }
+function openHistoryScreen() { console.log('open history'); }
+function openPastConversation(id) { console.log('open past:', id); }
+
+// ── Home Input: Enter to submit + chips hide/show ──
+document.getElementById('home-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handleHomeSubmit();
+  }
+});
+
+document.getElementById('home-input').addEventListener('input', (e) => {
+  const chips = document.getElementById('prompt-chips');
+  if (e.target.value.trim()) {
+    chips.classList.add('hidden');
+  } else {
+    chips.classList.remove('hidden');
+  }
+});
 
 // ── Keyboard Shortcut: Cmd/Ctrl+D ──
 document.addEventListener('keydown', (e) => {
