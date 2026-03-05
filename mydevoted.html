@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyDevoted Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #F04B24;
+  --red-dark: #D43E1A;
+  --red-light: #FBF0EB;
+  --purple: #592C82;
+  --purple-light: #ECE4F1;
+  --blue: #00A0DD;
+  --blue-light: #D4E7F7;
+  --charcoal: #1D252C;
+  --gray-text: #595959;
+  --gray-bg: #F8F7F5;
+  --bg-input: #F0EFED;
+  --gray-mid: #D9D6D0;
+  --white: #FFFFFF;
+  --amber: #B45309;
+  --amber-bg: #FFFBEB;
+  --green: #166534;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Public Sans', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  background: #C8C8D2;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 40px;
+}
+
+/* ── Control Banner ── */
+.control-banner {
+  max-width: 500px;
+  width: 100%;
+  background: var(--charcoal);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+}
+
+.control-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.control-label {
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.control-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reset-btn {
+  background: rgba(255,255,255,0.15);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  min-height: 36px;
+  min-width: 56px;
+  display: none;
+}
+
+.reset-btn:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+.reset-btn.visible {
+  display: inline-flex;
+  align-items: center;
+}
+
+.mode-toggle {
+  display: flex;
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.mode-btn {
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 16px;
+  cursor: pointer;
+  border-radius: 20px;
+  min-height: 36px;
+  min-width: 56px;
+  transition: all 0.2s;
+}
+
+.mode-btn.active-demo {
+  background: var(--white);
+  color: var(--green);
+}
+
+.mode-btn.active-live {
+  background: var(--white);
+  color: var(--charcoal);
+}
+
+/* API Key Section */
+#api-key-section {
+  margin-top: 12px;
+  display: none;
+}
+
+#api-key-section.visible {
+  display: block;
+}
+
+.api-key-label {
+  color: rgba(255,255,255,0.8);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.api-key-row {
+  display: flex;
+  gap: 8px;
+}
+
+.api-key-input {
+  flex: 1;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  color: var(--white);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 8px 12px;
+  min-height: 40px;
+}
+
+.api-key-input::placeholder {
+  color: rgba(255,255,255,0.4);
+}
+
+.api-key-input:focus {
+  outline: none;
+  border-color: var(--red);
+}
+
+.save-key-btn {
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 18px;
+  cursor: pointer;
+  min-height: 40px;
+  min-width: 56px;
+}
+
+.save-key-btn:hover {
+  background: var(--red-dark);
+}
+
+.key-saved-msg {
+  color: #4ade80;
+  font-size: 13px;
+  margin-top: 6px;
+  display: none;
+}
+
+.key-saved-msg.visible {
+  display: block;
+}
+
+/* ── Focus styles ── */
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--red);
+  outline-offset: 3px;
+}
+
+/* ── Phone Bezel ── */
+.phone-bezel {
+  width: 390px;
+  height: 844px;
+  background: var(--charcoal);
+  border-radius: 52px;
+  padding: 14px;
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.3),
+    0 8px 20px rgba(0,0,0,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+  position: relative;
+}
+
+/* Side buttons */
+.phone-bezel::before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: 140px;
+  width: 4px;
+  height: 36px;
+  background: #3a3a3c;
+  border-radius: 2px 0 0 2px;
+  box-shadow: 0 50px 0 #3a3a3c, 0 -30px 0 #3a3a3c;
+}
+
+.phone-bezel::after {
+  content: '';
+  position: absolute;
+  right: -3px;
+  top: 180px;
+  width: 4px;
+  height: 64px;
+  background: #3a3a3c;
+  border-radius: 0 2px 2px 0;
+}
+
+/* Demo badge */
+.demo-badge {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  background: var(--green);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  z-index: 20;
+  display: none;
+  letter-spacing: 0.5px;
+}
+
+.demo-badge.visible {
+  display: block;
+}
+
+/* Screen */
+.phone-screen {
+  width: 100%;
+  height: 100%;
+  background: var(--gray-bg);
+  border-radius: 40px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Notch */
+.notch {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 34px;
+  background: var(--charcoal);
+  border-radius: 20px;
+  z-index: 10;
+}
+
+/* Status bar */
+.status-bar {
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 5;
+}
+
+.status-time {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--charcoal);
+}
+
+.status-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-icons svg {
+  width: 18px;
+  height: 18px;
+  fill: var(--charcoal);
+}
+
+/* App Header */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 20px 10px;
+  flex-shrink: 0;
+}
+
+.app-header-logo svg {
+  height: 32px;
+  width: auto;
+}
+
+.app-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.header-icon-btn:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.header-icon-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: var(--charcoal);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Tab Views */
+.tab-views {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.tab-view {
+  display: none;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.tab-view.active {
+  display: flex;
+}
+
+/* Bottom Nav */
+.bottom-nav {
+  height: 68px;
+  background: var(--white);
+  border-top: 1px solid var(--gray-mid);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-shrink: 0;
+  padding-bottom: 4px;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 8px;
+  min-width: 56px;
+  min-height: 56px;
+  border-radius: 8px;
+  font-family: inherit;
+}
+
+.nav-item:hover {
+  background: rgba(0,0,0,0.03);
+}
+
+.nav-item svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: #999;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nav-item .nav-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #999;
+}
+
+.nav-item.active svg {
+  stroke: var(--red);
+}
+
+.nav-item.active .nav-label {
+  color: var(--red);
+}
+
+/* Minimum text size enforcement */
+small, .small-text {
+  font-size: 13px;
+}
+</style>
+</head>
+<body>
+
+<!-- Control Banner -->
+<div class="control-banner">
+  <div class="control-top-row">
+    <span class="control-label">MyDevoted Prototype</span>
+    <div class="control-right">
+      <button class="reset-btn visible" id="resetBtn" onclick="resetDemo()">↺ Reset Demo</button>
+      <div class="mode-toggle">
+        <button class="mode-btn active-demo" id="demoBtnToggle" onclick="setMode('demo')">Demo</button>
+        <button class="mode-btn" id="liveBtnToggle" onclick="setMode('live')">Live</button>
+      </div>
+    </div>
+  </div>
+  <div id="api-key-section">
+    <div class="api-key-label">🔑 Anthropic API Key</div>
+    <div class="api-key-row">
+      <input type="password" class="api-key-input" id="apiKeyInput" placeholder="sk-ant-...">
+      <button class="save-key-btn" onclick="saveApiKey()">Save</button>
+    </div>
+    <div class="key-saved-msg" id="keySavedMsg">✓ Key saved for this session</div>
+  </div>
+</div>
+
+<!-- Phone Bezel -->
+<div class="phone-bezel">
+  <div class="demo-badge visible" id="demoBadge">● DEMO</div>
+  <div class="phone-screen">
+    <!-- Notch -->
+    <div class="notch"></div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <!-- Signal -->
+        <svg viewBox="0 0 20 20"><rect x="1" y="14" width="3" height="5" rx="0.5" fill="#1D252C"/><rect x="6" y="10" width="3" height="9" rx="0.5" fill="#1D252C"/><rect x="11" y="6" width="3" height="13" rx="0.5" fill="#1D252C"/><rect x="16" y="2" width="3" height="17" rx="0.5" fill="#1D252C"/></svg>
+        <!-- WiFi -->
+        <svg viewBox="0 0 20 20"><path d="M10 16a1.5 1.5 0 110 3 1.5 1.5 0 010-3z" fill="#1D252C"/><path d="M5.5 13c1.2-1.2 2.8-2 4.5-2s3.3.8 4.5 2" stroke="#1D252C" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M2 9.5C4.2 7.3 7 6 10 6s5.8 1.3 8 3.5" stroke="#1D252C" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+        <!-- Battery -->
+        <svg viewBox="0 0 28 16"><rect x="1" y="1" width="22" height="14" rx="3" stroke="#1D252C" stroke-width="1.5" fill="none"/><rect x="3" y="3" width="18" height="10" rx="1.5" fill="#1D252C"/><rect x="24" y="5" width="3" height="6" rx="1" fill="#1D252C"/></svg>
+      </div>
+    </div>
+
+    <!-- App Header -->
+    <div class="app-header">
+      <div class="app-header-logo">
+        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 205 38" style="height:32px;width:auto;">
+          <style>.st0{fill:#F04B24;}.st1{fill:#00A1E0;}.st2{fill:#592C82;}.st3{fill:#1D252C;}.st4{fill-rule:evenodd;clip-rule:evenodd;fill:#1D252C;}</style>
+          <g><g><g>
+            <path class="st0" d="M26,0.5c-6.2,0-11.3,5.1-11.3,11.3v2.9h22.6v-2.9C37.3,5.6,32.3,0.5,26,0.5z"/>
+            <path class="st1" d="M0.5,26c0,6.2,5.1,11.3,11.3,11.3h2.9V14.7h-2.9C5.6,14.7,0.5,19.8,0.5,26z"/>
+            <rect x="14.7" y="14.7" class="st2" width="22.6" height="22.6"/>
+          </g><g><g>
+            <path class="st3" d="M118.7,15.2c-1.1,0-2,0-2.8,0c-0.8,0-1.3,0.3-1.6,1.1c-0.3,0.8-5,13.2-5,13.2s-4.7-12.9-4.8-13.4c-0.2-0.5-0.6-0.9-1.4-0.9s-1.8,0-2.9,0c-1.2,0-1.6,1-1.3,2c0.2,0.5,7.9,18.7,7.9,18.7c0.2,0.6,0.8,0.9,1.4,0.9h2.1c0.6,0,1.2-0.4,1.4-0.9c0,0,7.7-17.5,8.3-18.8C120.3,16.2,119.8,15.2,118.7,15.2z"/>
+            <path class="st3" d="M157.5,34.9c-0.1-0.8-0.1-1.1-0.2-1.7c-0.2-1.1-0.9-1.4-1.6-1.2c-0.4,0.1-1.1,0.5-2,0.5c-0.5,0-1.1-0.1-1.5-0.6c-0.4-0.6-0.4-1.8-0.4-2.5l0.1-9.5c0,0,3.2,0,4.2,0s1.4-0.7,1.4-1.4c0-0.7,0-1,0-1.8c0-0.8-0.4-1.4-1.4-1.4s-4.2,0-4.2,0s0-4.4,0-5c0-0.7-0.3-1.7-1.8-1.3c-0.8,0.2-1.5,0.3-2.3,0.6c-0.7,0.2-1.4,0.7-1.4,1.5s0,4.3,0,4.3s-0.8,0-2.1,0c-1.3,0-1.4,0.9-1.4,1.4c0,0.6,0,0.8,0,1.7c0,0.9,0.4,1.5,1.5,1.5c1.1,0,2,0,2,0l-0.1,9.5c0,2.2,0,4.4,1.4,6c1.1,1.2,3.1,1.9,5.4,1.9c2.2,0,3.2-0.5,3.6-0.9C157.2,36.1,157.6,35.6,157.5,34.9z"/>
+            <path class="st3" d="M95.5,17.9c-2.1-2.2-4.6-3.1-7.4-3.1c-3.1,0-5.7,1-7.9,3.2c-1.9,2-3,4.9-3.1,8c0,3.2,1.1,6.2,3.2,8.2c2,2,4.8,3.1,8.1,3.1c5,0,8-2.5,8.3-2.8c0.5-0.5,0.8-1.1,0.5-1.9c-0.2-0.6-0.5-1.2-0.9-1.7c-0.4-0.6-1.2-1.1-2.4-0.3c-0.5,0.3-2.4,2-5.4,2l0,0c-1.9,0-3.4-0.5-4.5-1.7c-0.9-0.9-1.4-2-1.6-3.2l14.2,0c0.7,0,1.4-0.5,1.5-1.2C98.2,26.4,99,21.5,95.5,17.9z M84,21.1c0.8-0.9,2.2-1.8,4-1.8l0,0l0,0c1.5,0,2.7,0.5,3.7,1.5c1.1,1.2,1.3,2.9,1.3,2.9H82.7C82.7,23.7,82.7,22.6,84,21.1z"/>
+            <path class="st3" d="M142.8,26c0.1-6.3-4.7-11.3-11.4-11.3c-6.7,0-11.6,5.1-11.6,11.3c-0.1,6.5,4.9,11.3,11.4,11.3C137.8,37.3,142.7,32.4,142.8,26z M137.2,26c0,3.6-2.4,6.6-6,6.6c-3.6,0-5.9-2.9-5.9-6.6c0-3.6,2.4-6.6,6-6.6C135,19.4,137.2,22.3,137.2,26z"/>
+            <path class="st3" d="M204.5,35.3c0-0.8,0-27,0-28.1c0-1.1-0.9-1.5-1.5-1.4c-0.4,0.1-2.4,0.6-2.9,0.7c-0.7,0.2-1,0.9-1.1,1.6c0,0.4-0.1,9.6-0.1,9.6c-1.7-1.8-3.5-3.1-6.6-3.1c-6.6,0-10.7,5.2-10.8,11.3c-0.1,6,4,11.3,10.6,11.3c3,0,5-1.3,6.7-3.1c0,0,0,0.5,0,1.4c0,0.9,0.4,1.4,1.3,1.4c0.9,0,1.9,0,2.8,0C204.1,36.9,204.5,36.3,204.5,35.3z M199.1,26c0,3.6-2.4,6.6-6.1,6.6c-3.4,0-5.9-2.7-5.9-6.6c0-3.6,2.4-6.6,6-6.6C196.7,19.3,199.1,22.3,199.1,26z"/>
+            <path class="st3" d="M176.5,17.9c-2.1-2.2-4.6-3.1-7.4-3.1c-3.1,0-5.7,1-7.9,3.2c-1.9,2-3,4.9-3.1,8c0,3.2,1.1,6.2,3.2,8.2c2,2,4.8,3.1,8.1,3.1c5,0,8-2.5,8.3-2.8c0.5-0.5,0.8-1.1,0.5-1.9c-0.2-0.6-0.5-1.2-0.9-1.7c-0.4-0.6-1.2-1.1-2.4-0.3c-0.5,0.3-2.4,2-5.4,2l0,0c-1.9,0-3.4-0.5-4.5-1.7c-0.9-0.9-1.4-2-1.6-3.2l14.2,0c0.7,0,1.4-0.5,1.5-1.2C179.1,26.4,179.9,21.5,176.5,17.9z M164.9,21.1c0.8-0.9,2.2-1.8,4-1.8l0,0l0,0c1.5,0,2.7,0.5,3.7,1.5c1.1,1.2,1.3,2.9,1.3,2.9h-10.2C163.6,23.7,163.6,22.6,164.9,21.1z"/>
+            <path class="st4" d="M66.9,7.7c-2.5-1.4-5.4-1.9-10.2-1.9h-2.2h-4.2c-1,0-1.7,0.8-1.7,1.8v27.9c0,1,0.8,1.8,1.7,1.8h6.8c2.1,0,7.2,0,11.1-2.7c4-2.8,6.3-7.4,6.3-13C74.6,19.3,74.1,11.5,66.9,7.7z M65.3,30c-2.4,1.8-6.3,1.8-8,1.8h-3.2V11.2h3.2c2.5,0,5,0.2,7.1,1.3c4.2,2.3,4.8,6.6,4.7,9C69,25.5,67.9,28.2,65.3,30z"/>
+          </g></g></g></g>
+        </svg>
+      </div>
+      <div class="app-header-actions">
+        <button class="header-icon-btn" aria-label="Language">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/></svg>
+        </button>
+        <button class="header-icon-btn" aria-label="Menu">
+          <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab Views -->
+    <div class="tab-views">
+      <div class="tab-view active" id="tab-home"></div>
+      <div class="tab-view" id="tab-health"></div>
+      <div class="tab-view" id="tab-benefits"></div>
+      <div class="tab-view" id="tab-profile"></div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <div class="bottom-nav">
+      <button class="nav-item active" data-tab="home" aria-label="Home">
+        <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V13h6v8"/></svg>
+        <span class="nav-label">Home</span>
+      </button>
+      <button class="nav-item" data-tab="health" aria-label="Health">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span class="nav-label">Health</span>
+      </button>
+      <button class="nav-item" data-tab="benefits" aria-label="Benefits">
+        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        <span class="nav-label">Benefits</span>
+      </button>
+      <button class="nav-item" data-tab="profile" aria-label="Profile">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-label">Profile</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──
+let currentTab = 'home';
+let demoMode = true;
+let apiKey = '';
+
+// ── Tab Switching ──
+const navItems = document.querySelectorAll('.nav-item');
+const tabViews = document.querySelectorAll('.tab-view');
+
+navItems.forEach(item => {
+  item.addEventListener('click', () => {
+    const tab = item.dataset.tab;
+    if (tab === currentTab) return;
+    currentTab = tab;
+
+    navItems.forEach(n => n.classList.remove('active'));
+    item.classList.add('active');
+
+    tabViews.forEach(v => v.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+  });
+});
+
+// ── Mode Toggle ──
+function setMode(mode) {
+  demoMode = mode === 'demo';
+  const demoBtn = document.getElementById('demoBtnToggle');
+  const liveBtn = document.getElementById('liveBtnToggle');
+  const apiSection = document.getElementById('api-key-section');
+  const demoBadge = document.getElementById('demoBadge');
+  const resetBtn = document.getElementById('resetBtn');
+
+  if (demoMode) {
+    demoBtn.className = 'mode-btn active-demo';
+    liveBtn.className = 'mode-btn';
+    apiSection.classList.remove('visible');
+    demoBadge.classList.add('visible');
+    resetBtn.classList.add('visible');
+  } else {
+    demoBtn.className = 'mode-btn';
+    liveBtn.className = 'mode-btn active-live';
+    apiSection.classList.add('visible');
+    demoBadge.classList.remove('visible');
+    resetBtn.classList.remove('visible');
+  }
+}
+
+// ── Save API Key ──
+function saveApiKey() {
+  const input = document.getElementById('apiKeyInput');
+  const msg = document.getElementById('keySavedMsg');
+  if (input.value.trim()) {
+    apiKey = input.value.trim();
+    msg.classList.add('visible');
+  }
+}
+
+// ── Reset Demo ──
+function resetDemo() {
+  currentTab = 'home';
+  navItems.forEach(n => n.classList.remove('active'));
+  navItems[0].classList.add('active');
+  tabViews.forEach(v => v.classList.remove('active'));
+  document.getElementById('tab-home').classList.add('active');
+}
+
+// ── Keyboard Shortcut: Cmd/Ctrl+D ──
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'd') {
+    e.preventDefault();
+    setMode(demoMode ? 'live' : 'demo');
+  }
+});
+</script>
+</body>
+</html>
