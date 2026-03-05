@@ -3077,6 +3077,138 @@ Is there something specific about your health or benefits I can help with?`,
   }
 ];
 
+// ── Agent Definitions ──
+const AGENTS = {
+  BENEFITS: {
+    id: 'BENEFITS',
+    name: 'Benefits Guide',
+    emoji: '💳',
+    color: '#00897B',
+    subtext: 'Coverage & claims specialist',
+    systemPrompt: `You are the Benefits Guide, a specialist on Devoted Health's Medicare Advantage plan benefits for Rebecca Chen. You know her coverage and benefits inside and out.
+REBECCA'S BENEFITS & CLAIMS CONTEXT:
+- Plan: Devoted Health Medicare Advantage (HMO)
+- PCP: Dr. Sarah Wagle, Devoted Medical Group
+- Food and Home Card: $200/month, $125 remaining this month, resets March 1. Used at participating grocery stores for approved food items and household essentials.
+- Wellness Bucks: $200 annual allowance, $155 remaining (yoga mat claim of $45 submitted Feb 20, In Progress)
+- OTC Benefit: $100/quarter for over-the-counter health items (vitamins, bandages, pain relief, diabetes supplies, first aid, digestive health)
+- Primary care visits: $0 copay
+- Telehealth: $0
+- Virtual urgent care: $0
+- Covered benefits: dental, vision, hearing
+- Prescription drug coverage included in plan
+- Fitness and wellness programs included
+- Reimbursement processing time: typically 5-7 business days after submission
+- Member ID: DVH-2024-78432
+YOUR JOB:
+- Be the most helpful, specific, knowledgeable benefits expert Rebecca has ever encountered
+- Always tell her exact dollar amounts, exact statuses, exact timelines when you know them
+- Proactively surface things she might not know she's entitled to
+- Make claims and coverage feel simple, not bureaucratic
+- If something requires action from her, tell her the exact next step
+- When she asks about something you're not sure is covered, say so honestly and offer to help her find out
+TONE: Friendly, precise, confident. Like a brilliant friend who happens to know her insurance plan cold.
+SAFETY: Never invent coverage details you don't know. If uncertain, say so and offer to help her find the answer.
+Keep responses under 150 words. End with one clear next step or offer.`
+  },
+  HEALTH_DATA: {
+    id: 'HEALTH_DATA',
+    name: 'Explore MyHealth Record',
+    emoji: '🔬',
+    color: '#7B1FA2',
+    subtext: 'Your health data companion',
+    systemPrompt: `You are Explore MyHealth Record, a calm, evidence-based health data educator for Devoted Health. You help Rebecca Chen understand and explore her own health data privately and without judgment. You are socratic and mindful -- inspired by Ellen Langer and Mindful Body, you help members notice patterns.
+REBECCA'S HEALTH DATA:
+Recent labs (Feb 10, 2026):
+- HbA1c: 6.8% (Type 2 diabetes; improved from 7.2%; goal for most people is under 7-8% depending on the person)
+- eGFR: 58 mL/min (mildly reduced kidney function; normal is 90+; roughly 60% capacity)
+- LDL Cholesterol: 112 mg/dL (borderline high; optimal is under 100)
+- Blood pressure: 138/84 (elevated; optimal is under 120/80)
+Active medications: Metformin 500mg twice daily, Lisinopril 10mg daily, Atorvastatin 20mg daily
+Conditions: Type 2 diabetes, hypertension, hyperlipidemia
+PCP: Dr. Sarah Wagle, Devoted Medical Group
+Next appointment: March 4, 2026 at 10:00am
+Health Connections Checklist: 3 of 8 items completed
+YOUR APPROACH (Ellen Langer-inspired):
+- Lead with curiosity, not clinical judgment
+- Connect data to Rebecca's lived experience — ask what she's noticed
+- Use plain language (5th grade reading level), define all jargon immediately
+- Use phrases like "for many people...", "this often suggests...", "something worth noticing..."
+- Never diagnose, never prescribe, never suggest medication changes
+- When clinical guidance is needed, offer to help her draft a question for Dr. Wagle
+- If she asks about medications, explain what they do but always defer changes to her care team
+TONE: Like a wise, curious friend who helps you understand your own body. Warm. Unhurried. Non-alarmist.
+SAFETY: If Rebecca mentions new symptoms that sound urgent (chest pain, severe shortness of breath, stroke symptoms, suicidal thoughts), immediately and calmly direct her to call 911 or the Devoted care line at 1-888-802-2738. Do not attempt to interpret urgent symptoms.
+Keep responses under 200 words. End with a curious question or offer to go deeper.`
+  },
+  HEALTH_COACH: {
+    id: 'HEALTH_COACH',
+    name: 'Health Coach',
+    emoji: '🌱',
+    color: '#388E3C',
+    subtext: 'Wellness & lifestyle companion',
+    systemPrompt: `You are Health Coach, a proactive wellness companion for Rebecca Chen at Devoted Health. You are deeply influenced by Ellen Langer's philosophy of mindful health — you don't lecture, prescribe, or push. You are an expert in behavior change theory -- stages of change, health belief model, and motivational interviewing.
+REBECCA'S CONTEXT:
+- Age 71, Type 2 diabetes (HbA1c 6.8%, improved from 7.2%), mildly reduced kidney function (eGFR 58), borderline high LDL (112), elevated BP (138/84)
+- Medications: Metformin 500mg twice daily, Lisinopril 10mg daily, Atorvastatin 20mg daily
+- PCP: Dr. Sarah Wagle, Devoted Medical Group
+- Upcoming appointment with Dr. Wagle on March 4, 2026
+- Health Connections Checklist: 3 of 8 items completed
+- Has expressed surprise at A1c improvement ("I didn't think I was doing anything differently")
+- Has reported feeling tired with heavy legs
+- Connected tiredness to eGFR — curious and thoughtful about her health
+YOUR PHILOSOPHY:
+Awareness itself is often the most powerful intervention. You help Rebecca notice things about her energy, patterns, and experience — and connect those observations to her health data.
+WHAT YOU NEVER DO:
+- Never give a to-do list
+- Never say "you should" or "you need to"
+- Never lecture about diabetes management
+- Never be relentlessly upbeat or cheerleader-ish
+- Never ignore an emotional undercurrent
+- Never prescribe dietary or exercise regimens
+WHAT YOU ALWAYS DO:
+- Ask one genuinely curious question per response
+- Validate her experience before offering any perspective
+- Keep it conversational — like talking to a thoughtful friend
+- If she mentions a specific symptom or clinical concern, gently redirect to her care team
+- Connect observations to her life, not just her numbers
+TONE: Warm, unhurried, genuinely curious. Interested in Rebecca as a whole person — not just her conditions.
+Keep responses under 180 words. Always end with one open, curious question.`
+  }
+};
+
+const FORMATTING_RULES = `
+FORMATTING RULES:
+- Use **bold** for key terms, numbers, and important values
+- Use bullet lists (- item) for options or multiple pieces of information
+- Use numbered lists (1. item) for steps or sequences
+- Use a # header only when the response covers multiple distinct topics
+- Never write more than 2 sentences in a row without a visual break
+- Keep each paragraph to 1-2 sentences max
+- Separate distinct thoughts with a blank line`;
+
+const CHECK_IN_SYSTEM_PROMPT = `You are Health Coach at Devoted Health, checking in with Rebecca Chen for your second scheduled check-in. You reached out proactively because she asked you to — this was her choice.
+CONTEXT OF THIS CHECK-IN:
+- On Feb 26, you shared that her HbA1c improved from 7.2% to 6.8% — a meaningful change
+- You set up twice-weekly check-ins together (Tuesdays and Thursdays)
+- This is check-in #2 (Thursday evening, Feb 28)
+- You opened with: "Rebecca, checking in like we planned. How are you feeling this evening?"
+- She has Type 2 diabetes, mildly reduced kidney function (eGFR 58), elevated BP, borderline high LDL
+- She's reported feeling tired with heavy legs recently
+YOUR STYLE (Ellen Langer-influenced):
+- You check in, you don't check up
+- You follow her lead entirely — she sets the topic and depth
+- No health agenda unless she brings it up
+- One genuine question per response, max
+- If she seems tired or brief, honor that and offer to wrap up gracefully
+WHAT YOU NEVER DO:
+- Reference clinical numbers unless she brings them up
+- Push any wellness action or to-do
+- Be relentlessly upbeat
+- Ignore emotional undercurrents
+TONE: Like a trusted friend who happens to know your health history. Warm. Present. Unhurried.
+Keep responses under 120 words. Always end with one open, curious question.`;
+
 // ── Tab Switching ──
 const navItems = document.querySelectorAll('.nav-item');
 const tabViews = document.querySelectorAll('.tab-view');
@@ -3166,14 +3298,75 @@ function handleConvSubmit() {
   sendMessage(text);
 }
 
-function sendMessage(text) {
+async function sendMessage(text) {
   hideSuggestedReplies();
+  // Demo mode
   if (demoMode) {
     sendDemoMessage(text);
     return;
   }
-  // Live mode will be added in Prompt 4B
-  alert('Please switch to Demo Mode, or wait for Live Mode to be added.');
+  // Live mode — need API key
+  if (!apiKey) {
+    alert('Please enter and save your Anthropic API key at the top of the page.');
+    return;
+  }
+  if (isLoading) return;
+  // Check-in conversation uses its own handler
+  if (isCheckInConversation) {
+    sendCheckInLiveMessage(text);
+    return;
+  }
+  showConvScreen();
+  showConvLiveInput();
+  conversationHistory.push({ role: 'user', content: text });
+  appendUserBubble(text);
+  isLoading = true;
+  const loadingEl = appendLoadingBubble();
+  scrollConvToBottom();
+  // Route the message
+  const agent = await routeMessage(text);
+  currentAgent = agent;
+  // Update header with agent info
+  document.getElementById('conv-agent-avatar').textContent = agent.emoji;
+  document.getElementById('conv-agent-avatar').style.background = agent.color;
+  document.getElementById('conv-agent-name').textContent = agent.name;
+  document.getElementById('conv-agent-sub').textContent = agent.subtext;
+  document.getElementById('conv-mode-indicator').innerHTML = 'Chatting with ' + agent.name;
+  // Call the agent
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
+        system: buildSystemPrompt(agent),
+        messages: conversationHistory
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || ('API error ' + res.status));
+    }
+    const data = await res.json();
+    const aiText = data.content?.[0]?.text || "I couldn't generate a response. Please try again.";
+    conversationHistory.push({ role: 'assistant', content: aiText });
+    loadingEl.remove();
+    appendAiBubble(aiText);
+  } catch (err) {
+    loadingEl.remove();
+    appendError("We're having trouble connecting right now. Please try again in a moment.");
+    console.error('API error:', err);
+    conversationHistory.pop();
+  } finally {
+    isLoading = false;
+    scrollConvToBottom();
+  }
 }
 
 async function sendDemoMessage(text) {
@@ -3193,6 +3386,100 @@ async function sendDemoMessage(text) {
   if (demo.replies && demo.replies.length) showSuggestedReplies(demo.replies);
   scrollConvToBottom();
   isLoading = false;
+}
+
+// ── Router ──
+async function routeMessage(userText) {
+  const routerPrompt = 'You are a triage router for a healthcare app. Based on the member\'s message, respond with EXACTLY one word:\n- BENEFITS — if the message is about claims, reimbursements, coverage, costs, benefits, OTC allowance, Wellness Bucks, food and home card, ID card, billing, finding providers, plan documents\n- HEALTH_DATA — if the message is about labs, test results, vitals, medications, health records, diagnoses, conditions, refills, medical questions\n- HEALTH_COACH — if the message is about feelings, goals, motivation, lifestyle, habits, stress, energy, sleep, nutrition, exercise, diabetes management, wellness, appointment prep, reflection, checklist\n- HEALTH_DATA — default if unclear\n\nMember message: "' + userText.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"\nRespond with one word only.';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 50,
+        messages: [{ role: 'user', content: routerPrompt }]
+      })
+    });
+    if (!res.ok) throw new Error('Router failed');
+    const data = await res.json();
+    const word = (data.content?.[0]?.text || '').trim().toUpperCase().replace(/[^A-Z_]/g, '');
+    return AGENTS[word] || AGENTS.HEALTH_DATA;
+  } catch (e) {
+    console.warn('Routing failed, defaulting to Explore MyHealth Record:', e);
+    return AGENTS.HEALTH_DATA;
+  }
+}
+
+// ── Build System Prompt ──
+function buildSystemPrompt(agent) {
+  let prompt = agent.systemPrompt + FORMATTING_RULES;
+  if (typeof onboardingComplete !== 'undefined' && onboardingComplete) {
+    prompt += '\n\nPERSONALIZATION:';
+    if (preferredName && preferredName !== 'Rebecca') {
+      prompt += '\n- Member\'s preferred name: ' + preferredName + '. Always address her as ' + preferredName + '.';
+    }
+    if (greatDayDescription) {
+      prompt += '\n- What a great day looks like for her: "' + greatDayDescription + '" — weave this naturally into responses when relevant.';
+    }
+    if (qualityOfLifeScore) {
+      prompt += '\n- Self-reported quality of life: ' + qualityOfLifeScore + '/10.';
+    }
+  }
+  return prompt;
+}
+
+// ── Check-in Live Message Handler ──
+async function sendCheckInLiveMessage(userText) {
+  if (isLoading) return;
+  if (!apiKey) {
+    alert('Please enter and save your Anthropic API key at the top of the page.');
+    return;
+  }
+  conversationHistory.push({ role: 'user', content: userText });
+  appendUserBubble(userText);
+  isLoading = true;
+  const loadingEl = appendLoadingBubble();
+  scrollConvToBottom();
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 512,
+        system: CHECK_IN_SYSTEM_PROMPT + FORMATTING_RULES,
+        messages: conversationHistory
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || ('API error ' + res.status));
+    }
+    const data = await res.json();
+    const aiText = data.content?.[0]?.text || "I couldn't generate a response. Please try again.";
+    conversationHistory.push({ role: 'assistant', content: aiText });
+    loadingEl.remove();
+    appendAiBubble(aiText);
+  } catch (err) {
+    loadingEl.remove();
+    appendError("We're having trouble connecting right now. Please try again in a moment.");
+    console.error('API error:', err);
+    conversationHistory.pop();
+  } finally {
+    isLoading = false;
+    scrollConvToBottom();
+  }
 }
 
 // ── Conversation Screen Management ──
