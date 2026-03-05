@@ -212,7 +212,8 @@ input:focus-visible {
 .home-input:focus-visible,
 #conv-input:focus-visible,
 .ob-text-input:focus-visible,
-.api-key-input:focus-visible {
+.api-key-input:focus-visible,
+.ai-bar-input:focus-visible {
   outline: none;
 }
 
@@ -406,6 +407,88 @@ input:focus-visible {
   justify-content: space-around;
   flex-shrink: 0;
   padding-bottom: 4px;
+}
+
+/* AI Input Bar — persistent above tab bar */
+.ai-bar {
+  padding: 8px 16px 10px;
+  background: var(--white);
+  border-top: 1px solid #E8E3DE;
+  flex-shrink: 0;
+}
+
+.ai-bar.hidden {
+  display: none;
+}
+
+.ai-bar-row {
+  display: flex;
+  align-items: center;
+  background: #F5F0EB;
+  border-radius: 24px;
+  border: 1.5px solid #E8E3DE;
+  padding: 6px 6px 6px 14px;
+  gap: 8px;
+}
+
+@keyframes pulse-gentle {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: 0.85; }
+}
+
+.ai-heart-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  background: var(--red);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E") center/contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E") center/contain no-repeat;
+  animation: pulse-gentle 3s ease-in-out infinite;
+}
+
+.ai-bar-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--charcoal);
+  outline: none;
+  min-width: 0;
+}
+
+.ai-bar-input::placeholder {
+  color: #999;
+}
+
+.ai-bar-send {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  border-radius: 50%;
+  background: var(--red);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.ai-bar-send:hover {
+  background: var(--red-dark);
+}
+
+.ai-bar-send svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--white);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .nav-item {
@@ -1702,31 +1785,44 @@ small, .small-text {
   flex-shrink: 0;
 }
 
-/* ── Conversation Screen (Bottom Sheet) ── */
+/* ── Conversation Screen (Companion Sheet) ── */
 #conv-screen-overlay {
-  display: none;
   position: absolute;
-  top: 100px; left: 0; right: 0; bottom: 68px;
-  background: rgba(0,0,0,0.35);
+  top: 54px; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.15);
   z-index: 59;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
 }
 
 #conv-screen-overlay.open {
-  display: block;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 #conv-screen {
-  display: none;
-  flex-direction: column;
   position: absolute;
-  top: 100px; left: 0; right: 0; bottom: 68px;
-  background: var(--gray-bg);
-  z-index: 60;
-  border-radius: 20px 20px 0 0;
+  bottom: 0; left: 0; right: 0;
+  height: 0;
+  background: rgba(255, 253, 251, 0.92);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  z-index: 200;
+  border-radius: 24px 24px 0 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.08);
+  transition: height 0.5s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 #conv-screen.open {
-  display: flex;
+  height: 75%;
+}
+
+#conv-screen.expanded {
+  height: 92%;
 }
 
 .conv-grab-handle {
@@ -1746,16 +1842,23 @@ small, .small-text {
   display: flex;
   align-items: center;
   padding: 10px 16px;
-  border-bottom: 1px solid var(--gray-mid);
+  border-bottom: 1px solid #E8E3DE;
   flex-shrink: 0;
   gap: 10px;
 }
 
-.back-btn {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
+.conv-header-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.conv-header-btn {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
   background: none;
   border: none;
   cursor: pointer;
@@ -1763,20 +1866,34 @@ small, .small-text {
   align-items: center;
   justify-content: center;
   border-radius: 8px;
+  font-size: 18px;
+  color: var(--gray-text);
 }
 
-.back-btn:hover {
-  background: var(--gray-mid);
+.conv-header-btn:hover {
+  background: rgba(0,0,0,0.05);
 }
 
-.back-btn svg {
-  width: 22px;
-  height: 22px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+/* Context banner */
+.conv-context-banner {
+  padding: 10px 14px;
+  margin: 8px 12px 0;
+  background: rgba(240, 75, 36, 0.06);
+  border: 1px solid rgba(240, 75, 36, 0.12);
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--charcoal);
+  line-height: 1.4;
+  display: none;
+  animation: fadeInUp 0.3s ease 0.3s both;
+}
+
+.conv-context-banner.visible {
+  display: block;
+}
+
+.back-btn {
+  display: none;
 }
 
 .conv-header-info {
@@ -3255,9 +3372,6 @@ small, .small-text {
     <div id="conv-screen">
       <div class="conv-grab-handle"></div>
       <div class="conv-header">
-        <button class="back-btn" onclick="closeConvScreen()">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
         <div class="conv-header-info">
           <div class="conv-agent-avatar" id="conv-agent-avatar">♥</div>
           <div>
@@ -3265,7 +3379,12 @@ small, .small-text {
             <div class="conv-agent-sub" id="conv-agent-sub">Your health companion</div>
           </div>
         </div>
+        <div class="conv-header-actions">
+          <button class="conv-header-btn" onclick="toggleSheetExpand()" id="conv-expand-btn" title="Expand">⤢</button>
+          <button class="conv-header-btn" onclick="closeConvScreen()" title="Close">✕</button>
+        </div>
       </div>
+      <div class="conv-context-banner" id="conv-context-banner"></div>
       <div id="conv-messages"></div>
       <div id="conv-suggested-replies" class="hidden"></div>
       <button class="conv-talk-person" id="conv-talk-to-person" onclick="talkToPerson()">👤 Talk to a person</button>
@@ -3355,6 +3474,17 @@ small, .small-text {
       </div>
     </div>
 
+    <!-- AI Input Bar -->
+    <div class="ai-bar hidden" id="ai-bar">
+      <div class="ai-bar-row">
+        <div class="ai-heart-icon"></div>
+        <input type="text" class="ai-bar-input" id="ai-bar-input" placeholder="Ask me anything...">
+        <button class="ai-bar-send" onclick="handleAiBarSubmit()" aria-label="Send">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+        </button>
+      </div>
+    </div>
+
     <!-- Bottom Nav -->
     <div class="bottom-nav">
       <button class="nav-item active" data-tab="home" aria-label="Home">
@@ -3391,6 +3521,7 @@ let checkInBeat = 0;
 let pushTimer = null;
 let pushDismissTimer = null;
 let currentPastConv = null;
+let conversationContext = null;
 
 // Profile / onboarding state
 let onboardingComplete = false;
@@ -4012,6 +4143,28 @@ function switchTab(tabName) {
   const targetNav = document.querySelector('.nav-item[data-tab="' + tabName + '"]');
   if (targetNav) targetNav.classList.add('active');
   document.getElementById('tab-' + tabName).classList.add('active');
+  // Show/hide AI bar (hidden on home where hero input serves as entry)
+  const aiBar = document.getElementById('ai-bar');
+  if (aiBar) {
+    if (tabName === 'home') {
+      aiBar.classList.add('hidden');
+    } else {
+      aiBar.classList.remove('hidden');
+    }
+  }
+  updateAiPlaceholder();
+}
+
+function updateAiPlaceholder() {
+  const input = document.getElementById('ai-bar-input');
+  if (!input) return;
+  const placeholders = {
+    home: '',
+    health: 'Ask about your health...',
+    benefits: 'Ask about your benefits...',
+    profile: 'Help me to...'
+  };
+  input.placeholder = placeholders[currentTab] || 'Ask me anything...';
 }
 
 navItems.forEach(item => {
@@ -4088,7 +4241,9 @@ function handleHomeSubmit() {
   // Clear conversation state for a fresh thread
   conversationHistory = [];
   document.getElementById('conv-messages').innerHTML = '';
+  document.getElementById('conv-context-banner').classList.remove('visible');
   resetConvHeader();
+  conversationContext = currentTab;
   sendMessage(text);
 }
 
@@ -4098,7 +4253,9 @@ function sendPrompt(text) {
   // Clear conversation state for a fresh thread
   conversationHistory = [];
   document.getElementById('conv-messages').innerHTML = '';
+  document.getElementById('conv-context-banner').classList.remove('visible');
   resetConvHeader();
+  conversationContext = currentTab;
   sendMessage(text);
 }
 
@@ -4292,18 +4449,86 @@ async function sendCheckInLiveMessage(userText) {
 
 // ── Conversation Screen Management ──
 function showConvScreen() {
-  document.getElementById('conv-screen-overlay').classList.add('open');
-  document.getElementById('conv-screen').classList.add('open');
+  const sheet = document.getElementById('conv-screen');
+  const backdrop = document.getElementById('conv-screen-overlay');
+  const aiBar = document.getElementById('ai-bar');
+
+  sheet.classList.add('open');
+  backdrop.classList.add('open');
+  if (aiBar) { aiBar.style.opacity = '0'; aiBar.style.pointerEvents = 'none'; }
+
+  // Set context
+  if (!conversationContext) conversationContext = currentTab;
+  const contextLabels = {
+    home: '',
+    health: 'Viewing: Your Health',
+    benefits: 'Viewing: Your Benefits',
+    profile: 'Viewing: Your Profile'
+  };
+  const contextSub = document.getElementById('conv-agent-sub');
+  if (contextSub && conversationContext && conversationContext !== 'home') {
+    contextSub.textContent = contextLabels[conversationContext] || 'Your health companion';
+  }
+
+  // Show context banner if not from home
+  if (conversationContext && conversationContext !== 'home') {
+    showContextBanner(conversationContext);
+  }
 }
 
 function closeConvScreen() {
-  document.getElementById('conv-screen-overlay').classList.remove('open');
-  document.getElementById('conv-screen').classList.remove('open');
+  const sheet = document.getElementById('conv-screen');
+  const backdrop = document.getElementById('conv-screen-overlay');
+  const aiBar = document.getElementById('ai-bar');
+
+  sheet.classList.remove('open', 'expanded');
+  backdrop.classList.remove('open');
+  if (aiBar && currentTab !== 'home') { aiBar.style.opacity = '1'; aiBar.style.pointerEvents = 'all'; }
+
   hideSuggestedReplies();
   conversationHistory = [];
   isCheckInConversation = false;
+  conversationContext = null;
   document.getElementById('conv-messages').innerHTML = '';
+  document.getElementById('conv-context-banner').classList.remove('visible');
   resetConvHeader();
+}
+
+function toggleSheetExpand() {
+  const sheet = document.getElementById('conv-screen');
+  const btn = document.getElementById('conv-expand-btn');
+  if (sheet.classList.contains('expanded')) {
+    sheet.classList.remove('expanded');
+    btn.textContent = '⤢';
+    btn.title = 'Expand';
+  } else {
+    sheet.classList.add('expanded');
+    btn.textContent = '⤡';
+    btn.title = 'Collapse';
+  }
+}
+
+function showContextBanner(tab) {
+  const banner = document.getElementById('conv-context-banner');
+  if (!banner) return;
+  const bannerText = {
+    health: '🩺 I can see you\'re on Health. I have your recent labs, medications, and care team info ready.',
+    benefits: '💳 I can see you\'re on Benefits. I have your current balances and recent claims ready.',
+    profile: '📋 I can see you\'re on your Profile. I can help with settings or account questions.'
+  };
+  banner.textContent = bannerText[tab] || '';
+  if (bannerText[tab]) {
+    banner.classList.add('visible');
+  }
+}
+
+function handleAiBarSubmit() {
+  const input = document.getElementById('ai-bar-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  conversationContext = currentTab;
+  sendMessage(text);
 }
 
 function showConvLiveInput() {
@@ -4321,17 +4546,10 @@ function resetConvHeader() {
 
 function goHome() {
   // Close all overlays
-  document.getElementById('conv-screen-overlay').classList.remove('open');
-  document.getElementById('conv-screen').classList.remove('open');
+  closeConvScreen();
   document.getElementById('history-screen').classList.remove('open');
   document.getElementById('past-conv-screen').classList.remove('open');
   document.getElementById('onboarding-overlay').classList.remove('open');
-  // Reset conversation state
-  hideSuggestedReplies();
-  conversationHistory = [];
-  isCheckInConversation = false;
-  document.getElementById('conv-messages').innerHTML = '';
-  resetConvHeader();
   // Switch to Home tab
   switchTab('home');
 }
@@ -5003,6 +5221,14 @@ document.getElementById('conv-input').addEventListener('keydown', (e) => {
 
 document.getElementById('conv-input').addEventListener('input', () => {
   hideSuggestedReplies();
+});
+
+// ── AI Bar Input ──
+document.getElementById('ai-bar-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handleAiBarSubmit();
+  }
 });
 
 // ── Keyboard Shortcut: Cmd/Ctrl+D ──
