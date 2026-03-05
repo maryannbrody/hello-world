@@ -1666,24 +1666,44 @@ small, .small-text {
   flex-shrink: 0;
 }
 
-/* ── Conversation Screen ── */
+/* ── Conversation Screen (Bottom Sheet) ── */
+#conv-screen-overlay {
+  display: none;
+  position: absolute;
+  top: 100px; left: 0; right: 0; bottom: 68px;
+  background: rgba(0,0,0,0.35);
+  z-index: 59;
+}
+
+#conv-screen-overlay.open {
+  display: block;
+}
+
 #conv-screen {
   display: none;
   flex-direction: column;
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 100px; left: 0; right: 0; bottom: 68px;
   background: var(--gray-bg);
   z-index: 60;
-  border-radius: 40px;
+  border-radius: 20px 20px 0 0;
 }
 
 #conv-screen.open {
   display: flex;
 }
 
-.conv-spacer {
-  height: 54px;
+.conv-grab-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--gray-mid);
+  border-radius: 2px;
+  margin: 10px auto 0;
   flex-shrink: 0;
+}
+
+.conv-spacer {
+  display: none;
 }
 
 .conv-header {
@@ -1961,12 +1981,12 @@ small, .small-text {
   color: var(--charcoal);
 }
 
-/* Mode indicator */
+/* Mode indicator — sits inside input area, above the input field */
 .conv-mode-indicator {
   text-align: center;
-  padding: 4px 16px 8px;
-  font-size: 13px;
-  color: var(--gray-text);
+  padding: 6px 16px 0;
+  font-size: 12px;
+  color: #999;
 }
 
 /* Conversation input area */
@@ -3185,8 +3205,9 @@ small, .small-text {
     </div>
 
     <!-- Conversation Screen Overlay -->
+    <div id="conv-screen-overlay" onclick="closeConvScreen()"></div>
     <div id="conv-screen">
-      <div class="conv-spacer"></div>
+      <div class="conv-grab-handle"></div>
       <div class="conv-header">
         <button class="back-btn" onclick="closeConvScreen()">
           <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
@@ -3202,8 +3223,8 @@ small, .small-text {
       <div id="conv-messages"></div>
       <div id="conv-suggested-replies" class="hidden"></div>
       <button class="conv-talk-person" id="conv-talk-to-person" onclick="talkToPerson()">👤 Talk to a person</button>
-      <div class="conv-mode-indicator" id="conv-mode-indicator">Get instant answers · Supported by AI</div>
       <div id="conv-live-input">
+        <div class="conv-mode-indicator" id="conv-mode-indicator">Get instant answers · Supported by AI</div>
         <div class="conv-input-wrap">
           <input type="text" id="conv-input" placeholder="Ask me anything…">
           <button class="conv-send-btn" onclick="handleConvSubmit()">
@@ -3950,6 +3971,10 @@ function switchTab(tabName) {
 navItems.forEach(item => {
   item.addEventListener('click', () => {
     const tab = item.dataset.tab;
+    // Close conversation sheet if open
+    if (document.getElementById('conv-screen').classList.contains('open')) {
+      closeConvScreen();
+    }
     if (tab === currentTab) return;
     switchTab(tab);
   });
@@ -4221,10 +4246,12 @@ async function sendCheckInLiveMessage(userText) {
 
 // ── Conversation Screen Management ──
 function showConvScreen() {
+  document.getElementById('conv-screen-overlay').classList.add('open');
   document.getElementById('conv-screen').classList.add('open');
 }
 
 function closeConvScreen() {
+  document.getElementById('conv-screen-overlay').classList.remove('open');
   document.getElementById('conv-screen').classList.remove('open');
   hideSuggestedReplies();
   conversationHistory = [];
@@ -4248,6 +4275,7 @@ function resetConvHeader() {
 
 function goHome() {
   // Close all overlays
+  document.getElementById('conv-screen-overlay').classList.remove('open');
   document.getElementById('conv-screen').classList.remove('open');
   document.getElementById('history-screen').classList.remove('open');
   document.getElementById('past-conv-screen').classList.remove('open');
@@ -4687,8 +4715,8 @@ function triggerHumanHandoff(text) {
     '<div class="handoff-avatar" style="background:' + teamColor + '">' + teamEmoji + '</div>' +
     '<div class="handoff-team-name">' + teamName + '</div>' +
     '<div class="handoff-team-desc">' + teamDesc + '</div>' +
-    '<button class="handoff-connect-btn" onclick="connectToHuman(\'' + teamName + '\',\'' + teamEmoji + '\',\'' + teamColor + '\')">Connect now</button>' +
-    '<button class="handoff-keep-btn" onclick="keepChatting()">Keep chatting instead</button>';
+    '<button class="handoff-connect-btn" onclick="connectToHuman(\'' + teamName + '\',\'' + teamEmoji + '\',\'' + teamColor + '\')">Send to care team</button>' +
+    '<button class="handoff-keep-btn" onclick="keepChatting()">Continue with AI</button>';
   msgs.appendChild(card);
   scrollConvToBottom();
 }
@@ -4697,28 +4725,16 @@ async function connectToHuman(teamName, teamEmoji, teamColor) {
   const card = document.getElementById('handoff-card');
   if (card) card.remove();
 
-  // Update header
-  document.getElementById('conv-agent-avatar').textContent = teamEmoji;
-  document.getElementById('conv-agent-avatar').style.background = teamColor;
-  document.getElementById('conv-agent-name').textContent = teamName;
-  document.getElementById('conv-agent-sub').textContent = 'Connecting…';
+  // Update header to show message sent
+  document.getElementById('conv-agent-sub').textContent = 'Message sent';
+  document.getElementById('conv-mode-indicator').innerHTML = teamName + ' · Typically responds in a few minutes';
 
-  // Context summary
-  const msgs = document.getElementById('conv-messages');
-  const ctx = document.createElement('div');
-  ctx.className = 'context-card';
-  ctx.innerHTML = '<div class="context-title">Sharing your context</div><div class="context-text">Rebecca Chen · Member DVH-2024-78432<br>Recent conversation about health data and benefits</div>';
-  msgs.appendChild(ctx);
+  // Show async confirmation as AI bubble
+  appendAiBubble("Your message has been sent to **" + teamName + "**. A member of the team will review your conversation and respond here — most replies arrive within a few minutes during business hours.");
   scrollConvToBottom();
 
-  await delay(2000);
-
-  document.getElementById('conv-agent-sub').textContent = 'Connected';
-  document.getElementById('conv-talk-to-person').style.display = 'none';
-  document.getElementById('conv-input').placeholder = 'Message ' + teamName + '…';
-
-  appendAiBubble("Hi Rebecca — I'm with " + teamName + ". I can see the context from your conversation. How can I help you today?");
-  scrollConvToBottom();
+  // Keep input visible so member can add more context
+  document.getElementById('conv-input').placeholder = 'Add more details…';
 }
 
 function keepChatting() {
