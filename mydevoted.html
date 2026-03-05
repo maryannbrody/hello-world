@@ -208,6 +208,14 @@ input:focus-visible {
   outline-offset: 3px;
 }
 
+/* Inputs inside pill wrappers rely on parent :focus-within styling */
+.home-input:focus-visible,
+#conv-input:focus-visible,
+.ob-text-input:focus-visible,
+.api-key-input:focus-visible {
+  outline: none;
+}
+
 /* ── Phone Bezel ── */
 .phone-bezel {
   width: 390px;
