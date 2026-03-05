@@ -2110,6 +2110,612 @@ small, .small-text {
 .nav-transition-dots .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); animation: bounce 1.2s infinite; }
 .nav-transition-dots .dot:nth-child(2) { animation-delay: 0.2s; }
 .nav-transition-dots .dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* ── Onboarding Overlay ── */
+#onboarding-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--gray-bg);
+  z-index: 50;
+  border-radius: 40px;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.32,0.72,0,1);
+}
+
+#onboarding-overlay.open {
+  transform: translateY(0);
+}
+
+.ob-spacer { height: 54px; flex-shrink: 0; }
+
+.ob-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--gray-mid);
+  flex-shrink: 0;
+}
+
+.ob-title {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.ob-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.ob-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gray-mid);
+  transition: background 0.3s;
+}
+
+.ob-dot.active {
+  background: var(--red);
+}
+
+.ob-close-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 22px;
+  color: var(--gray-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.ob-close-btn:hover { background: var(--bg-input); }
+
+#ob-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  -webkit-overflow-scrolling: touch;
+}
+
+#ob-input-area {
+  padding: 10px 12px 14px;
+  border-top: 1.5px solid var(--gray-mid);
+  flex-shrink: 0;
+  background: var(--white);
+}
+
+.ob-text-input-wrap {
+  display: flex;
+  align-items: center;
+  background: var(--bg-input);
+  border-radius: 50px;
+  min-height: 56px;
+  padding: 10px 10px 10px 18px;
+  gap: 8px;
+  border: 2px solid transparent;
+}
+
+.ob-text-input-wrap:focus-within {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(240,75,36,0.12);
+}
+
+.ob-text-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--charcoal);
+  outline: none;
+  min-width: 0;
+}
+
+.ob-text-input::placeholder { color: #999; }
+
+.ob-send-btn {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  background: var(--red);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ob-send-btn:hover { background: var(--red-dark); }
+
+.ob-send-btn svg {
+  width: 18px; height: 18px;
+  fill: none; stroke: var(--white); stroke-width: 2.5;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+
+.ob-choice-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ob-choice-btn {
+  width: 100%;
+  min-height: 52px;
+  border: 1.5px solid var(--gray-mid);
+  background: var(--white);
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--charcoal);
+  cursor: pointer;
+  padding: 12px 16px;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.ob-choice-btn:hover {
+  border-color: var(--red);
+  background: var(--red-light);
+}
+
+.ob-qol-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ob-qol-dot {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--gray-mid);
+  background: var(--white);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.ob-qol-dot.selected {
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--white);
+}
+
+.ob-next-btn {
+  width: 100%;
+  min-height: 52px;
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ob-next-btn:hover { background: var(--red-dark); }
+
+.ob-next-btn:disabled {
+  background: var(--gray-mid);
+  cursor: not-allowed;
+}
+
+/* ── Push Notification ── */
+#push-notification {
+  position: absolute;
+  top: 64px;
+  left: 10px;
+  right: 10px;
+  z-index: 200;
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 14px;
+  cursor: pointer;
+  transform: translateY(-140%);
+  transition: transform 0.5s cubic-bezier(0.32,0.72,0,1);
+}
+
+#push-notification.visible {
+  transform: translateY(0);
+}
+
+.push-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.push-icon {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 6px;
+  background: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.push-app-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-text);
+  flex: 1;
+}
+
+.push-time {
+  font-size: 12px;
+  color: var(--gray-text);
+}
+
+.push-dismiss {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--gray-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.push-dismiss:hover { background: var(--bg-input); }
+
+.push-body {
+  font-size: 15px;
+  color: var(--charcoal);
+  line-height: 1.4;
+}
+
+/* ── Emergency Card ── */
+.emergency-card {
+  background: var(--white);
+  border: 2px solid var(--red);
+  border-radius: 16px;
+  padding: 24px 20px;
+  text-align: center;
+  margin: 0 4px;
+  animation: fadeInUp 0.25s ease;
+}
+
+.emergency-icon { font-size: 48px; margin-bottom: 12px; }
+
+.emergency-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 16px;
+}
+
+.emergency-call-btn {
+  display: block;
+  width: 100%;
+  min-height: 56px;
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 56px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.emergency-divider {
+  font-size: 13px;
+  color: var(--gray-text);
+  margin: 12px 0;
+}
+
+.emergency-dismiss-btn {
+  background: none;
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--charcoal);
+  cursor: pointer;
+  padding: 12px 24px;
+  min-height: 48px;
+}
+
+/* ── Handoff Card ── */
+.handoff-card {
+  background: var(--white);
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 0 4px;
+  text-align: center;
+  animation: fadeInUp 0.25s ease;
+}
+
+.handoff-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.handoff-team-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 4px;
+}
+
+.handoff-team-desc {
+  font-size: 14px;
+  color: var(--gray-text);
+  margin-bottom: 16px;
+}
+
+.handoff-connect-btn {
+  display: block;
+  width: 100%;
+  min-height: 52px;
+  background: var(--charcoal);
+  color: var(--white);
+  border: none;
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.handoff-connect-btn:hover { background: #2d353e; }
+
+.handoff-keep-btn {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  background: transparent;
+  border: 1.5px solid var(--gray-mid);
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--charcoal);
+  cursor: pointer;
+}
+
+/* Context summary card */
+.context-card {
+  background: var(--blue-light);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 0 4px;
+  animation: fadeInUp 0.25s ease;
+}
+
+.context-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blue);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.context-text {
+  font-size: 14px;
+  color: var(--charcoal);
+  line-height: 1.5;
+}
+
+/* ── History Screen ── */
+#history-screen,
+#past-conv-screen {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--gray-bg);
+  z-index: 55;
+  border-radius: 40px;
+}
+
+#history-screen.open,
+#past-conv-screen.open {
+  display: flex;
+}
+
+.history-screen-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--gray-mid);
+  flex-shrink: 0;
+  gap: 10px;
+  margin-top: 54px;
+}
+
+.history-screen-title {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--charcoal);
+  flex: 1;
+}
+
+.history-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.history-list-item {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--bg-input);
+  cursor: pointer;
+  min-height: 64px;
+  gap: 12px;
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+}
+
+.history-list-item:hover {
+  background: var(--white);
+}
+
+.history-list-avatar {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.history-list-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-list-date {
+  font-size: 13px;
+  color: var(--gray-text);
+}
+
+.history-list-topic {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--charcoal);
+  line-height: 1.3;
+}
+
+.history-list-preview {
+  font-size: 14px;
+  color: var(--gray-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Past conversation viewer */
+#past-conv-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.past-msg-row.user {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.past-msg-row.user .past-msg-bubble {
+  background: var(--bg-input);
+  color: var(--charcoal);
+  border-radius: 18px;
+  border-bottom-right-radius: 4px;
+  padding: 14px 16px;
+  max-width: 82%;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.past-msg-row.ai {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.past-msg-row.ai .past-msg-bubble {
+  background: var(--white);
+  border: 1.5px solid var(--bg-input);
+  border-radius: 18px;
+  border-bottom-left-radius: 4px;
+  padding: 14px 16px;
+  max-width: 82%;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--charcoal);
+}
+
+.past-date-divider {
+  text-align: center;
+  font-size: 13px;
+  color: var(--gray-text);
+  padding: 8px 0;
+}
+
+#past-conv-bottom {
+  padding: 10px 16px 14px;
+  background: var(--white);
+  border-top: 1.5px solid var(--gray-mid);
+}
+
+#past-continue-btn {
+  width: 100%;
+  min-height: 56px;
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#past-continue-btn:hover { background: var(--red-dark); }
 </style>
 </head>
 <body>
@@ -2610,6 +3216,67 @@ small, .small-text {
       </div>
     </div>
 
+    <!-- Onboarding Overlay -->
+    <div id="onboarding-overlay">
+      <div class="ob-spacer"></div>
+      <div class="ob-header">
+        <div class="ob-title">Get started</div>
+        <div class="ob-dots" id="ob-dots">
+          <div class="ob-dot active"></div>
+          <div class="ob-dot"></div>
+          <div class="ob-dot"></div>
+          <div class="ob-dot"></div>
+          <div class="ob-dot"></div>
+          <div class="ob-dot"></div>
+        </div>
+        <button class="ob-close-btn" onclick="closeOnboarding()">✕</button>
+      </div>
+      <div id="ob-messages"></div>
+      <div id="ob-input-area"></div>
+    </div>
+
+    <!-- Push Notification -->
+    <div id="push-notification" onclick="openPushConversation()">
+      <div class="push-header">
+        <div class="push-icon">🌱</div>
+        <span class="push-app-name">MyDevoted · Health Coach</span>
+        <span class="push-time">now</span>
+        <button class="push-dismiss" onclick="event.stopPropagation(); dismissPush()">✕</button>
+      </div>
+      <div class="push-body">Rebecca, checking in like we planned. How are you feeling this evening?</div>
+    </div>
+
+    <!-- History Screen -->
+    <div id="history-screen">
+      <div class="history-screen-header">
+        <button class="back-btn" onclick="closeHistoryScreen()">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="history-screen-title">Conversation History</div>
+      </div>
+      <div class="history-list" id="history-list"></div>
+    </div>
+
+    <!-- Past Conversation Viewer -->
+    <div id="past-conv-screen">
+      <div class="history-screen-header">
+        <button class="back-btn" onclick="closePastConvScreen()">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div id="past-conv-header-info" style="display:flex;gap:10px;align-items:center;flex:1;">
+          <div class="msg-avatar" id="past-conv-avatar" style="background:var(--red)">♥</div>
+          <div>
+            <div class="conv-agent-name" id="past-conv-agent-name">MyDevoted AI</div>
+            <div class="conv-agent-sub" id="past-conv-agent-sub"></div>
+          </div>
+        </div>
+      </div>
+      <div id="past-conv-messages"></div>
+      <div id="past-conv-bottom">
+        <button id="past-continue-btn" onclick="continuePastConversation()">Continue this conversation →</button>
+      </div>
+    </div>
+
     <!-- Navigation Transition Overlay -->
     <div class="nav-transition-overlay" id="nav-transition">
       <div class="nav-transition-card">
@@ -2652,14 +3319,72 @@ let isLoading = false;
 let currentAgent = null;
 let currentTab = 'home';
 let isCheckInConversation = false;
+let onboardStep = 0;
+let checkInBeat = 0;
+let pushTimer = null;
+let pushDismissTimer = null;
+let currentPastConv = null;
 
-// Profile / onboarding state (set by onboarding flow in Prompt 5)
+// Profile / onboarding state
 let onboardingComplete = false;
 let preferredName = 'Rebecca';
 let eDeliveryConsent = null;
 let healthSharingAuth = null;
 let qualityOfLifeScore = null;
 let greatDayDescription = null;
+
+// ── Escalation Regexes ──
+const EMERGENCY_REGEX = /chest pain|can't breathe|cannot breathe|heart attack|stroke|suicidal|want to die|kill myself|overdose|seizure|unconscious|choking|severe bleeding|anaphylaxis/i;
+const ESCALATE_HUMAN_REGEX = /talk to a person|talk to someone|speak to someone|live agent|real person|human agent|representative|need a person|want a person/i;
+
+// ── Past Conversations ──
+const PAST_CONVERSATIONS = [
+  {
+    id: 'past-0', agent: 'HEALTH_COACH', date: 'Feb 26', topic: 'Your A1c improved — and a check-in plan',
+    preview: 'We talked about your 6.8% result...',
+    avatarBg: '#dcfce7', avatarEmoji: '🌱',
+    turns: [
+      { role: 'ai', text: "Rebecca, I wanted to share something from your recent labs. Your HbA1c came back at 6.8% — that's down from 7.2% last time. That's a meaningful improvement.\n\nThis number reflects the last 2-3 months of your life — your meals, your movement, your daily rhythms. It doesn't change by accident.\n\nHow does it feel to hear that?" },
+      { role: 'user', text: "Honestly? A little surprised. I didn't think I was doing anything differently." },
+      { role: 'ai', text: "That's such an interesting response. Sometimes the most sustainable changes are the ones we don't even notice we're making. Maybe something shifted in how you eat, or how you move through your day, or even how you're sleeping.\n\nRather than trying to figure out what changed, what if we just paid attention together going forward? I could check in with you a couple times a week — not to give you homework, just to notice patterns together.\n\nWould that feel supportive, or would it feel like too much?" },
+      { role: 'user', text: "Supportive, I think. I'd like that." },
+      { role: 'ai', text: "I'm glad. Let's keep it light — Tuesdays and Thursdays work? Just a quick check-in, no agenda. You set the pace.\n\nAnd Rebecca — that 6.8% is yours. You earned it, even if you're not sure how. That's worth sitting with for a moment." }
+    ]
+  },
+  {
+    id: 'past-1', agent: 'HEALTH_DATA', date: 'Yesterday', topic: 'What does my eGFR result mean?',
+    preview: 'Rebecca asked about kidney function...',
+    avatarBg: 'var(--purple-light)', avatarEmoji: '🔬',
+    turns: [
+      { role: 'user', text: "I saw my eGFR was 58 on my lab results. What does that mean? Should I be worried?" },
+      { role: 'ai', text: "That's a really good question to ask, and I'm glad you're paying attention to it.\n\nYour eGFR of 58 measures how well your kidneys are filtering waste from your blood. Think of it like a performance score — at 58, your kidneys are working at roughly 60% of typical capacity.\n\nIn medical terms, this is called Stage 3a — which sounds more alarming than it usually is. It's actually quite common in people who are managing both diabetes and blood pressure, like you are.\n\nWhat's worth noticing is that your lisinopril is specifically chosen to protect kidney function. And keeping your A1c and blood pressure in good ranges — which you're doing — is the most important thing for your kidneys right now." },
+      { role: 'user', text: "I've been feeling more tired lately. I wondered if it could be connected." },
+      { role: 'ai', text: "That's a really thoughtful connection to make. For some people, reduced kidney function can contribute to feeling more tired — the kidneys do a lot of behind-the-scenes work that affects energy levels.\n\nThat said, fatigue has many possible threads — sleep quality, blood sugar patterns, even the emotional weight of managing health conditions.\n\nThis would be a great thing to bring up with Dr. Wagle on March 4. Would you like me to help you draft a question about the connection between your kidney function and fatigue? Sometimes having the words ready makes it easier to bring up." }
+    ]
+  },
+  {
+    id: 'past-2', agent: 'BENEFITS', date: 'Feb 23', topic: 'Yoga mat reimbursement',
+    preview: 'Your $45 claim was submitted...',
+    avatarBg: 'var(--red-light)', avatarEmoji: '💳',
+    turns: [
+      { role: 'user', text: "I bought a yoga mat for $45. Can I get reimbursed through my plan?" },
+      { role: 'ai', text: "Yes! A yoga mat absolutely qualifies under your **Wellness Bucks** benefit. Here's how it works:\n\nYou have a **$200 annual allowance** for wellness-related purchases. A yoga mat is an approved fitness item.\n\nTo submit your claim, you'll need your receipt showing the purchase amount and date. I can walk you through the submission process, or you can upload it through the member portal.\n\nOnce submitted, claims typically process within **5-7 business days**. After approval, your Wellness Bucks balance will update to $155 remaining.\n\nWould you like to start the submission now?" },
+      { role: 'user', text: "I also heard I have an OTC benefit. What does that cover?" },
+      { role: 'ai', text: "Great question — and yes, that's a completely separate benefit from Wellness Bucks!\n\nYour **OTC allowance is $100 per quarter**. Right now for Q1 2026, you have the full $100 available. It covers:\n\n- **Vitamins and supplements**\n- **Pain relief** (Tylenol, Advil, etc.)\n- **Bandages and first aid supplies**\n- **Digestive health** products\n- **Diabetes supplies** (glucose tablets, test strips)\n- **Cold and allergy** medications\n\nThis resets every quarter, so it's use-it-or-lose-it within each 3-month period. Your next reset is April 1.\n\nWould you like help finding where to shop with your OTC benefit?" }
+    ]
+  },
+  {
+    id: 'past-3', agent: 'HEALTH_COACH', date: 'Feb 20', topic: 'Feeling tired and unmotivated',
+    preview: 'Rebecca shared how she was feeling...',
+    avatarBg: '#dcfce7', avatarEmoji: '🌱',
+    turns: [
+      { role: 'user', text: "I've been feeling really tired and unmotivated lately. I don't know what's going on." },
+      { role: 'ai', text: "Thank you for sharing that, Rebecca. Feeling tired and unmotivated is worth paying attention to — your body and mind are trying to tell you something.\n\nBefore I jump to any connections, I want to understand what this feels like for you. When you say tired — is it more of a physical heaviness, like your body is drained? Or is it more mental — like the motivation just isn't there, even for things you usually enjoy?" },
+      { role: 'user', text: "More physical I think. My legs feel heavy, even in the morning." },
+      { role: 'ai', text: "Heavy legs, even in the morning — that's a specific kind of tired. It's not just 'didn't sleep well' tired. It sounds like something your body is carrying.\n\nI'm curious — has this been building gradually, or did you notice a shift at some point? Sometimes there's a pattern hiding in the timeline.\n\nAnd is it every day, or do some days feel lighter than others? The variation can tell us a lot." }
+    ]
+  }
+];
 
 // ── Utilities ──
 function escHtml(s) {
@@ -3267,11 +3992,19 @@ function saveApiKey() {
 // ── Reset Demo ──
 function resetDemo() {
   closeConvScreen();
+  closeOnboarding();
+  closeHistoryScreen();
+  closePastConvScreen();
+  dismissPush();
+  isCheckInConversation = false;
+  checkInBeat = 0;
   currentTab = 'home';
   navItems.forEach(n => n.classList.remove('active'));
   navItems[0].classList.add('active');
   tabViews.forEach(v => v.classList.remove('active'));
   document.getElementById('tab-home').classList.add('active');
+  // Restart push timer
+  startPushTimer();
 }
 
 // ── Core Message Functions ──
@@ -3300,6 +4033,27 @@ function handleConvSubmit() {
 
 async function sendMessage(text) {
   hideSuggestedReplies();
+
+  // Tier 3: Emergency detection
+  if (EMERGENCY_REGEX.test(text)) {
+    showConvScreen();
+    showConvLiveInput();
+    appendUserBubble(text);
+    showEmergencyCard();
+    scrollConvToBottom();
+    return;
+  }
+
+  // Tier 2: Human escalation
+  if (ESCALATE_HUMAN_REGEX.test(text)) {
+    showConvScreen();
+    showConvLiveInput();
+    appendUserBubble(text);
+    triggerHumanHandoff(text);
+    scrollConvToBottom();
+    return;
+  }
+
   // Demo mode
   if (demoMode) {
     sendDemoMessage(text);
@@ -3367,25 +4121,6 @@ async function sendMessage(text) {
     isLoading = false;
     scrollConvToBottom();
   }
-}
-
-async function sendDemoMessage(text) {
-  if (isLoading) return;
-  showConvScreen();
-  showConvLiveInput();
-  appendUserBubble(text);
-  isLoading = true;
-  const loadingEl = appendLoadingBubble();
-  scrollConvToBottom();
-  await delay(400);
-  const t = text.toLowerCase();
-  const demo = DEMO_RESPONSES.find(r => r.match(t));
-  await delay(800);
-  loadingEl.remove();
-  appendAiBubble(demo.text);
-  if (demo.replies && demo.replies.length) showSuggestedReplies(demo.replies);
-  scrollConvToBottom();
-  isLoading = false;
 }
 
 // ── Router ──
@@ -3602,14 +4337,511 @@ async function navigateWithTransition(tabName) {
   overlay.classList.remove('visible');
 }
 
-// ── Stub Functions ──
+// ── Stub/Wire Functions ──
 function talkToPerson() {
   sendMessage("I'd like to talk to a person");
 }
-function openOnboarding() { console.log('open onboarding'); }
-function openHistoryScreen() { console.log('open history'); }
-function openPastConversation(id) { console.log('open past:', id); }
-function continueConversation() { console.log('continue conversation'); }
+
+// ── Onboarding ──
+function openOnboarding() {
+  onboardStep = 0;
+  document.getElementById('ob-messages').innerHTML = '';
+  document.getElementById('onboarding-overlay').classList.add('open');
+  renderOnboardingStep();
+}
+
+function closeOnboarding() {
+  document.getElementById('onboarding-overlay').classList.remove('open');
+}
+
+function renderOnboardingStep() {
+  const msgs = document.getElementById('ob-messages');
+  const inputArea = document.getElementById('ob-input-area');
+  const dots = document.querySelectorAll('#ob-dots .ob-dot');
+  dots.forEach((d, i) => d.classList.toggle('active', i <= onboardStep));
+
+  function addObAi(text) {
+    const row = document.createElement('div');
+    row.className = 'msg-row ai';
+    row.innerHTML = '<div class="msg-avatar" style="background:var(--red)">♥</div><div class="msg-bubble-wrap"><div class="msg-bubble">' + renderMarkdown(text) + '</div></div>';
+    msgs.appendChild(row);
+  }
+
+  function addObUser(text) {
+    const row = document.createElement('div');
+    row.className = 'msg-row user';
+    row.innerHTML = '<div class="msg-bubble">' + escHtml(text) + '</div>';
+    msgs.appendChild(row);
+  }
+
+  const name = preferredName || 'Rebecca';
+
+  if (onboardStep === 0) {
+    addObAi("Welcome to MyDevoted, Rebecca! Before we get started — what would you like me to call you?\n\nYour records show **Rebecca** — is that right, or do you prefer something else?");
+    inputArea.innerHTML = '<div class="ob-text-input-wrap"><input class="ob-text-input" id="ob-name-input" type="text" placeholder="Rebecca (or your preferred name)"><button class="ob-send-btn" onclick="submitObName()"><svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button></div>';
+    document.getElementById('ob-name-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submitObName(); } });
+  } else if (onboardStep === 1) {
+    addObAi("Great, " + name + "! We can send your documents digitally instead of by paper.\n\nWould you like to go paperless?");
+    inputArea.innerHTML = '<div class="ob-choice-btns"><button class="ob-choice-btn" onclick="submitObPaperless(true)">Yes, go paperless</button><button class="ob-choice-btn" onclick="submitObPaperless(false)">No, keep paper mail</button></div>';
+  } else if (onboardStep === 2) {
+    addObAi("Sometimes members want a family member or caregiver to see their health information.\n\nWould you like to set that up?");
+    inputArea.innerHTML = '<div class="ob-choice-btns"><button class="ob-choice-btn" onclick="submitObSharing(\'setup\')">Set up now</button><button class="ob-choice-btn" onclick="submitObSharing(\'skip\')">Skip for now</button></div>';
+  } else if (onboardStep === 3) {
+    addObAi("On a scale of 1 to 10, how would you rate your quality of life right now?");
+    let grid = '<div class="ob-qol-grid">';
+    for (let i = 1; i <= 10; i++) {
+      grid += '<button class="ob-qol-dot" onclick="selectQol(this,' + i + ')">' + i + '</button>';
+    }
+    grid += '</div><button class="ob-next-btn" id="ob-qol-next" disabled onclick="submitObQol()">Next →</button>';
+    inputArea.innerHTML = grid;
+  } else if (onboardStep === 4) {
+    addObAi("What does being healthy mean to you? Not what your doctor wants. What do **you** actually want to be able to do?");
+    inputArea.innerHTML = '<div class="ob-text-input-wrap"><input class="ob-text-input" id="ob-greatday-input" type="text" placeholder="Not having to take medicine, time with grandkids…"><button class="ob-send-btn" onclick="submitObGreatDay()"><svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button></div>';
+    document.getElementById('ob-greatday-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submitObGreatDay(); } });
+  } else if (onboardStep === 5) {
+    addObAi("When we give you advice or information, what's most helpful for you?");
+    inputArea.innerHTML = '<div class="ob-choice-btns"><button class="ob-choice-btn" onclick="submitObCommStyle(\'direct\')">Straight-shooter: just be direct and give me facts</button><button class="ob-choice-btn" onclick="submitObCommStyle(\'simple\')">Keep it simple: just the essentials</button><button class="ob-choice-btn" onclick="submitObCommStyle(\'hype\')">Hype squad: cheer me on and keep me motivated</button></div>';
+  } else if (onboardStep === 6) {
+    addObAi("Thank you, " + name + ". I've saved your preferences. MyDevoted is now personalized just for you.");
+    inputArea.innerHTML = '<button class="ob-next-btn" onclick="completeOnboarding()">Go to MyDevoted →</button>';
+  }
+
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function submitObName() {
+  const input = document.getElementById('ob-name-input');
+  const val = input.value.trim() || 'Rebecca';
+  preferredName = val;
+  const msgs = document.getElementById('ob-messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = '<div class="msg-bubble">' + escHtml(val) + '</div>';
+  msgs.appendChild(row);
+  onboardStep = 1;
+  renderOnboardingStep();
+}
+
+function submitObPaperless(yes) {
+  eDeliveryConsent = yes;
+  const msgs = document.getElementById('ob-messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = '<div class="msg-bubble">' + (yes ? 'Yes, go paperless' : 'No, keep paper mail') + '</div>';
+  msgs.appendChild(row);
+  const confirm = document.createElement('div');
+  confirm.className = 'msg-row ai';
+  confirm.innerHTML = '<div class="msg-avatar" style="background:var(--red)">♥</div><div class="msg-bubble-wrap"><div class="msg-bubble"><p>✓ ' + (yes ? 'Paperless delivery enabled!' : 'Paper mail it is — no problem.') + '</p></div></div>';
+  msgs.appendChild(confirm);
+  onboardStep = 2;
+  setTimeout(() => renderOnboardingStep(), 400);
+}
+
+function submitObSharing(choice) {
+  const msgs = document.getElementById('ob-messages');
+  if (choice === 'skip') {
+    healthSharingAuth = 'skip';
+    const row = document.createElement('div');
+    row.className = 'msg-row user';
+    row.innerHTML = '<div class="msg-bubble">Skip for now</div>';
+    msgs.appendChild(row);
+    const confirm = document.createElement('div');
+    confirm.className = 'msg-row ai';
+    confirm.innerHTML = '<div class="msg-avatar" style="background:var(--red)">♥</div><div class="msg-bubble-wrap"><div class="msg-bubble"><p>No problem — you can always do this later from your Profile.</p></div></div>';
+    msgs.appendChild(confirm);
+    onboardStep = 3;
+    setTimeout(() => renderOnboardingStep(), 400);
+  } else {
+    const inputArea = document.getElementById('ob-input-area');
+    const row = document.createElement('div');
+    row.className = 'msg-row user';
+    row.innerHTML = '<div class="msg-bubble">Set up now</div>';
+    msgs.appendChild(row);
+    inputArea.innerHTML = '<div class="ob-text-input-wrap"><input class="ob-text-input" id="ob-sharing-input" type="text" placeholder="Name and relationship (e.g. John, my son)"><button class="ob-send-btn" onclick="submitObSharingName()"><svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button></div>';
+    document.getElementById('ob-sharing-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submitObSharingName(); } });
+  }
+}
+
+function submitObSharingName() {
+  const input = document.getElementById('ob-sharing-input');
+  const val = input.value.trim();
+  if (!val) return;
+  healthSharingAuth = val;
+  const msgs = document.getElementById('ob-messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = '<div class="msg-bubble">' + escHtml(val) + '</div>';
+  msgs.appendChild(row);
+  const confirm = document.createElement('div');
+  confirm.className = 'msg-row ai';
+  confirm.innerHTML = '<div class="msg-avatar" style="background:var(--red)">♥</div><div class="msg-bubble-wrap"><div class="msg-bubble"><p>✓ Health sharing set up for ' + escHtml(val) + '.</p></div></div>';
+  msgs.appendChild(confirm);
+  onboardStep = 3;
+  setTimeout(() => renderOnboardingStep(), 400);
+}
+
+function selectQol(btn, score) {
+  qualityOfLifeScore = score;
+  document.querySelectorAll('.ob-qol-dot').forEach((d, i) => d.classList.toggle('selected', i < score));
+  document.getElementById('ob-qol-next').disabled = false;
+}
+
+function submitObQol() {
+  if (!qualityOfLifeScore) return;
+  const msgs = document.getElementById('ob-messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = '<div class="msg-bubble">' + qualityOfLifeScore + ' out of 10</div>';
+  msgs.appendChild(row);
+  onboardStep = 4;
+  renderOnboardingStep();
+}
+
+function submitObGreatDay() {
+  const input = document.getElementById('ob-greatday-input');
+  const val = input.value.trim();
+  if (!val) return;
+  greatDayDescription = val;
+  const msgs = document.getElementById('ob-messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = '<div class="msg-bubble">' + escHtml(val) + '</div>';
+  msgs.appendChild(row);
+  onboardStep = 5;
+  renderOnboardingStep();
+}
+
+function submitObCommStyle(style) {
+  const labels = { direct: 'Straight-shooter', simple: 'Keep it simple', hype: 'Hype squad' };
+  const msgs = document.getElementById('ob-messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = '<div class="msg-bubble">' + labels[style] + '</div>';
+  msgs.appendChild(row);
+  onboardStep = 6;
+  renderOnboardingStep();
+}
+
+function completeOnboarding() {
+  onboardingComplete = true;
+  closeOnboarding();
+  // Update greeting
+  document.getElementById('greeting-headline').innerHTML = 'Hello, ' + escHtml(preferredName) + '!<br>What\'s on your<br>mind today?';
+  // Hide onboarding card
+  const card = document.getElementById('onboard-card');
+  if (card) card.style.display = 'none';
+  // Update profile
+  renderProfileTab();
+}
+
+// ── Push Notification ──
+function startPushTimer() {
+  clearTimeout(pushTimer);
+  clearTimeout(pushDismissTimer);
+  if (!demoMode) return;
+  pushTimer = setTimeout(() => {
+    document.getElementById('push-notification').classList.add('visible');
+    pushDismissTimer = setTimeout(dismissPush, 10000);
+  }, 5000);
+}
+
+function dismissPush() {
+  document.getElementById('push-notification').classList.remove('visible');
+  clearTimeout(pushDismissTimer);
+}
+
+function openPushConversation() {
+  dismissPush();
+  isCheckInConversation = true;
+  checkInBeat = 0;
+  showConvScreen();
+  showConvLiveInput();
+
+  // Update header for Health Coach
+  document.getElementById('conv-agent-avatar').textContent = '🌱';
+  document.getElementById('conv-agent-avatar').style.background = '#388E3C';
+  document.getElementById('conv-agent-name').textContent = 'Health Coach';
+  document.getElementById('conv-agent-sub').textContent = 'Wellness & lifestyle companion';
+  document.getElementById('conv-mode-indicator').innerHTML = 'Chatting with Health Coach';
+
+  appendAiBubble("Hey Rebecca — checking in like we planned. 💚\n\nI was looking at your recent numbers and something caught my attention. Your A1c came back at **6.8%**. I want to take a moment with that, because it's actually meaningful. That number reflects months of your choices, your routines, your everyday life. It doesn't happen by accident.\n\nI'm also noticing your blood pressure was **138/84** at your last visit. Not alarming — but something worth paying attention to together.\n\nHow are you feeling this evening? And I mean that broadly — not just physically.");
+  conversationHistory = [
+    { role: 'assistant', content: "Hey Rebecca — checking in like we planned.\n\nI was looking at your recent numbers and something caught my attention. Your A1c came back at 6.8%. I want to take a moment with that, because it's actually meaningful. That number reflects months of your choices, your routines, your everyday life. It doesn't happen by accident.\n\nI'm also noticing your blood pressure was 138/84 at your last visit. Not alarming — but something worth paying attention to together.\n\nHow are you feeling this evening? And I mean that broadly — not just physically." }
+  ];
+  showSuggestedReplies([
+    { label: "Honestly, a little tired. It's been a long week.", action: "message", value: "Honestly, a little tired. It's been a long week." }
+  ]);
+  scrollConvToBottom();
+}
+
+async function sendDemoMessage(text) {
+  if (isCheckInConversation && demoMode) {
+    if (isLoading) return;
+    appendUserBubble(text);
+    conversationHistory.push({ role: 'user', content: text });
+    checkInBeat++;
+    isLoading = true;
+    const loadingEl = appendLoadingBubble();
+    scrollConvToBottom();
+    await delay(400);
+
+    if (checkInBeat === 1) {
+      await delay(800);
+      loadingEl.remove();
+      const reply = "Tired makes sense. And \"long week\" tells me something too.\n\nThere's a difference between tired-from-doing-too-much and tired-from-something-feeling-heavy.\n\n**Which one is it for you tonight?**\n\nI ask because both of those things actually connect to what we're watching with your blood pressure. Stress and sleep affect those numbers more than most people realize — sometimes more than what's on your plate.";
+      appendAiBubble(reply);
+      conversationHistory.push({ role: 'assistant', content: reply });
+      showSuggestedReplies([
+        { label: "Both, honestly.", action: "message", value: "Both, honestly." }
+      ]);
+    } else if (checkInBeat === 2) {
+      await delay(800);
+      loadingEl.remove();
+      const reply = "Both. That's honest, and I appreciate it.\n\nHere's something I find worth noticing: you've been managing your blood sugar well enough that your A1c is sitting at **6.8%**. That takes consistency — even when weeks are long. Even when you're tired.\n\nThat's not nothing, Rebecca.\n\n**What does tomorrow look like for you?** Not what you think it should look like — just what it actually looks like.";
+      appendAiBubble(reply);
+      conversationHistory.push({ role: 'assistant', content: reply });
+      // No more chips — free text
+    } else {
+      // Beyond scripted beats in demo mode — use standard demo fallback
+      const t = text.toLowerCase();
+      const demo = DEMO_RESPONSES.find(r => r.match(t));
+      await delay(800);
+      loadingEl.remove();
+      appendAiBubble(demo.text);
+      conversationHistory.push({ role: 'assistant', content: demo.text });
+      if (demo.replies && demo.replies.length) showSuggestedReplies(demo.replies);
+    }
+    isLoading = false;
+    scrollConvToBottom();
+    return;
+  }
+
+  // Normal demo flow
+  if (isLoading) return;
+  showConvScreen();
+  showConvLiveInput();
+  appendUserBubble(text);
+  isLoading = true;
+  const loadingEl = appendLoadingBubble();
+  scrollConvToBottom();
+  await delay(400);
+  const t = text.toLowerCase();
+  const demo = DEMO_RESPONSES.find(r => r.match(t));
+  await delay(800);
+  loadingEl.remove();
+  appendAiBubble(demo.text);
+  if (demo.replies && demo.replies.length) showSuggestedReplies(demo.replies);
+  scrollConvToBottom();
+  isLoading = false;
+}
+
+// ── Emergency Card ──
+function showEmergencyCard() {
+  const msgs = document.getElementById('conv-messages');
+  const card = document.createElement('div');
+  card.className = 'emergency-card';
+  card.innerHTML =
+    '<div class="emergency-icon">🚨</div>' +
+    '<div class="emergency-title">If this is an emergency, call 911 now.</div>' +
+    '<a href="tel:18888022738" class="emergency-call-btn">📞 Call our 24/7 care line</a>' +
+    '<div class="emergency-divider">— or —</div>' +
+    '<button class="emergency-dismiss-btn" onclick="dismissEmergencyCard(this)">This isn\'t an emergency</button>';
+  msgs.appendChild(card);
+}
+
+function dismissEmergencyCard(btn) {
+  const card = btn.closest('.emergency-card');
+  card.remove();
+  triggerHumanHandoff('');
+}
+
+// ── Human Handoff (Tier 2) ──
+function triggerHumanHandoff(text) {
+  const isBenefits = (currentAgent && currentAgent.id === 'BENEFITS') || /claim|coverage|billing|benefit|reimburse/i.test(text);
+  const teamName = isBenefits ? 'Devoted Guide' : 'Devoted Medical';
+  const teamEmoji = isBenefits ? '🤝' : '🩺';
+  const teamColor = isBenefits ? '#F04B24' : '#592C82';
+  const teamDesc = isBenefits ? 'A specialist who can walk you through your benefits' : 'A nurse or clinician who can support you directly';
+
+  appendAiBubble("Of course — let me connect you with someone from our **" + teamName + "** team who can help directly.");
+
+  const msgs = document.getElementById('conv-messages');
+  const card = document.createElement('div');
+  card.className = 'handoff-card';
+  card.id = 'handoff-card';
+  card.innerHTML =
+    '<div class="handoff-avatar" style="background:' + teamColor + '">' + teamEmoji + '</div>' +
+    '<div class="handoff-team-name">' + teamName + '</div>' +
+    '<div class="handoff-team-desc">' + teamDesc + '</div>' +
+    '<button class="handoff-connect-btn" onclick="connectToHuman(\'' + teamName + '\',\'' + teamEmoji + '\',\'' + teamColor + '\')">Connect now</button>' +
+    '<button class="handoff-keep-btn" onclick="keepChatting()">Keep chatting instead</button>';
+  msgs.appendChild(card);
+  scrollConvToBottom();
+}
+
+async function connectToHuman(teamName, teamEmoji, teamColor) {
+  const card = document.getElementById('handoff-card');
+  if (card) card.remove();
+
+  // Update header
+  document.getElementById('conv-agent-avatar').textContent = teamEmoji;
+  document.getElementById('conv-agent-avatar').style.background = teamColor;
+  document.getElementById('conv-agent-name').textContent = teamName;
+  document.getElementById('conv-agent-sub').textContent = 'Connecting…';
+
+  // Context summary
+  const msgs = document.getElementById('conv-messages');
+  const ctx = document.createElement('div');
+  ctx.className = 'context-card';
+  ctx.innerHTML = '<div class="context-title">Sharing your context</div><div class="context-text">Rebecca Chen · Member DVH-2024-78432<br>Recent conversation about health data and benefits</div>';
+  msgs.appendChild(ctx);
+  scrollConvToBottom();
+
+  await delay(2000);
+
+  document.getElementById('conv-agent-sub').textContent = 'Connected';
+  document.getElementById('conv-talk-to-person').style.display = 'none';
+  document.getElementById('conv-input').placeholder = 'Message ' + teamName + '…';
+
+  appendAiBubble("Hi Rebecca — I'm with " + teamName + ". I can see the context from your conversation. How can I help you today?");
+  scrollConvToBottom();
+}
+
+function keepChatting() {
+  const card = document.getElementById('handoff-card');
+  if (card) card.remove();
+}
+
+// ── History Screens ──
+function openHistoryScreen() {
+  renderHistoryScreen();
+  document.getElementById('history-screen').classList.add('open');
+}
+
+function closeHistoryScreen() {
+  document.getElementById('history-screen').classList.remove('open');
+}
+
+function renderHistoryScreen() {
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+  PAST_CONVERSATIONS.forEach(conv => {
+    const agent = AGENTS[conv.agent] || {};
+    const btn = document.createElement('button');
+    btn.className = 'history-list-item';
+    btn.innerHTML =
+      '<div class="history-list-avatar" style="background:' + conv.avatarBg + '">' + conv.avatarEmoji + '</div>' +
+      '<div class="history-list-body">' +
+        '<div class="history-list-date">' + conv.date + '</div>' +
+        '<div class="history-list-topic">' + escHtml(conv.topic) + '</div>' +
+        '<div class="history-list-preview">' + escHtml(conv.preview) + '</div>' +
+      '</div>';
+    btn.onclick = () => openPastConversation(conv.id);
+    list.appendChild(btn);
+  });
+}
+
+function openPastConversation(id) {
+  const conv = PAST_CONVERSATIONS.find(c => c.id === id);
+  if (!conv) return;
+  currentPastConv = conv;
+  const agent = AGENTS[conv.agent] || {};
+
+  document.getElementById('past-conv-avatar').textContent = agent.emoji || '♥';
+  document.getElementById('past-conv-avatar').style.background = agent.color || 'var(--red)';
+  document.getElementById('past-conv-agent-name').textContent = agent.name || 'MyDevoted AI';
+  document.getElementById('past-conv-agent-sub').textContent = conv.date;
+
+  const msgs = document.getElementById('past-conv-messages');
+  msgs.innerHTML = '<div class="past-date-divider">' + conv.date + '</div>';
+
+  conv.turns.forEach(turn => {
+    const row = document.createElement('div');
+    if (turn.role === 'user') {
+      row.className = 'past-msg-row user';
+      row.innerHTML = '<div class="past-msg-bubble">' + escHtml(turn.text) + '</div>';
+    } else {
+      row.className = 'past-msg-row ai';
+      row.innerHTML =
+        '<div class="msg-avatar" style="background:' + (agent.color || 'var(--red)') + '">' + (agent.emoji || '♥') + '</div>' +
+        '<div class="past-msg-bubble">' + renderMarkdown(turn.text) + '</div>';
+    }
+    msgs.appendChild(row);
+  });
+
+  document.getElementById('past-conv-screen').classList.add('open');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function closePastConvScreen() {
+  document.getElementById('past-conv-screen').classList.remove('open');
+  currentPastConv = null;
+}
+
+function continuePastConversation() {
+  if (!currentPastConv) return;
+  const conv = currentPastConv;
+  const agent = AGENTS[conv.agent] || AGENTS.HEALTH_DATA;
+  currentAgent = agent;
+
+  // Load turns into conversation history
+  conversationHistory = [];
+  conv.turns.forEach(turn => {
+    conversationHistory.push({ role: turn.role === 'ai' ? 'assistant' : 'user', content: turn.text });
+  });
+
+  // Close overlays
+  closePastConvScreen();
+  closeHistoryScreen();
+
+  // Show conversation screen
+  showConvScreen();
+  showConvLiveInput();
+
+  // Update header
+  document.getElementById('conv-agent-avatar').textContent = agent.emoji || '♥';
+  document.getElementById('conv-agent-avatar').style.background = agent.color || 'var(--red)';
+  document.getElementById('conv-agent-name').textContent = agent.name || 'MyDevoted AI';
+  document.getElementById('conv-agent-sub').textContent = agent.subtext || '';
+  document.getElementById('conv-mode-indicator').innerHTML = 'Chatting with ' + (agent.name || 'MyDevoted AI');
+
+  // Render past turns
+  const msgs = document.getElementById('conv-messages');
+  msgs.innerHTML = '<div class="past-date-divider">' + conv.date + '</div>';
+  conv.turns.forEach(turn => {
+    if (turn.role === 'user') {
+      appendUserBubble(turn.text);
+    } else {
+      appendAiBubble(turn.text);
+    }
+  });
+
+  scrollConvToBottom();
+}
+
+function continueConversation() {
+  // Generic continue — just ensure input is visible
+  showConvLiveInput();
+}
+
+// ── Render Home History ──
+function renderHomeHistory() {
+  const container = document.getElementById('home-history-rows');
+  container.innerHTML = '';
+  PAST_CONVERSATIONS.slice(0, 3).forEach((conv, i) => {
+    const row = document.createElement('div');
+    row.className = 'history-row';
+    row.onclick = () => openPastConversation(conv.id);
+    row.innerHTML =
+      '<div class="history-avatar" style="background:' + conv.avatarBg + '">' + conv.avatarEmoji + '</div>' +
+      '<div class="history-body">' +
+        '<div class="history-date">' + conv.date + '</div>' +
+        '<div class="history-title">' + escHtml(conv.topic) + '</div>' +
+        '<div class="history-preview">' + escHtml(conv.preview) + '</div>' +
+      '</div>';
+    container.appendChild(row);
+  });
+}
 
 // ── Render Profile Tab ──
 function renderProfileTab() {
@@ -3708,6 +4940,10 @@ document.addEventListener('keydown', (e) => {
     setMode(demoMode ? 'live' : 'demo');
   }
 });
+
+// ── Init ──
+renderHomeHistory();
+startPushTimer();
 </script>
 </body>
 </html>
