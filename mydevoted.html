@@ -2764,7 +2764,7 @@ small, .small-text {
 
     <!-- App Header -->
     <div class="app-header">
-      <div class="app-header-logo">
+      <div class="app-header-logo" onclick="goHome()" style="cursor:pointer">
         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 205 38" style="height:32px;width:auto;">
           <style>.st0{fill:#F04B24;}.st1{fill:#00A1E0;}.st2{fill:#592C82;}.st3{fill:#1D252C;}.st4{fill-rule:evenodd;clip-rule:evenodd;fill:#1D252C;}</style>
           <g><g><g>
@@ -2830,7 +2830,7 @@ small, .small-text {
 
         <!-- 5. Needs your attention -->
         <div class="attention-section">
-          <div class="section-header">What's happening between us?</div>
+          <div class="section-header">Recent Activity</div>
 
           <!-- Card 1: Onboarding -->
           <button class="attention-card" id="onboard-card" onclick="openOnboarding()">
@@ -2845,7 +2845,7 @@ small, .small-text {
           </button>
 
           <!-- Card 2: Claim -->
-          <button class="attention-card" onclick="sendPrompt('Tell me about my reimbursement claim status')">
+          <button class="attention-card" onclick="switchTab('benefits')">
             <div class="card-accent card-accent-red"></div>
             <div class="card-icon card-icon-red">💳</div>
             <div class="card-body">
@@ -2857,7 +2857,7 @@ small, .small-text {
           </button>
 
           <!-- Card 3: Appointment -->
-          <button class="attention-card" onclick="sendPrompt('I want to think about what matters most to me before my appointment with Dr. Patel on March 4')">
+          <button class="attention-card" onclick="switchTab('health')">
             <div class="card-accent card-accent-blue"></div>
             <div class="card-icon card-icon-blue">📅</div>
             <div class="card-body">
@@ -2872,7 +2872,7 @@ small, .small-text {
         <!-- 6. Recent conversations -->
         <div class="recent-section">
           <div class="recent-header">
-            <div class="section-header">Recently Discussed</div>
+            <div class="section-header">Recent Chats</div>
             <button class="see-all-btn" onclick="openHistoryScreen()">See all →</button>
           </div>
           <div id="home-history-rows">
@@ -3202,7 +3202,7 @@ small, .small-text {
       <div id="conv-messages"></div>
       <div id="conv-suggested-replies" class="hidden"></div>
       <button class="conv-talk-person" id="conv-talk-to-person" onclick="talkToPerson()">👤 Talk to a person</button>
-      <div class="conv-mode-indicator" id="conv-mode-indicator">Chatting with MyDevoted AI</div>
+      <div class="conv-mode-indicator" id="conv-mode-indicator">Get instant answers · Supported by AI</div>
       <div id="conv-live-input">
         <div class="conv-input-wrap">
           <input type="text" id="conv-input" placeholder="Ask me anything…">
@@ -4014,12 +4014,20 @@ function handleHomeSubmit() {
   if (!text) return;
   input.value = '';
   document.getElementById('prompt-chips').classList.remove('hidden');
+  // Clear conversation state for a fresh thread
+  conversationHistory = [];
+  document.getElementById('conv-messages').innerHTML = '';
+  resetConvHeader();
   sendMessage(text);
 }
 
 function sendPrompt(text) {
   document.getElementById('home-input').value = '';
   document.getElementById('prompt-chips').classList.remove('hidden');
+  // Clear conversation state for a fresh thread
+  conversationHistory = [];
+  document.getElementById('conv-messages').innerHTML = '';
+  resetConvHeader();
   sendMessage(text);
 }
 
@@ -4080,12 +4088,6 @@ async function sendMessage(text) {
   // Route the message
   const agent = await routeMessage(text);
   currentAgent = agent;
-  // Update header with agent info
-  document.getElementById('conv-agent-avatar').textContent = agent.emoji;
-  document.getElementById('conv-agent-avatar').style.background = agent.color;
-  document.getElementById('conv-agent-name').textContent = agent.name;
-  document.getElementById('conv-agent-sub').textContent = agent.subtext;
-  document.getElementById('conv-mode-indicator').innerHTML = 'Chatting with ' + agent.name;
   // Call the agent
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -4241,7 +4243,23 @@ function resetConvHeader() {
   document.getElementById('conv-agent-avatar').style.background = 'var(--red)';
   document.getElementById('conv-agent-name').textContent = 'MyDevoted AI';
   document.getElementById('conv-agent-sub').textContent = 'Your health companion';
-  document.getElementById('conv-mode-indicator').innerHTML = 'Chatting with MyDevoted AI';
+  document.getElementById('conv-mode-indicator').innerHTML = 'Get instant answers · Supported by AI';
+}
+
+function goHome() {
+  // Close all overlays
+  document.getElementById('conv-screen').classList.remove('open');
+  document.getElementById('history-screen').classList.remove('open');
+  document.getElementById('past-conv-screen').classList.remove('open');
+  document.getElementById('onboarding-overlay').classList.remove('open');
+  // Reset conversation state
+  hideSuggestedReplies();
+  conversationHistory = [];
+  isCheckInConversation = false;
+  document.getElementById('conv-messages').innerHTML = '';
+  resetConvHeader();
+  // Switch to Home tab
+  switchTab('home');
 }
 
 // ── Bubble Helpers ──
@@ -4557,12 +4575,8 @@ function openPushConversation() {
   showConvScreen();
   showConvLiveInput();
 
-  // Update header for Health Coach
-  document.getElementById('conv-agent-avatar').textContent = '🌱';
-  document.getElementById('conv-agent-avatar').style.background = '#388E3C';
-  document.getElementById('conv-agent-name').textContent = 'Health Coach';
-  document.getElementById('conv-agent-sub').textContent = 'Wellness & lifestyle companion';
-  document.getElementById('conv-mode-indicator').innerHTML = 'Chatting with Health Coach';
+  // Reset header to MyDevoted AI
+  resetConvHeader();
 
   appendAiBubble("Hey Rebecca — checking in like we planned. 💚\n\nI was looking at your recent numbers and something caught my attention. Your A1c came back at **6.8%**. I want to take a moment with that, because it's actually meaningful. That number reflects months of your choices, your routines, your everyday life. It doesn't happen by accident.\n\nI'm also noticing your blood pressure was **138/84** at your last visit. Not alarming — but something worth paying attention to together.\n\nHow are you feeling this evening? And I mean that broadly — not just physically.");
   conversationHistory = [
@@ -4798,12 +4812,8 @@ function continuePastConversation() {
   showConvScreen();
   showConvLiveInput();
 
-  // Update header
-  document.getElementById('conv-agent-avatar').textContent = agent.emoji || '♥';
-  document.getElementById('conv-agent-avatar').style.background = agent.color || 'var(--red)';
-  document.getElementById('conv-agent-name').textContent = agent.name || 'MyDevoted AI';
-  document.getElementById('conv-agent-sub').textContent = agent.subtext || '';
-  document.getElementById('conv-mode-indicator').innerHTML = 'Chatting with ' + (agent.name || 'MyDevoted AI');
+  // Reset header to MyDevoted AI
+  resetConvHeader();
 
   // Render past turns
   const msgs = document.getElementById('conv-messages');
