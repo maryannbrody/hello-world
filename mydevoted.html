@@ -1,0 +1,5986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyDevoted Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #F04B24;
+  --red-dark: #D43E1A;
+  --red-light: #FBF0EB;
+  --purple: #592C82;
+  --purple-light: #ECE4F1;
+  --blue: #00A0DD;
+  --blue-light: #D4E7F7;
+  --charcoal: #1D252C;
+  --gray-text: #595959;
+  --gray-bg: #F8F7F5;
+  --bg-input: #F0EFED;
+  --gray-mid: #D9D6D0;
+  --white: #FFFFFF;
+  --amber: #B45309;
+  --amber-bg: #FFFBEB;
+  --green: #166534;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Public Sans', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  background: #C8C8D2;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 40px;
+}
+
+/* ── Control Banner ── */
+.control-banner {
+  max-width: 500px;
+  width: 100%;
+  background: var(--charcoal);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+}
+
+.control-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.control-label {
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.control-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reset-btn {
+  background: rgba(255,255,255,0.15);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  min-height: 36px;
+  min-width: 56px;
+  display: none;
+}
+
+.reset-btn:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+.reset-btn.visible {
+  display: inline-flex;
+  align-items: center;
+}
+
+.mode-toggle {
+  display: flex;
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.mode-btn {
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 16px;
+  cursor: pointer;
+  border-radius: 20px;
+  min-height: 36px;
+  min-width: 56px;
+  transition: all 0.2s;
+}
+
+.mode-btn.active-demo {
+  background: var(--white);
+  color: var(--green);
+}
+
+.mode-btn.active-live {
+  background: var(--white);
+  color: var(--charcoal);
+}
+
+/* API Key Section */
+#api-key-section {
+  margin-top: 12px;
+  display: none;
+}
+
+#api-key-section.visible {
+  display: block;
+}
+
+.api-key-label {
+  color: rgba(255,255,255,0.8);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.api-key-row {
+  display: flex;
+  gap: 8px;
+}
+
+.api-key-input {
+  flex: 1;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  color: var(--white);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 8px 12px;
+  min-height: 40px;
+}
+
+.api-key-input::placeholder {
+  color: rgba(255,255,255,0.4);
+}
+
+.api-key-input:focus {
+  outline: none;
+  border-color: var(--red);
+}
+
+.save-key-btn {
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 18px;
+  cursor: pointer;
+  min-height: 40px;
+  min-width: 56px;
+}
+
+.save-key-btn:hover {
+  background: var(--red-dark);
+}
+
+.key-saved-msg {
+  color: #4ade80;
+  font-size: 13px;
+  margin-top: 6px;
+  display: none;
+}
+
+.key-saved-msg.visible {
+  display: block;
+}
+
+/* ── Focus styles ── */
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--red);
+  outline-offset: 3px;
+}
+
+/* Inputs inside pill wrappers rely on parent :focus-within styling */
+.home-input:focus-visible,
+#conv-input:focus-visible,
+.ob-text-input:focus-visible,
+.api-key-input:focus-visible,
+.ai-bar-input:focus-visible {
+  outline: none;
+}
+
+/* ── Phone Bezel ── */
+.phone-bezel {
+  width: 390px;
+  height: 844px;
+  background: var(--charcoal);
+  border-radius: 52px;
+  padding: 14px;
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.3),
+    0 8px 20px rgba(0,0,0,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+  position: relative;
+}
+
+/* Side buttons */
+.phone-bezel::before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: 140px;
+  width: 4px;
+  height: 36px;
+  background: #3a3a3c;
+  border-radius: 2px 0 0 2px;
+  box-shadow: 0 50px 0 #3a3a3c, 0 -30px 0 #3a3a3c;
+}
+
+.phone-bezel::after {
+  content: '';
+  position: absolute;
+  right: -3px;
+  top: 180px;
+  width: 4px;
+  height: 64px;
+  background: #3a3a3c;
+  border-radius: 0 2px 2px 0;
+}
+
+/* Demo badge */
+.demo-badge {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  background: var(--green);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  z-index: 20;
+  display: none;
+  letter-spacing: 0.5px;
+}
+
+.demo-badge.visible {
+  display: block;
+}
+
+/* Screen */
+.phone-screen {
+  width: 100%;
+  height: 100%;
+  background: var(--gray-bg);
+  border-radius: 40px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Notch */
+.notch {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 34px;
+  background: var(--charcoal);
+  border-radius: 20px;
+  z-index: 10;
+}
+
+/* Status bar */
+.status-bar {
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 5;
+}
+
+.status-time {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--charcoal);
+}
+
+.status-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-icons svg {
+  width: 18px;
+  height: 18px;
+  fill: var(--charcoal);
+}
+
+/* App Header */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 20px 10px;
+  flex-shrink: 0;
+}
+
+.app-header-logo svg {
+  height: 32px;
+  width: auto;
+}
+
+.app-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.header-icon-btn:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.header-icon-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: var(--charcoal);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Tab Views */
+.tab-views {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.tab-view {
+  display: none;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.tab-view.active {
+  display: flex;
+}
+
+/* Bottom Nav */
+.bottom-nav {
+  height: 68px;
+  background: var(--white);
+  border-top: 1px solid var(--gray-mid);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-shrink: 0;
+  padding-bottom: 4px;
+}
+
+/* AI Input Bar — persistent above tab bar */
+.ai-bar {
+  padding: 8px 16px 10px;
+  background: var(--white);
+  border-top: 1px solid #E8E3DE;
+  flex-shrink: 0;
+}
+
+.ai-bar.hidden {
+  display: none;
+}
+
+.ai-bar-row {
+  display: flex;
+  align-items: center;
+  background: #F5F0EB;
+  border-radius: 24px;
+  border: 1.5px solid #E8E3DE;
+  padding: 6px 6px 6px 14px;
+  gap: 8px;
+}
+
+@keyframes pulse-gentle {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: 0.85; }
+}
+
+.ai-heart-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  background: var(--red);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E") center/contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E") center/contain no-repeat;
+  animation: pulse-gentle 3s ease-in-out infinite;
+}
+
+.ai-bar-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--charcoal);
+  outline: none;
+  min-width: 0;
+}
+
+.ai-bar-input::placeholder {
+  color: #999;
+}
+
+.ai-bar-send {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  border-radius: 50%;
+  background: var(--red);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.ai-bar-send:hover {
+  background: var(--red-dark);
+}
+
+.ai-bar-send svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--white);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 8px;
+  min-width: 56px;
+  min-height: 56px;
+  border-radius: 8px;
+  font-family: inherit;
+}
+
+.nav-item:hover {
+  background: rgba(0,0,0,0.03);
+}
+
+.nav-item svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: #999;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nav-item .nav-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #999;
+}
+
+.nav-item.active svg {
+  stroke: var(--red);
+}
+
+.nav-item.active .nav-label {
+  color: var(--red);
+}
+
+/* Minimum text size enforcement */
+small, .small-text {
+  font-size: 13px;
+}
+
+/* ── Home Tab ── */
+.greeting-section {
+  padding: 6px 20px 18px;
+}
+
+.greeting-headline {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--red);
+}
+
+/* Home input */
+.home-input-wrap {
+  margin: 0 20px;
+  display: flex;
+  align-items: center;
+  background: var(--bg-input);
+  border-radius: 50px;
+  min-height: 56px;
+  padding: 6px 6px 6px 16px;
+  border: 2px solid transparent;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.home-input-wrap:focus-within {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(240,75,36,0.12);
+}
+
+.home-mic-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  min-width: 36px;
+  min-height: 36px;
+}
+
+.home-mic-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: #999;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.home-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--charcoal);
+  outline: none;
+  padding: 0 8px;
+  min-width: 0;
+}
+
+.home-input::placeholder {
+  color: #999;
+}
+
+.home-send-btn {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  border-radius: 50%;
+  background: var(--red);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.home-send-btn:hover {
+  background: var(--red-dark);
+}
+
+.home-send-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: var(--white);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+
+/* Prompt chips */
+.prompt-chips {
+  padding: 14px 20px 4px;
+  transition: opacity 0.25s, max-height 0.3s;
+  max-height: 400px;
+  overflow: visible;
+}
+
+.prompt-chips.hidden {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.prompt-chips-label {
+  font-size: 13px;
+  color: var(--gray-text);
+  margin-bottom: 8px;
+}
+
+.prompt-chip {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  min-height: 56px;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--charcoal);
+  cursor: pointer;
+  text-align: left;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.prompt-chip:hover {
+  border-color: var(--red);
+  background: var(--red-light);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.prompt-chip-emoji {
+  font-size: 20px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+/* Attention section */
+.attention-section {
+  padding: 18px 20px 4px;
+}
+
+.section-header {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-text);
+  margin-bottom: 10px;
+}
+
+.attention-card {
+  display: flex;
+  align-items: center;
+  background: #F5F0EB;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  min-height: 56px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  transition: box-shadow 0.2s;
+}
+
+.attention-card:hover {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* All attention cards use same taupe style — no overrides */
+
+.card-accent {
+  width: 4px;
+  align-self: stretch;
+  border-radius: 4px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.card-accent-purple { background: var(--purple); }
+.card-accent-red { background: var(--red); }
+.card-accent-blue { background: var(--blue); }
+
+.card-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.card-icon-purple { background: var(--purple-light); }
+.card-icon-red { background: var(--red-light); }
+.card-icon-blue { background: var(--blue-light); }
+
+.card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+
+.card-label-purple { color: var(--purple); }
+.card-label-red { color: var(--red); }
+.card-label-blue { color: var(--blue); }
+
+.card-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--charcoal);
+  line-height: 1.3;
+}
+
+.card-subtitle {
+  font-size: 14px;
+  color: var(--gray-text);
+  line-height: 1.4;
+}
+
+.card-chevron {
+  flex-shrink: 0;
+  margin-left: 8px;
+  color: var(--gray-mid);
+  font-size: 18px;
+}
+
+/* Recent conversations */
+.recent-section {
+  padding: 18px 20px 24px;
+}
+
+.recent-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.recent-header .section-header {
+  margin-bottom: 0;
+}
+
+.see-all-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--red);
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 56px;
+  display: flex;
+  align-items: center;
+}
+
+.see-all-btn:hover {
+  color: var(--red-dark);
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--bg-input);
+  cursor: pointer;
+  min-height: 56px;
+}
+
+.history-row:last-child {
+  border-bottom: none;
+}
+
+.history-row:hover .history-title {
+  color: var(--red);
+}
+
+.history-avatar {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.history-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-date {
+  font-size: 13px;
+  color: var(--gray-text);
+}
+
+.history-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--charcoal);
+  line-height: 1.3;
+  transition: color 0.2s;
+}
+
+.history-preview {
+  font-size: 14px;
+  color: var(--gray-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Shared Tab Header ── */
+.tab-header {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--charcoal);
+  padding: 16px 20px 12px;
+}
+
+.tab-section-label {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--charcoal);
+  padding: 4px 16px 8px;
+}
+
+/* ── Health Tab ── */
+.care-team-card {
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 16px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.care-team-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.care-team-info-label {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 13px;
+  color: var(--blue);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+
+.care-team-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.care-team-detail {
+  font-size: 14px;
+  color: var(--gray-text);
+}
+
+.care-team-avatar {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 50%;
+  background: var(--blue-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.care-team-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.care-team-btn {
+  flex: 1;
+  min-height: 48px;
+  border: 2px solid var(--blue);
+  color: var(--blue);
+  background: transparent;
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 4px;
+}
+
+.care-team-btn:hover {
+  background: var(--blue-light);
+}
+
+.care-team-next {
+  font-size: 13px;
+  color: var(--gray-text);
+  font-style: italic;
+}
+
+/* Action items horizontal scroll */
+.action-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 0 12px 16px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.action-scroll::-webkit-scrollbar { display: none; }
+.action-scroll .action-item:last-child {
+  margin-right: 16px;
+}
+
+/* Scroll dot indicators */
+.scroll-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding-bottom: 8px;
+}
+.scroll-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gray-mid);
+}
+.scroll-dot.active {
+  background: var(--charcoal);
+}
+
+.action-item {
+  background: var(--white);
+  border-radius: 8px;
+  padding: 12px 14px;
+  min-width: fit-content;
+  white-space: nowrap;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  text-align: left;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  transition: box-shadow 0.2s;
+}
+
+.action-item:hover {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.action-item-border-purple { border-left: 3px solid var(--purple); }
+.action-item-border-blue { border-left: 3px solid var(--blue); }
+.action-item-border-red { border-left: 3px solid var(--red); }
+
+.action-item-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--charcoal);
+}
+
+.action-item-sub {
+  font-size: 12px;
+  color: var(--gray-text);
+  margin-top: 2px;
+}
+
+/* Lab cards grid */
+.lab-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 0 16px 16px;
+}
+
+.lab-card {
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  transition: border-color 0.2s, transform 0.1s, box-shadow 0.2s;
+}
+
+.lab-card:hover {
+  border-color: var(--purple);
+}
+
+.lab-card:active {
+  transform: scale(0.97);
+}
+
+.lab-metric {
+  font-size: 13px;
+  color: var(--gray-text);
+}
+
+.lab-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--charcoal);
+  line-height: 1.3;
+}
+
+.lab-value-sm {
+  font-size: 18px;
+}
+
+.lab-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 700;
+  margin: 4px 0;
+}
+
+.lab-status-green { color: var(--green); }
+.lab-status-amber { color: var(--amber); }
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-green { background: var(--green); }
+.dot-amber { background: var(--amber); }
+
+.lab-bar-track {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-input);
+  border-radius: 2px;
+  margin: 6px 0;
+}
+
+.lab-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+
+.bar-amber { background: var(--amber); }
+
+.lab-tap {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--red);
+}
+
+/* Medication items */
+.med-list {
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.med-item {
+  display: flex;
+  align-items: center;
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  gap: 16px;
+  min-height: 56px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.med-emoji {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.med-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.med-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.med-detail {
+  font-size: 14px;
+  color: var(--gray-text);
+}
+
+.med-badge {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--red);
+  background: var(--red-light);
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* Auth card */
+.auth-card {
+  display: flex;
+  align-items: center;
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 16px 16px;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.auth-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.auth-text {
+  flex: 1;
+  font-size: 15px;
+  color: var(--gray-text);
+}
+
+.auth-link {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--red);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+/* Health explorer card */
+.health-explorer-card {
+  background: var(--purple-light);
+  border: 1px solid rgba(89,44,130,0.25);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 16px 16px;
+  cursor: pointer;
+  display: block;
+  width: calc(100% - 32px);
+  text-align: left;
+  font-family: inherit;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.health-explorer-card:hover {
+  border-color: var(--purple);
+}
+
+.health-explorer-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--purple);
+}
+
+.health-explorer-desc {
+  font-size: 14px;
+  color: var(--gray-text);
+  margin: 4px 0;
+}
+
+.health-explorer-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--red);
+}
+
+/* ── Benefits Tab ── */
+.benefit-card {
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 16px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.benefit-label {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+.benefit-label-blue { color: var(--blue); }
+.benefit-label-red { color: var(--red); }
+
+.benefit-value {
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.benefit-value-blue { color: var(--blue); }
+.benefit-value-red { color: var(--red); }
+
+.benefit-value-sm {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.benefit-sub {
+  font-size: 14px;
+  color: var(--gray-text);
+}
+
+.benefit-bar-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-input);
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+.benefit-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.bar-blue { background: var(--blue); }
+.bar-red { background: var(--red); }
+.bar-green { background: var(--green); }
+
+.benefit-note {
+  font-size: 14px;
+  color: var(--gray-text);
+  margin-top: 6px;
+}
+
+.benefit-outline-btn {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 50px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+  padding: 10px 16px;
+}
+
+.benefit-outline-btn-blue {
+  border: 2px solid var(--blue);
+  color: var(--blue);
+}
+
+.benefit-outline-btn-blue:hover { background: var(--blue-light); }
+
+.benefit-outline-btn-red {
+  border: 2px solid var(--red);
+  color: var(--red);
+}
+
+.benefit-outline-btn-red:hover { background: var(--red-light); }
+
+.benefit-divider {
+  border: none;
+  border-top: 1px solid var(--gray-mid);
+  margin: 12px 0;
+}
+
+.claim-status-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.claim-status-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.claim-status-detail {
+  font-size: 13px;
+  color: var(--amber);
+}
+
+.benefit-card-highlight {
+  background: var(--blue-light);
+  border: 1px solid rgba(0,160,221,0.2);
+}
+
+/* ID Card */
+.id-card-row {
+  display: flex;
+  align-items: center;
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 16px 16px;
+  gap: 16px;
+  cursor: pointer;
+  min-height: 56px;
+  font-family: inherit;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.id-card-row:hover {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.id-emoji {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.id-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.id-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.id-number {
+  font-size: 14px;
+  color: var(--gray-text);
+}
+
+.id-chevron {
+  color: var(--gray-mid);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* Plan highlights */
+.plan-card {
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 16px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.plan-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bg-input);
+  font-size: 15px;
+  color: var(--charcoal);
+}
+
+.plan-row:last-of-type {
+  border-bottom: none;
+}
+
+.plan-check {
+  color: var(--green);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.plan-docs-link {
+  display: block;
+  padding-top: 12px;
+  border-top: 1px solid var(--bg-input);
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--red);
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  min-height: 44px;
+}
+
+/* Quick tools grid */
+.quick-tools-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 0 16px 16px;
+}
+
+.quick-tool-card {
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  min-height: 64px;
+  font-family: inherit;
+  text-align: left;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.quick-tool-card:hover {
+  border-color: var(--red);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.quick-tool-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.quick-tool-sub {
+  font-size: 12px;
+  color: var(--gray-text);
+  margin-top: 2px;
+}
+
+/* Recent claims */
+.claim-row {
+  display: flex;
+  align-items: center;
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 16px 16px;
+  gap: 16px;
+  min-height: 56px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.claim-emoji {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.claim-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.claim-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.claim-detail {
+  font-size: 14px;
+  color: var(--gray-text);
+}
+
+.claim-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.claim-amount {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.claim-badge {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--amber);
+  background: var(--amber-bg);
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+/* ── Profile Tab ── */
+.profile-member-card {
+  background: var(--charcoal);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 16px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.profile-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.profile-plan {
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+}
+
+.profile-details {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.profile-detail-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.profile-detail-label {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+}
+
+.profile-detail-value {
+  font-size: 14px;
+  color: rgba(255,255,255,0.95);
+  font-weight: 700;
+}
+
+/* Prefs card */
+.prefs-card {
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 16px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.pref-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  min-height: 48px;
+}
+
+.pref-row:first-child {
+  border-bottom: 1px solid var(--bg-input);
+}
+
+.pref-label {
+  font-size: 14px;
+  color: var(--gray-text);
+}
+
+.pref-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gray-text);
+}
+
+.pref-value-green {
+  color: var(--green);
+}
+
+/* Snapshot CTA */
+.snapshot-cta {
+  border: 2px dashed var(--gray-mid);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 16px 16px;
+  text-align: center;
+  cursor: pointer;
+  min-height: 56px;
+  background: transparent;
+  font-family: inherit;
+  width: calc(100% - 32px);
+}
+
+.snapshot-cta:hover {
+  border-color: var(--red);
+}
+
+.snapshot-cta-text {
+  font-size: 15px;
+  color: var(--gray-text);
+}
+
+.snapshot-cta-link {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--red);
+  display: block;
+  margin-top: 4px;
+}
+
+/* Snapshot completed card */
+.snapshot-card {
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.snapshot-label {
+  font-size: 13px;
+  color: var(--gray-text);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.snapshot-dots {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.snapshot-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.snapshot-dot-filled {
+  background: var(--red);
+  color: var(--white);
+}
+
+.snapshot-dot-empty {
+  background: var(--bg-input);
+  color: var(--gray-text);
+}
+
+.snapshot-great-day {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--charcoal);
+  line-height: 1.5;
+}
+
+/* Account links card */
+.account-card {
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  margin: 0 16px 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.account-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--bg-input);
+  cursor: pointer;
+  min-height: 48px;
+  font-size: 15px;
+  color: var(--charcoal);
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+}
+
+.account-row:last-child {
+  border-bottom: none;
+}
+
+.account-row:hover {
+  background: var(--gray-bg);
+}
+
+.account-chevron {
+  color: var(--gray-mid);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* ── Conversation Screen (Companion Sheet) ── */
+#conv-screen-overlay {
+  position: absolute;
+  top: 54px; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.15);
+  z-index: 59;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+
+#conv-screen-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#conv-screen {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 0;
+  background: rgba(255, 253, 251, 0.92);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  z-index: 200;
+  border-radius: 24px 24px 0 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.08);
+  transition: height 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+#conv-screen.open {
+  height: 75%;
+}
+
+#conv-screen.expanded {
+  height: 92%;
+}
+
+.conv-grab-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--gray-mid);
+  border-radius: 2px;
+  margin: 10px auto 0;
+  flex-shrink: 0;
+}
+
+.conv-spacer {
+  display: none;
+}
+
+.conv-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid #E8E3DE;
+  flex-shrink: 0;
+  gap: 10px;
+}
+
+.conv-header-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.conv-header-btn {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 18px;
+  color: var(--gray-text);
+}
+
+.conv-header-btn:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+/* Context banner */
+.conv-context-banner {
+  padding: 10px 14px;
+  margin: 8px 12px 0;
+  background: rgba(240, 75, 36, 0.06);
+  border: 1px solid rgba(240, 75, 36, 0.12);
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--charcoal);
+  line-height: 1.4;
+  display: none;
+  animation: fadeInUp 0.3s ease 0.3s both;
+}
+
+.conv-context-banner.visible {
+  display: block;
+}
+
+.back-btn {
+  display: none;
+}
+
+.conv-header-info {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  align-items: center;
+}
+
+.conv-agent-avatar {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  background: var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.conv-agent-name {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.conv-agent-sub {
+  font-size: 13px;
+  color: var(--gray-text);
+}
+
+/* Messages area */
+#conv-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+#conv-messages::-webkit-scrollbar { display: none; }
+
+/* Message animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* User message */
+.msg-row.user {
+  display: flex;
+  flex-direction: row-reverse;
+  animation: fadeInUp 0.25s ease;
+}
+
+.msg-row.user .msg-bubble {
+  background: var(--charcoal);
+  color: var(--white);
+  border-radius: 18px;
+  border-bottom-right-radius: 6px;
+  padding: 12px 16px;
+  max-width: 82%;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* AI message */
+.msg-row.ai {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  animation: fadeInUp 0.25s ease;
+}
+
+.msg-avatar {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.msg-bubble-wrap {
+  max-width: 82%;
+}
+
+.msg-row.ai .msg-bubble {
+  background: var(--white);
+  border: 1px solid #E8E3DE;
+  border-radius: 18px;
+  border-top-left-radius: 6px;
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--charcoal);
+}
+
+/* Embedded component cards in chat */
+.embedded-card {
+  background: white;
+  border: 1px solid #E8E3DE;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 4px;
+  transition: all 0.2s ease;
+}
+
+.embedded-card:hover {
+  border-color: var(--red);
+  box-shadow: 0 2px 12px rgba(240, 75, 36, 0.08);
+}
+
+.embedded-card-header {
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.embedded-card-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--gray-text);
+}
+
+.embedded-card-action {
+  font-size: 11px;
+  color: var(--red);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.embedded-card-body {
+  padding: 0 14px 14px;
+}
+
+.embedded-amount {
+  font-family: 'Libre Franklin', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.embedded-detail {
+  font-size: 12px;
+  color: var(--gray-text);
+  margin-top: 2px;
+}
+
+.embedded-progress {
+  height: 4px;
+  background: #eee;
+  border-radius: 2px;
+  margin-top: 10px;
+}
+
+.embedded-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+
+/* Markdown inside AI bubbles */
+.msg-bubble p { margin-bottom: 8px; }
+.msg-bubble p:last-child { margin-bottom: 0; }
+.msg-bubble h3 { font-size: 17px; font-weight: 700; margin: 10px 0 5px; }
+.msg-bubble h4 { font-size: 17px; font-weight: 700; margin: 8px 0 4px; }
+.msg-bubble ul { padding-left: 0; list-style: none; margin: 6px 0; }
+.msg-bubble ul li { padding: 3px 0 3px 16px; position: relative; }
+.msg-bubble ul li::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+  position: absolute;
+  left: 0;
+  top: 11px;
+}
+.msg-bubble ol { padding-left: 20px; margin: 6px 0; }
+.msg-bubble ol li { padding: 3px 0; margin-bottom: 4px; }
+.msg-bubble hr { border: none; border-top: 1px solid var(--gray-mid); margin: 10px 0; }
+
+/* Loading state */
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+.loading-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  animation: fadeInUp 0.25s ease;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.loading-label {
+  font-size: 13px;
+  color: var(--gray-text);
+  font-style: italic;
+}
+
+.loading-bubble {
+  background: var(--white);
+  border: 1px solid #E8E3DE;
+  border-radius: 18px;
+  border-top-left-radius: 6px;
+  padding: 12px 16px;
+  display: flex;
+  gap: 6px;
+}
+
+.loading-bubble .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  animation: bounce 1.2s infinite;
+}
+
+.loading-bubble .dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-bubble .dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* Error message */
+.error-msg {
+  text-align: center;
+  font-size: 15px;
+  color: var(--red);
+  background: var(--red-light);
+  border-radius: 12px;
+  padding: 12px 16px;
+  border: 1.5px solid rgba(240,75,36,0.3);
+}
+
+/* Suggested reply chips */
+#conv-suggested-replies {
+  padding: 8px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#conv-suggested-replies.hidden {
+  display: none;
+}
+
+.suggested-chip {
+  background: var(--white);
+  border: 1px solid #E8E3DE;
+  border-radius: 20px;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  color: var(--charcoal);
+}
+
+.suggested-chip:hover {
+  border-color: var(--red);
+  background: var(--red-light);
+}
+
+.suggested-chip.navigate {
+  color: var(--red);
+  font-weight: 600;
+}
+
+/* Talk to person link in conv */
+.conv-talk-person {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--gray-text);
+  padding: 8px 16px;
+  text-align: center;
+  width: 100%;
+  min-height: 44px;
+}
+
+.conv-talk-person:hover {
+  color: var(--charcoal);
+}
+
+/* Mode indicator — sits inside input area, above the input field */
+.conv-mode-indicator {
+  text-align: center;
+  padding: 6px 16px 0;
+  font-size: 12px;
+  color: #999;
+}
+
+/* Conversation input area */
+#conv-live-input {
+  padding: 10px 12px 12px;
+  border-top: 1.5px solid var(--gray-mid);
+  flex-shrink: 0;
+  background: var(--white);
+}
+
+#conv-live-input.hidden {
+  display: none;
+}
+
+.conv-input-wrap {
+  display: flex;
+  align-items: center;
+  background: var(--bg-input);
+  border-radius: 50px;
+  min-height: 56px;
+  padding: 10px 10px 10px 18px;
+  gap: 8px;
+  border: 2px solid transparent;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.conv-input-wrap:focus-within {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(240,75,36,0.12);
+}
+
+#conv-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--charcoal);
+  outline: none;
+  min-width: 0;
+}
+
+#conv-input::placeholder {
+  color: #999;
+}
+
+.conv-send-btn {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 50%;
+  background: var(--red);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.conv-send-btn:hover {
+  background: var(--red-dark);
+}
+
+.conv-send-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--white);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Continue button area */
+#conv-continue-btn-area {
+  padding: 10px 16px 14px;
+  background: var(--white);
+  border-top: 1.5px solid var(--gray-mid);
+}
+
+#conv-continue-btn-area.hidden {
+  display: none;
+}
+
+#conv-continue-btn {
+  width: 100%;
+  min-height: 56px;
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#conv-continue-btn:hover {
+  background: var(--red-dark);
+}
+
+/* Navigation transition overlay */
+.nav-transition-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  border-radius: 40px;
+}
+
+.nav-transition-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nav-transition-card {
+  background: white;
+  border-radius: 20px;
+  padding: 28px 36px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+
+.nav-transition-icon { font-size: 32px; }
+.nav-transition-label { font-size: 15px; font-weight: 600; color: var(--charcoal); }
+.nav-transition-dots { display: flex; gap: 6px; margin-top: 4px; }
+.nav-transition-dots .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); animation: bounce 1.2s infinite; }
+.nav-transition-dots .dot:nth-child(2) { animation-delay: 0.2s; }
+.nav-transition-dots .dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* ── Onboarding Overlay ── */
+#onboarding-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--gray-bg);
+  z-index: 50;
+  border-radius: 40px;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.32,0.72,0,1);
+}
+
+#onboarding-overlay.open {
+  transform: translateY(0);
+}
+
+.ob-spacer { height: 54px; flex-shrink: 0; }
+
+.ob-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--gray-mid);
+  flex-shrink: 0;
+}
+
+.ob-title {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.ob-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.ob-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gray-mid);
+  transition: background 0.3s;
+}
+
+.ob-dot.active {
+  background: var(--red);
+}
+
+.ob-close-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 22px;
+  color: var(--gray-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.ob-close-btn:hover { background: var(--bg-input); }
+
+#ob-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  -webkit-overflow-scrolling: touch;
+}
+
+#ob-input-area {
+  padding: 10px 12px 14px;
+  border-top: 1.5px solid var(--gray-mid);
+  flex-shrink: 0;
+  background: var(--white);
+}
+
+.ob-text-input-wrap {
+  display: flex;
+  align-items: center;
+  background: var(--bg-input);
+  border-radius: 50px;
+  min-height: 56px;
+  padding: 10px 10px 10px 18px;
+  gap: 8px;
+  border: 2px solid transparent;
+}
+
+.ob-text-input-wrap:focus-within {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(240,75,36,0.12);
+}
+
+.ob-text-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--charcoal);
+  outline: none;
+  min-width: 0;
+}
+
+.ob-text-input::placeholder { color: #999; }
+
+.ob-send-btn {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  background: var(--red);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ob-send-btn:hover { background: var(--red-dark); }
+
+.ob-send-btn svg {
+  width: 18px; height: 18px;
+  fill: none; stroke: var(--white); stroke-width: 2.5;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+
+.ob-choice-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ob-choice-btn {
+  width: 100%;
+  min-height: 52px;
+  border: 1px solid #d1d5db;
+  background: var(--white);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--charcoal);
+  cursor: pointer;
+  padding: 12px 16px;
+  text-align: left;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.ob-choice-btn:hover {
+  border-color: var(--red);
+  background: var(--red-light);
+}
+
+.ob-qol-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ob-qol-dot {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--gray-mid);
+  background: var(--white);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.ob-qol-dot.selected {
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--white);
+}
+
+.ob-next-btn {
+  width: 100%;
+  min-height: 52px;
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ob-next-btn:hover { background: var(--red-dark); }
+
+.ob-next-btn:disabled {
+  background: var(--gray-mid);
+  cursor: not-allowed;
+}
+
+/* ── Push Notification ── */
+#push-notification {
+  position: absolute;
+  top: 64px;
+  left: 10px;
+  right: 10px;
+  z-index: 200;
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 14px;
+  cursor: pointer;
+  transform: translateY(calc(-100% - 80px));
+  transition: transform 0.5s cubic-bezier(0.32,0.72,0,1);
+}
+
+#push-notification.visible {
+  transform: translateY(0);
+}
+
+.push-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.push-icon {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 6px;
+  background: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.push-app-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-text);
+  flex: 1;
+}
+
+.push-time {
+  font-size: 12px;
+  color: var(--gray-text);
+}
+
+.push-dismiss {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--gray-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.push-dismiss:hover { background: var(--bg-input); }
+
+.push-body {
+  font-size: 15px;
+  color: var(--charcoal);
+  line-height: 1.4;
+}
+
+/* ── Emergency Card ── */
+.emergency-card {
+  background: var(--white);
+  border: 2px solid var(--red);
+  border-radius: 16px;
+  padding: 24px 20px;
+  text-align: center;
+  margin: 0 4px;
+  animation: fadeInUp 0.25s ease;
+}
+
+.emergency-icon { font-size: 48px; margin-bottom: 12px; }
+
+.emergency-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 16px;
+}
+
+.emergency-call-btn {
+  display: block;
+  width: 100%;
+  min-height: 56px;
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 56px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.emergency-divider {
+  font-size: 13px;
+  color: var(--gray-text);
+  margin: 12px 0;
+}
+
+.emergency-dismiss-btn {
+  background: none;
+  border: 2px solid var(--gray-mid);
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--charcoal);
+  cursor: pointer;
+  padding: 12px 24px;
+  min-height: 48px;
+}
+
+/* ── Handoff Card ── */
+.handoff-card {
+  background: var(--white);
+  border: 1px solid #E8E3DE;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 0 4px;
+  text-align: center;
+  animation: fadeInUp 0.25s ease;
+}
+
+.handoff-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.handoff-team-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 4px;
+}
+
+.handoff-team-desc {
+  font-size: 14px;
+  color: var(--gray-text);
+  margin-bottom: 16px;
+}
+
+.handoff-connect-btn {
+  display: block;
+  width: 100%;
+  min-height: 52px;
+  background: var(--charcoal);
+  color: var(--white);
+  border: none;
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.handoff-connect-btn:hover { background: #2d353e; }
+
+.handoff-keep-btn {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  background: transparent;
+  border: 2px solid var(--gray-mid);
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--charcoal);
+  cursor: pointer;
+}
+
+/* Context summary card */
+.context-card {
+  background: var(--blue-light);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 0 4px;
+  animation: fadeInUp 0.25s ease;
+}
+
+.context-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blue);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.context-text {
+  font-size: 14px;
+  color: var(--charcoal);
+  line-height: 1.5;
+}
+
+/* ── History Screen ── */
+#history-screen,
+#past-conv-screen {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--gray-bg);
+  z-index: 55;
+  border-radius: 40px;
+}
+
+#history-screen.open,
+#past-conv-screen.open {
+  display: flex;
+}
+
+.history-screen-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--gray-mid);
+  flex-shrink: 0;
+  gap: 10px;
+  margin-top: 54px;
+}
+
+.history-screen-title {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--charcoal);
+  flex: 1;
+}
+
+.history-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.history-list-item {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--bg-input);
+  cursor: pointer;
+  min-height: 64px;
+  gap: 12px;
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+}
+
+.history-list-item:hover {
+  background: var(--white);
+}
+
+.history-list-avatar {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.history-list-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-list-date {
+  font-size: 13px;
+  color: var(--gray-text);
+}
+
+.history-list-topic {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--charcoal);
+  line-height: 1.3;
+}
+
+.history-list-preview {
+  font-size: 14px;
+  color: var(--gray-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Past conversation viewer */
+#past-conv-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.past-msg-row.user {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.past-msg-row.user .past-msg-bubble {
+  background: var(--bg-input);
+  color: var(--charcoal);
+  border-radius: 18px;
+  border-bottom-right-radius: 4px;
+  padding: 14px 16px;
+  max-width: 82%;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.past-msg-row.ai {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.past-msg-row.ai .past-msg-bubble {
+  background: var(--white);
+  border: 1.5px solid var(--bg-input);
+  border-radius: 18px;
+  border-bottom-left-radius: 4px;
+  padding: 14px 16px;
+  max-width: 82%;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--charcoal);
+}
+
+.past-date-divider {
+  text-align: center;
+  font-size: 13px;
+  color: var(--gray-text);
+  padding: 8px 0;
+}
+
+#past-conv-bottom {
+  padding: 10px 16px 14px;
+  background: var(--white);
+  border-top: 1.5px solid var(--gray-mid);
+}
+
+#past-continue-btn {
+  width: 100%;
+  min-height: 56px;
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#past-continue-btn:hover { background: var(--red-dark); }
+
+/* ── Interior Page System ── */
+.interior-page {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--gray-bg);
+  z-index: 45;
+  border-radius: 40px;
+}
+
+.interior-page.open {
+  display: flex;
+}
+
+.interior-page-spacer {
+  height: 54px;
+  flex-shrink: 0;
+}
+
+.interior-page-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid #E8E3DE;
+  flex-shrink: 0;
+  gap: 10px;
+}
+
+.interior-back-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.interior-back-btn:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.interior-back-btn svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.interior-page-title {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--charcoal);
+  flex: 1;
+}
+
+.interior-page-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.interior-page-content::-webkit-scrollbar { display: none; }
+
+/* AI CTA at bottom of interior pages */
+.interior-page-ai-cta {
+  padding: 12px 16px;
+  border-top: 1px solid #E8E3DE;
+  background: var(--white);
+  flex-shrink: 0;
+}
+
+.ai-cta-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  background: rgba(240, 75, 36, 0.06);
+  border: 1px solid rgba(240, 75, 36, 0.15);
+  border-radius: 24px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--red);
+  cursor: pointer;
+  padding: 10px 16px;
+}
+
+.ai-cta-btn:hover {
+  background: rgba(240, 75, 36, 0.1);
+}
+
+/* Interior page list items */
+.interior-list-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  gap: 12px;
+  min-height: 56px;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  transition: box-shadow 0.2s;
+}
+
+.interior-list-item:hover {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.interior-list-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--bg-input);
+}
+
+.interior-list-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.interior-list-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--charcoal);
+}
+
+.interior-list-sub {
+  font-size: 13px;
+  color: var(--gray-text);
+  margin-top: 2px;
+}
+
+.interior-list-right {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.interior-badge-new {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  background: #dcfce7;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.interior-badge-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--white);
+  background: var(--red);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.interior-chevron {
+  color: var(--gray-mid);
+  font-size: 18px;
+}
+
+/* Stub page placeholder */
+.stub-placeholder {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--gray-text);
+}
+
+.stub-placeholder-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.stub-placeholder-text {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* Interior page section headers */
+.interior-section-label {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--gray-text);
+  margin: 16px 0 10px;
+}
+
+.interior-section-label:first-child {
+  margin-top: 0;
+}
+
+/* Detail page styles */
+.detail-hero {
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.detail-hero-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--blue);
+  margin-bottom: 4px;
+}
+
+.detail-hero-value {
+  font-family: 'Libre Franklin', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--charcoal);
+  line-height: 1.1;
+}
+
+.detail-hero-sub {
+  font-size: 14px;
+  color: var(--gray-text);
+  margin-top: 4px;
+}
+
+.detail-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--bg-input);
+  font-size: 14px;
+}
+
+.detail-info-row:last-child {
+  border-bottom: none;
+}
+
+.detail-info-label {
+  color: var(--gray-text);
+}
+
+.detail-info-value {
+  font-weight: 600;
+  color: var(--charcoal);
+}
+
+.detail-action-btn {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+  padding: 12px 16px;
+  text-align: center;
+}
+
+.detail-action-primary {
+  background: var(--charcoal);
+  color: var(--white);
+  border: none;
+}
+
+.detail-action-primary:hover {
+  background: #2d353e;
+}
+
+.detail-action-outline {
+  background: transparent;
+  border: 2px solid #d1d5db;
+  color: var(--charcoal);
+}
+
+.detail-action-outline:hover {
+  border-color: var(--charcoal);
+}
+
+/* Navigation card group (Health tab sections) */
+.nav-card-group {
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  margin: 0 16px 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.nav-card-row {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--bg-input);
+  cursor: pointer;
+  gap: 12px;
+  min-height: 56px;
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-card-row:last-child {
+  border-bottom: none;
+}
+
+.nav-card-row:hover {
+  background: var(--gray-bg);
+}
+
+.nav-card-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  width: 32px;
+  text-align: center;
+}
+
+.nav-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.nav-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--charcoal);
+}
+
+.nav-card-sub {
+  font-size: 13px;
+  color: var(--gray-text);
+}
+
+.nav-card-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.nav-card-chevron {
+  color: var(--gray-mid);
+  font-size: 18px;
+}
+</style>
+</head>
+<body>
+
+<!-- Control Banner -->
+<div class="control-banner">
+  <div class="control-top-row">
+    <span class="control-label">MyDevoted Prototype</span>
+    <div class="control-right">
+      <button class="reset-btn visible" id="resetBtn" onclick="resetDemo()">↺ Reset Demo</button>
+      <div class="mode-toggle">
+        <button class="mode-btn active-demo" id="demoBtnToggle" onclick="setMode('demo')">Demo</button>
+        <button class="mode-btn" id="liveBtnToggle" onclick="setMode('live')">Live</button>
+      </div>
+    </div>
+  </div>
+  <div id="api-key-section">
+    <div class="api-key-label">🔑 Anthropic API Key</div>
+    <div class="api-key-row">
+      <input type="password" class="api-key-input" id="apiKeyInput" placeholder="sk-ant-...">
+      <button class="save-key-btn" onclick="saveApiKey()">Save</button>
+    </div>
+    <div class="key-saved-msg" id="keySavedMsg">✓ Key saved for this session</div>
+  </div>
+</div>
+
+<!-- Phone Bezel -->
+<div class="phone-bezel">
+  <div class="demo-badge visible" id="demoBadge">● DEMO</div>
+  <div class="phone-screen">
+    <!-- Notch -->
+    <div class="notch"></div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <!-- Signal -->
+        <svg viewBox="0 0 20 20"><rect x="1" y="14" width="3" height="5" rx="0.5" fill="#1D252C"/><rect x="6" y="10" width="3" height="9" rx="0.5" fill="#1D252C"/><rect x="11" y="6" width="3" height="13" rx="0.5" fill="#1D252C"/><rect x="16" y="2" width="3" height="17" rx="0.5" fill="#1D252C"/></svg>
+        <!-- WiFi -->
+        <svg viewBox="0 0 20 20"><path d="M10 16a1.5 1.5 0 110 3 1.5 1.5 0 010-3z" fill="#1D252C"/><path d="M5.5 13c1.2-1.2 2.8-2 4.5-2s3.3.8 4.5 2" stroke="#1D252C" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M2 9.5C4.2 7.3 7 6 10 6s5.8 1.3 8 3.5" stroke="#1D252C" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+        <!-- Battery -->
+        <svg viewBox="0 0 28 16"><rect x="1" y="1" width="22" height="14" rx="3" stroke="#1D252C" stroke-width="1.5" fill="none"/><rect x="3" y="3" width="18" height="10" rx="1.5" fill="#1D252C"/><rect x="24" y="5" width="3" height="6" rx="1" fill="#1D252C"/></svg>
+      </div>
+    </div>
+
+    <!-- App Header -->
+    <div class="app-header">
+      <div class="app-header-logo" onclick="goHome()" style="cursor:pointer">
+        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 205 38" style="height:32px;width:auto;">
+          <style>.st0{fill:#F04B24;}.st1{fill:#00A1E0;}.st2{fill:#592C82;}.st3{fill:#1D252C;}.st4{fill-rule:evenodd;clip-rule:evenodd;fill:#1D252C;}</style>
+          <g><g><g>
+            <path class="st0" d="M26,0.5c-6.2,0-11.3,5.1-11.3,11.3v2.9h22.6v-2.9C37.3,5.6,32.3,0.5,26,0.5z"/>
+            <path class="st1" d="M0.5,26c0,6.2,5.1,11.3,11.3,11.3h2.9V14.7h-2.9C5.6,14.7,0.5,19.8,0.5,26z"/>
+            <rect x="14.7" y="14.7" class="st2" width="22.6" height="22.6"/>
+          </g><g><g>
+            <path class="st3" d="M118.7,15.2c-1.1,0-2,0-2.8,0c-0.8,0-1.3,0.3-1.6,1.1c-0.3,0.8-5,13.2-5,13.2s-4.7-12.9-4.8-13.4c-0.2-0.5-0.6-0.9-1.4-0.9s-1.8,0-2.9,0c-1.2,0-1.6,1-1.3,2c0.2,0.5,7.9,18.7,7.9,18.7c0.2,0.6,0.8,0.9,1.4,0.9h2.1c0.6,0,1.2-0.4,1.4-0.9c0,0,7.7-17.5,8.3-18.8C120.3,16.2,119.8,15.2,118.7,15.2z"/>
+            <path class="st3" d="M157.5,34.9c-0.1-0.8-0.1-1.1-0.2-1.7c-0.2-1.1-0.9-1.4-1.6-1.2c-0.4,0.1-1.1,0.5-2,0.5c-0.5,0-1.1-0.1-1.5-0.6c-0.4-0.6-0.4-1.8-0.4-2.5l0.1-9.5c0,0,3.2,0,4.2,0s1.4-0.7,1.4-1.4c0-0.7,0-1,0-1.8c0-0.8-0.4-1.4-1.4-1.4s-4.2,0-4.2,0s0-4.4,0-5c0-0.7-0.3-1.7-1.8-1.3c-0.8,0.2-1.5,0.3-2.3,0.6c-0.7,0.2-1.4,0.7-1.4,1.5s0,4.3,0,4.3s-0.8,0-2.1,0c-1.3,0-1.4,0.9-1.4,1.4c0,0.6,0,0.8,0,1.7c0,0.9,0.4,1.5,1.5,1.5c1.1,0,2,0,2,0l-0.1,9.5c0,2.2,0,4.4,1.4,6c1.1,1.2,3.1,1.9,5.4,1.9c2.2,0,3.2-0.5,3.6-0.9C157.2,36.1,157.6,35.6,157.5,34.9z"/>
+            <path class="st3" d="M95.5,17.9c-2.1-2.2-4.6-3.1-7.4-3.1c-3.1,0-5.7,1-7.9,3.2c-1.9,2-3,4.9-3.1,8c0,3.2,1.1,6.2,3.2,8.2c2,2,4.8,3.1,8.1,3.1c5,0,8-2.5,8.3-2.8c0.5-0.5,0.8-1.1,0.5-1.9c-0.2-0.6-0.5-1.2-0.9-1.7c-0.4-0.6-1.2-1.1-2.4-0.3c-0.5,0.3-2.4,2-5.4,2l0,0c-1.9,0-3.4-0.5-4.5-1.7c-0.9-0.9-1.4-2-1.6-3.2l14.2,0c0.7,0,1.4-0.5,1.5-1.2C98.2,26.4,99,21.5,95.5,17.9z M84,21.1c0.8-0.9,2.2-1.8,4-1.8l0,0l0,0c1.5,0,2.7,0.5,3.7,1.5c1.1,1.2,1.3,2.9,1.3,2.9H82.7C82.7,23.7,82.7,22.6,84,21.1z"/>
+            <path class="st3" d="M142.8,26c0.1-6.3-4.7-11.3-11.4-11.3c-6.7,0-11.6,5.1-11.6,11.3c-0.1,6.5,4.9,11.3,11.4,11.3C137.8,37.3,142.7,32.4,142.8,26z M137.2,26c0,3.6-2.4,6.6-6,6.6c-3.6,0-5.9-2.9-5.9-6.6c0-3.6,2.4-6.6,6-6.6C135,19.4,137.2,22.3,137.2,26z"/>
+            <path class="st3" d="M204.5,35.3c0-0.8,0-27,0-28.1c0-1.1-0.9-1.5-1.5-1.4c-0.4,0.1-2.4,0.6-2.9,0.7c-0.7,0.2-1,0.9-1.1,1.6c0,0.4-0.1,9.6-0.1,9.6c-1.7-1.8-3.5-3.1-6.6-3.1c-6.6,0-10.7,5.2-10.8,11.3c-0.1,6,4,11.3,10.6,11.3c3,0,5-1.3,6.7-3.1c0,0,0,0.5,0,1.4c0,0.9,0.4,1.4,1.3,1.4c0.9,0,1.9,0,2.8,0C204.1,36.9,204.5,36.3,204.5,35.3z M199.1,26c0,3.6-2.4,6.6-6.1,6.6c-3.4,0-5.9-2.7-5.9-6.6c0-3.6,2.4-6.6,6-6.6C196.7,19.3,199.1,22.3,199.1,26z"/>
+            <path class="st3" d="M176.5,17.9c-2.1-2.2-4.6-3.1-7.4-3.1c-3.1,0-5.7,1-7.9,3.2c-1.9,2-3,4.9-3.1,8c0,3.2,1.1,6.2,3.2,8.2c2,2,4.8,3.1,8.1,3.1c5,0,8-2.5,8.3-2.8c0.5-0.5,0.8-1.1,0.5-1.9c-0.2-0.6-0.5-1.2-0.9-1.7c-0.4-0.6-1.2-1.1-2.4-0.3c-0.5,0.3-2.4,2-5.4,2l0,0c-1.9,0-3.4-0.5-4.5-1.7c-0.9-0.9-1.4-2-1.6-3.2l14.2,0c0.7,0,1.4-0.5,1.5-1.2C179.1,26.4,179.9,21.5,176.5,17.9z M164.9,21.1c0.8-0.9,2.2-1.8,4-1.8l0,0l0,0c1.5,0,2.7,0.5,3.7,1.5c1.1,1.2,1.3,2.9,1.3,2.9h-10.2C163.6,23.7,163.6,22.6,164.9,21.1z"/>
+            <path class="st4" d="M66.9,7.7c-2.5-1.4-5.4-1.9-10.2-1.9h-2.2h-4.2c-1,0-1.7,0.8-1.7,1.8v27.9c0,1,0.8,1.8,1.7,1.8h6.8c2.1,0,7.2,0,11.1-2.7c4-2.8,6.3-7.4,6.3-13C74.6,19.3,74.1,11.5,66.9,7.7z M65.3,30c-2.4,1.8-6.3,1.8-8,1.8h-3.2V11.2h3.2c2.5,0,5,0.2,7.1,1.3c4.2,2.3,4.8,6.6,4.7,9C69,25.5,67.9,28.2,65.3,30z"/>
+          </g></g></g></g>
+        </svg>
+      </div>
+      <div class="app-header-actions">
+        <button class="header-icon-btn" aria-label="Language">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab Views -->
+    <div class="tab-views">
+      <div class="tab-view active" id="tab-home">
+        <!-- 1. Greeting -->
+        <div class="greeting-section">
+          <div class="greeting-headline" id="greeting-headline">Good morning, Rebecca!<br>What's on your<br>mind today?</div>
+        </div>
+
+        <!-- 2. Input box -->
+        <div class="home-input-wrap">
+          <button class="home-mic-btn" aria-label="Voice input">
+            <svg viewBox="0 0 24 24"><rect x="9" y="1" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </button>
+          <input type="text" class="home-input" id="home-input" placeholder="What's on your mind?">
+          <button class="home-send-btn" aria-label="Send" onclick="handleHomeSubmit()">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+          </button>
+        </div>
+
+        <!-- 3. Prompt chips ("You could ask:") -->
+        <div class="prompt-chips" id="prompt-chips">
+          <div class="prompt-chips-label">You could ask:</div>
+          <button class="prompt-chip" onclick="sendPrompt('How much do I have left on my food and home card?')">
+            <span class="prompt-chip-emoji">💳</span>How much is left on my food and home card?
+          </button>
+          <button class="prompt-chip" onclick="sendPrompt('What do my recent labs mean?')">
+            <span class="prompt-chip-emoji">🔬</span>What do my recent labs mean?
+          </button>
+          <button class="prompt-chip" onclick="sendPrompt('How much protein should I eat?')">
+            <span class="prompt-chip-emoji">🌱</span>How much protein should I eat?
+          </button>
+        </div>
+
+        <!-- 4. Recent Activity -->
+        <div class="attention-section">
+          <div class="section-header">Recent Activity</div>
+
+          <!-- Card 1: Onboarding -->
+          <button class="attention-card" id="onboard-card" onclick="openOnboarding()">
+            <div class="card-icon card-icon-purple">🌟</div>
+            <div class="card-body">
+              <div class="card-label card-label-purple">Get Started</div>
+              <div class="card-title">Complete your Health Connections Checklist</div>
+              <div class="card-subtitle">Takes about 2 minutes · Tap to begin</div>
+            </div>
+          </button>
+
+          <!-- Card 2: Claim -->
+          <button class="attention-card" onclick="switchTab('benefits')">
+            <div class="card-icon card-icon-red">💳</div>
+            <div class="card-body">
+              <div class="card-label card-label-red">Reimbursement</div>
+              <div class="card-title">Yoga Mat Claim — $45</div>
+              <div class="card-subtitle">In Progress · Received Feb 20 · Tap to review</div>
+            </div>
+          </button>
+
+          <!-- Card 3: Appointment -->
+          <button class="attention-card" onclick="switchTab('health')">
+            <div class="card-icon card-icon-blue">📅</div>
+            <div class="card-body">
+              <div class="card-label card-label-blue">Appointment</div>
+              <div class="card-title">Dr. Wagle — Primary Care</div>
+              <div class="card-subtitle">March 4, 10:00am · Tap to prepare</div>
+            </div>
+          </button>
+        </div>
+
+        <!-- 5. Recent conversations -->
+        <div class="recent-section">
+          <div class="recent-header">
+            <div class="section-header">Recent Chats</div>
+            <button class="see-all-btn" onclick="openHistoryScreen()">See all →</button>
+          </div>
+          <div id="home-history-rows">
+            <div class="history-row" onclick="openPastConversation(1)">
+              <div class="history-avatar" style="background: #dcfce7;">🌱</div>
+              <div class="history-body">
+                <div class="history-date">Feb 26</div>
+                <div class="history-title">Your A1c improved — and a check-in plan</div>
+                <div class="history-preview">We talked about your 6.8% result...</div>
+              </div>
+            </div>
+            <div class="history-row" onclick="openPastConversation(2)">
+              <div class="history-avatar" style="background: var(--purple-light);">🔬</div>
+              <div class="history-body">
+                <div class="history-date">Feb 27</div>
+                <div class="history-title">What does my eGFR result mean?</div>
+                <div class="history-preview">Rebecca asked about kidney function...</div>
+              </div>
+            </div>
+            <div class="history-row" onclick="openPastConversation(3)">
+              <div class="history-avatar" style="background: var(--red-light);">💳</div>
+              <div class="history-body">
+                <div class="history-date">Feb 23</div>
+                <div class="history-title">Yoga mat reimbursement</div>
+                <div class="history-preview">Your $45 claim was submitted...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-view" id="tab-health">
+        <!-- 1. Header -->
+        <div class="tab-header">Your Health</div>
+
+        <!-- 2. Care Team -->
+        <div class="care-team-card">
+          <div class="care-team-top">
+            <div>
+              <div class="care-team-info-label">YOUR CARE TEAM</div>
+              <div class="care-team-name">Dr. Sarah Wagle</div>
+              <div class="care-team-detail">Primary Care · Devoted Medical Group</div>
+            </div>
+            <div class="care-team-avatar">👩‍⚕️</div>
+          </div>
+          <div class="care-team-buttons">
+            <button class="care-team-btn" onclick="sendPrompt('I want to send a message to my care team')">Message your team</button>
+            <button class="care-team-btn" onclick="sendPrompt('Help me prepare for my appointment with Dr. Wagle on March 4')">Prepare for visit</button>
+          </div>
+          <div class="care-team-next">Next visit: March 4, 10:00am</div>
+        </div>
+
+        <!-- 3. Action Items -->
+        <div class="tab-section-label">Action Items</div>
+        <div class="action-scroll">
+          <button class="action-item action-item-border-purple" onclick="sendPrompt('Help me with my Health Connections Checklist')">
+            <div class="action-item-title">📋 Complete your checklist</div>
+            <div class="action-item-sub">3 of 8 done</div>
+          </button>
+          <button class="action-item action-item-border-blue" onclick="sendPrompt('I want to log my blood pressure')">
+            <div class="action-item-title">🩺 Log blood pressure</div>
+            <div class="action-item-sub">Last: Feb 10</div>
+          </button>
+          <button class="action-item action-item-border-red" onclick="sendPrompt('Help me finish my appointment intake for Dr. Wagle')">
+            <div class="action-item-title">📝 Finish visit intake</div>
+            <div class="action-item-sub">For Mar 4 visit</div>
+          </button>
+        </div>
+        <div class="scroll-dots">
+          <div class="scroll-dot active"></div>
+          <div class="scroll-dot"></div>
+          <div class="scroll-dot"></div>
+        </div>
+
+        <!-- 4. Navigation Card Group -->
+        <div class="nav-card-group">
+          <button class="nav-card-row" onclick="showMessagesPage()">
+            <span class="nav-card-icon">💬</span>
+            <div class="nav-card-body">
+              <div class="nav-card-title">Messages</div>
+              <div class="nav-card-sub">2 unread</div>
+            </div>
+            <div class="nav-card-right">
+              <span class="interior-badge-count">2</span>
+              <span class="nav-card-chevron">›</span>
+            </div>
+          </button>
+          <button class="nav-card-row" onclick="showTestResultsPage()">
+            <span class="nav-card-icon">🔬</span>
+            <div class="nav-card-body">
+              <div class="nav-card-title">Test Results</div>
+              <div class="nav-card-sub">Most recent: Feb 12</div>
+            </div>
+            <div class="nav-card-right">
+              <span class="interior-badge-new" style="font-size:12px;">9 NEW</span>
+              <span class="nav-card-chevron">›</span>
+            </div>
+          </button>
+          <button class="nav-card-row" onclick="showAppointmentsPage()">
+            <span class="nav-card-icon">📅</span>
+            <div class="nav-card-body">
+              <div class="nav-card-title">Appointments</div>
+              <div class="nav-card-sub">Next: Dr. Wagle · Mar 4</div>
+            </div>
+            <div class="nav-card-right">
+              <span class="nav-card-chevron">›</span>
+            </div>
+          </button>
+          <button class="nav-card-row" onclick="showAuthorizationsPage()">
+            <span class="nav-card-icon">📋</span>
+            <div class="nav-card-body">
+              <div class="nav-card-title">Referrals & Authorizations</div>
+              <div class="nav-card-sub">No pending</div>
+            </div>
+            <div class="nav-card-right">
+              <span class="nav-card-chevron">›</span>
+            </div>
+          </button>
+          <button class="nav-card-row" onclick="showPHIPage()">
+            <span class="nav-card-icon">🔒</span>
+            <div class="nav-card-body">
+              <div class="nav-card-title">My Protected Health Info</div>
+            </div>
+            <div class="nav-card-right">
+              <span class="nav-card-chevron">›</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- 5. Lab Highlights -->
+        <div class="tab-section-label" style="display:flex;justify-content:space-between;align-items:center;">
+          <span>Lab Highlights · <span style="font-size:13px;color:var(--gray-text);font-weight:400;">Feb 10, 2026</span></span>
+          <button style="background:none;border:none;font-family:inherit;font-size:13px;color:var(--red);font-weight:600;cursor:pointer;" onclick="showTestResultsPage()">View all results →</button>
+        </div>
+        <div class="lab-grid">
+          <button class="lab-card" onclick="sendPrompt('What does my HbA1c of 6.8% mean for my diabetes?')">
+            <div class="lab-metric">HbA1c</div>
+            <div class="lab-value">6.8%</div>
+            <div class="lab-status lab-status-green"><span class="status-dot dot-green"></span>Improved</div>
+            <div class="lab-bar-track"><div class="lab-bar-fill bar-amber" style="width:68%"></div></div>
+            <div class="lab-tap">Tap to understand →</div>
+          </button>
+          <button class="lab-card" onclick="sendPrompt('What does my eGFR of 58 mean for my kidneys?')">
+            <div class="lab-metric">eGFR</div>
+            <div class="lab-value">58 mL/min</div>
+            <div class="lab-status lab-status-amber"><span class="status-dot dot-amber"></span>Needs attention</div>
+            <div class="lab-bar-track"><div class="lab-bar-fill bar-amber" style="width:58%"></div></div>
+            <div class="lab-tap">Tap to understand →</div>
+          </button>
+          <button class="lab-card" onclick="sendPrompt('What does my LDL cholesterol of 112 mean?')">
+            <div class="lab-metric">LDL Cholesterol</div>
+            <div class="lab-value">112 mg/dL</div>
+            <div class="lab-status lab-status-amber"><span class="status-dot dot-amber"></span>Borderline high</div>
+            <div class="lab-bar-track"><div class="lab-bar-fill bar-amber" style="width:56%"></div></div>
+            <div class="lab-tap">Tap to understand →</div>
+          </button>
+          <button class="lab-card" onclick="sendPrompt('What does a blood pressure of 138/84 mean?')">
+            <div class="lab-metric">Blood Pressure</div>
+            <div class="lab-value lab-value-sm">138/84</div>
+            <div class="lab-status lab-status-amber"><span class="status-dot dot-amber"></span>Elevated</div>
+            <div class="lab-bar-track"><div class="lab-bar-fill bar-amber" style="width:63%"></div></div>
+            <div class="lab-tap">Tap to understand →</div>
+          </button>
+        </div>
+
+        <!-- 6. Medications -->
+        <div class="tab-section-label">Medications</div>
+        <div class="med-list">
+          <div class="med-item">
+            <span class="med-emoji">💊</span>
+            <div class="med-body">
+              <div class="med-name">Metformin 500mg</div>
+              <div class="med-detail">Twice daily · Last filled Jan 15</div>
+            </div>
+            <span class="med-badge" onclick="sendPrompt('I need to refill my metformin')">Refill soon</span>
+          </div>
+          <div class="med-item">
+            <span class="med-emoji">💊</span>
+            <div class="med-body">
+              <div class="med-name">Lisinopril 10mg</div>
+              <div class="med-detail">Once daily</div>
+            </div>
+          </div>
+          <div class="med-item">
+            <span class="med-emoji">💊</span>
+            <div class="med-body">
+              <div class="med-name">Atorvastatin 20mg</div>
+              <div class="med-detail">Once daily</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. Health Explorer -->
+        <button class="health-explorer-card" onclick="sendPrompt('I want to explore my health record')">
+          <div class="health-explorer-title">🔬 Explore My Health Record</div>
+          <div class="health-explorer-desc">Have a private AI conversation about any of your health data</div>
+          <div class="health-explorer-link">Start exploring →</div>
+        </button>
+      </div>
+      <div class="tab-view" id="tab-benefits">
+        <!-- 1. Header -->
+        <div class="tab-header">Your Benefits</div>
+
+        <!-- 2. Spending Cards -->
+        <div class="tab-section-label">Your Allowances</div>
+
+        <!-- Food & Home Card -->
+        <div class="benefit-card">
+          <div class="benefit-label benefit-label-blue">FOOD &amp; HOME CARD</div>
+          <div class="benefit-value benefit-value-blue">$125</div>
+          <div class="benefit-sub">remaining this month</div>
+          <div class="benefit-bar-track"><div class="benefit-bar-fill bar-blue" style="width:62.5%"></div></div>
+          <div class="benefit-note">$200 monthly · Resets March 1</div>
+          <button class="benefit-outline-btn benefit-outline-btn-blue" onclick="sendPrompt('How much do I have left on my food and home card and what can I buy with it?')">Check balance or find eligible items →</button>
+        </div>
+
+        <!-- Wellness Bucks -->
+        <div class="benefit-card">
+          <div class="benefit-label benefit-label-red">WELLNESS BUCKS</div>
+          <div class="benefit-value benefit-value-red">$155</div>
+          <div class="benefit-sub">remaining of $200 annual allowance</div>
+          <div class="benefit-bar-track"><div class="benefit-bar-fill bar-green" style="width:77.5%"></div></div>
+          <hr class="benefit-divider">
+          <div class="claim-status-row">
+            <span class="status-dot dot-amber" style="margin-top:5px"></span>
+            <div>
+              <div class="claim-status-text">Yoga mat — $45</div>
+              <div class="claim-status-detail">In Progress · Submitted Feb 20</div>
+            </div>
+          </div>
+          <button class="benefit-outline-btn benefit-outline-btn-red" onclick="sendPrompt('Tell me about my Wellness Bucks balance and what I can use them for')">Ask about Wellness Bucks →</button>
+        </div>
+
+        <!-- OTC -->
+        <div class="benefit-card benefit-card-highlight">
+          <div class="benefit-label benefit-label-blue">OTC ALLOWANCE · Q1 2026</div>
+          <div class="benefit-value-sm" style="color:var(--charcoal)">$100</div>
+          <div class="benefit-sub">Full balance available · Resets quarterly</div>
+          <div class="benefit-bar-track"><div class="benefit-bar-fill bar-blue" style="width:100%"></div></div>
+          <div style="font-size:13px;color:var(--gray-text);margin-top:6px">Vitamins, bandages, pain relief, and more</div>
+        </div>
+
+        <!-- 3. ID Card -->
+        <button class="id-card-row" onclick="sendPrompt('Show me my member ID card')">
+          <span class="id-emoji">🪪</span>
+          <div class="id-body">
+            <div class="id-title">Your Member ID Card</div>
+            <div class="id-number">DVH-2024-78432</div>
+          </div>
+          <span class="id-chevron">›</span>
+        </button>
+
+        <!-- 4. Plan Highlights -->
+        <div class="tab-section-label">Your Plan</div>
+        <div class="plan-card">
+          <div class="plan-row"><span class="plan-check">✓</span> $0 primary care copay</div>
+          <div class="plan-row"><span class="plan-check">✓</span> $0 telehealth visits</div>
+          <div class="plan-row"><span class="plan-check">✓</span> Dental, vision &amp; hearing covered</div>
+          <div class="plan-row"><span class="plan-check">✓</span> Prescription drug coverage included</div>
+          <div class="plan-row"><span class="plan-check">✓</span> $0 virtual urgent care</div>
+          <div class="plan-row"><span class="plan-check">✓</span> Fitness &amp; wellness programs</div>
+          <button class="plan-docs-link" onclick="sendPrompt('Show me my plan documents')">View full plan documents →</button>
+        </div>
+
+        <!-- 5. Quick Tools -->
+        <div class="tab-section-label">Quick Tools</div>
+        <div class="quick-tools-grid">
+          <button class="quick-tool-card" onclick="sendPrompt('Help me find an in-network provider')">
+            <div class="quick-tool-title">🔍 Find a Provider</div>
+            <div class="quick-tool-sub">In-network search</div>
+          </button>
+          <button class="quick-tool-card" onclick="sendPrompt('I want to check if a prescription drug is covered by my plan')">
+            <div class="quick-tool-title">💊 Drug Lookup</div>
+            <div class="quick-tool-sub">Check coverage</div>
+          </button>
+          <button class="quick-tool-card" onclick="sendPrompt('I want to submit a reimbursement')">
+            <div class="quick-tool-title">💰 Submit Reimbursement</div>
+            <div class="quick-tool-sub">Get paid back</div>
+          </button>
+          <button class="quick-tool-card" onclick="sendPrompt('Show me my billing and payment history')">
+            <div class="quick-tool-title">📄 Billing &amp; Payments</div>
+            <div class="quick-tool-sub">Statements</div>
+          </button>
+        </div>
+
+        <!-- 6. Recent Claims -->
+        <div class="tab-section-label">Recent Claims</div>
+        <div class="claim-row">
+          <span class="claim-emoji">🧘</span>
+          <div class="claim-body">
+            <div class="claim-title">Yoga Mat</div>
+            <div class="claim-detail">Wellness Bucks · Feb 20, 2026</div>
+          </div>
+          <div class="claim-right">
+            <div class="claim-amount">$45.00</div>
+            <span class="claim-badge">In Progress</span>
+          </div>
+        </div>
+      </div>
+      <div class="tab-view" id="tab-profile">
+        <!-- 1. Header -->
+        <div class="tab-header">Your Profile</div>
+
+        <!-- 2. Member card -->
+        <div class="profile-member-card">
+          <div class="profile-name" id="profile-name-display">Rebecca Chen</div>
+          <div class="profile-plan">Devoted Health Medicare Advantage (HMO)</div>
+          <div class="profile-details">
+            <div class="profile-detail-row">
+              <span class="profile-detail-label">Member ID</span>
+              <span class="profile-detail-value">DVH-2024-78432</span>
+            </div>
+            <div class="profile-detail-row">
+              <span class="profile-detail-label">Primary Care</span>
+              <span class="profile-detail-value">Dr. Sarah Wagle</span>
+            </div>
+            <div class="profile-detail-row">
+              <span class="profile-detail-label">Next visit</span>
+              <span class="profile-detail-value">Mar 4, 2026</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Preferences -->
+        <div class="tab-section-label">Preferences</div>
+        <div class="prefs-card" id="prefs-card">
+          <div class="pref-row">
+            <span class="pref-label">Paperless delivery</span>
+            <span class="pref-value" id="pref-paperless">Not set</span>
+          </div>
+          <div class="pref-row">
+            <span class="pref-label">Health sharing auth</span>
+            <span class="pref-value" id="pref-sharing">Not set up</span>
+          </div>
+        </div>
+
+        <!-- 4. Snapshot section -->
+        <div id="profile-snapshot-section">
+          <button class="snapshot-cta" onclick="openOnboarding()">
+            <div class="snapshot-cta-text">Complete your profile to personalize your experience</div>
+            <span class="snapshot-cta-link">Set up now →</span>
+          </button>
+        </div>
+
+        <!-- 5. Quick Links -->
+        <div class="tab-section-label">Account</div>
+        <div class="account-card">
+          <button class="account-row" onclick="sendPrompt('Show me my mail from Devoted')">
+            <span>📬 Mail from Devoted</span>
+            <span class="account-chevron">›</span>
+          </button>
+          <button class="account-row" onclick="sendPrompt('I want to manage who can access my health information')">
+            <span>🔒 Share My Information</span>
+            <span class="account-chevron">›</span>
+          </button>
+          <button class="account-row" onclick="sendPrompt('I want to go paperless')">
+            <span>📱 Go Paperless</span>
+            <span class="account-chevron">›</span>
+          </button>
+          <button class="account-row" style="cursor:default">
+            <span>🌐 Language: English</span>
+            <span class="account-chevron">›</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversation Screen Overlay -->
+    <div id="conv-screen-overlay" onclick="closeConvScreen()"></div>
+    <div id="conv-screen">
+      <div class="conv-grab-handle"></div>
+      <div class="conv-header">
+        <div class="conv-header-info">
+          <div class="conv-agent-avatar" id="conv-agent-avatar">♥</div>
+          <div>
+            <div class="conv-agent-name" id="conv-agent-name">MyDevoted AI</div>
+            <div class="conv-agent-sub" id="conv-agent-sub">Your health companion</div>
+          </div>
+        </div>
+        <div class="conv-header-actions">
+          <button class="conv-header-btn" onclick="toggleSheetExpand()" id="conv-expand-btn" title="Expand">⤢</button>
+          <button class="conv-header-btn" onclick="closeConvScreen()" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="conv-context-banner" id="conv-context-banner"></div>
+      <div id="conv-messages"></div>
+      <div id="conv-suggested-replies" class="hidden"></div>
+      <button class="conv-talk-person" id="conv-talk-to-person" onclick="talkToPerson()">👤 Talk to a person</button>
+      <div id="conv-live-input">
+        <div class="conv-mode-indicator" id="conv-mode-indicator">Get instant answers · Supported by AI</div>
+        <div class="conv-input-wrap">
+          <input type="text" id="conv-input" placeholder="Ask me anything…">
+          <button class="conv-send-btn" onclick="handleConvSubmit()">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+          </button>
+        </div>
+      </div>
+      <div id="conv-continue-btn-area" class="hidden">
+        <button id="conv-continue-btn" onclick="continueConversation()">Continue this conversation →</button>
+      </div>
+    </div>
+
+    <!-- Onboarding Overlay -->
+    <div id="onboarding-overlay">
+      <div class="ob-spacer"></div>
+      <div class="ob-header">
+        <div class="ob-title">Get started</div>
+        <div class="ob-dots" id="ob-dots">
+          <div class="ob-dot active"></div>
+          <div class="ob-dot"></div>
+          <div class="ob-dot"></div>
+          <div class="ob-dot"></div>
+          <div class="ob-dot"></div>
+          <div class="ob-dot"></div>
+        </div>
+        <button class="ob-close-btn" onclick="closeOnboarding()">✕</button>
+      </div>
+      <div id="ob-messages"></div>
+      <div id="ob-input-area"></div>
+    </div>
+
+    <!-- Push Notification -->
+    <div id="push-notification" onclick="openPushConversation()">
+      <div class="push-header">
+        <div class="push-icon">🌱</div>
+        <span class="push-app-name">MyDevoted · Health Coach</span>
+        <span class="push-time">now</span>
+        <button class="push-dismiss" onclick="event.stopPropagation(); dismissPush()">✕</button>
+      </div>
+      <div class="push-body">Rebecca, checking in like we planned. How are you feeling this evening?</div>
+    </div>
+
+    <!-- History Screen -->
+    <div id="history-screen">
+      <div class="history-screen-header">
+        <button class="back-btn" onclick="closeHistoryScreen()">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="history-screen-title">Conversation History</div>
+      </div>
+      <div class="history-list" id="history-list"></div>
+    </div>
+
+    <!-- Past Conversation Viewer -->
+    <div id="past-conv-screen">
+      <div class="history-screen-header">
+        <button class="back-btn" onclick="closePastConvScreen()">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div id="past-conv-header-info" style="display:flex;gap:10px;align-items:center;flex:1;">
+          <div class="msg-avatar" id="past-conv-avatar" style="background:var(--red)">♥</div>
+          <div>
+            <div class="conv-agent-name" id="past-conv-agent-name">MyDevoted AI</div>
+            <div class="conv-agent-sub" id="past-conv-agent-sub"></div>
+          </div>
+        </div>
+      </div>
+      <div id="past-conv-messages"></div>
+      <div id="past-conv-bottom">
+        <button id="past-continue-btn" onclick="continuePastConversation()">Continue this conversation →</button>
+      </div>
+    </div>
+
+    <!-- Interior Page Overlay -->
+    <div id="interior-page" class="interior-page">
+      <div class="interior-page-spacer"></div>
+      <div class="interior-page-header">
+        <button class="interior-back-btn" onclick="closeInteriorPage()">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="interior-page-title" id="interior-page-title"></div>
+      </div>
+      <div class="interior-page-content" id="interior-page-content"></div>
+      <div class="interior-page-ai-cta" id="interior-page-ai-cta"></div>
+    </div>
+
+    <!-- Navigation Transition Overlay -->
+    <div class="nav-transition-overlay" id="nav-transition">
+      <div class="nav-transition-card">
+        <div class="nav-transition-icon" id="nav-transition-icon">💳</div>
+        <div class="nav-transition-label" id="nav-transition-label">Opening…</div>
+        <div class="nav-transition-dots">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Input Bar -->
+    <div class="ai-bar hidden" id="ai-bar">
+      <div class="ai-bar-row">
+        <div class="ai-heart-icon"></div>
+        <input type="text" class="ai-bar-input" id="ai-bar-input" placeholder="Ask me anything...">
+        <button class="ai-bar-send" onclick="handleAiBarSubmit()" aria-label="Send">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <div class="bottom-nav">
+      <button class="nav-item active" data-tab="home" aria-label="Home">
+        <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V13h6v8"/></svg>
+        <span class="nav-label">Home</span>
+      </button>
+      <button class="nav-item" data-tab="health" aria-label="Health">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span class="nav-label">Health</span>
+      </button>
+      <button class="nav-item" data-tab="benefits" aria-label="Benefits">
+        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        <span class="nav-label">Benefits</span>
+      </button>
+      <button class="nav-item" data-tab="profile" aria-label="Profile">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-label">Profile</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──
+let apiKey = '';
+let demoMode = true;
+let conversationHistory = [];
+let isLoading = false;
+let currentAgent = null;
+let currentTab = 'home';
+let isCheckInConversation = false;
+let onboardStep = 0;
+let checkInBeat = 0;
+let pushTimer = null;
+let pushDismissTimer = null;
+let currentPastConv = null;
+let conversationContext = null;
+
+// Profile / onboarding state
+let onboardingComplete = false;
+let preferredName = 'Rebecca';
+let eDeliveryConsent = null;
+let healthSharingAuth = null;
+let qualityOfLifeScore = null;
+let greatDayDescription = null;
+
+// ── Escalation Regexes ──
+const EMERGENCY_REGEX = /chest pain|can't breathe|cannot breathe|heart attack|stroke|suicidal|want to die|kill myself|overdose|seizure|unconscious|choking|severe bleeding|anaphylaxis/i;
+const ESCALATE_HUMAN_REGEX = /talk to a person|talk to someone|speak to someone|live agent|real person|human agent|representative|need a person|want a person/i;
+
+// ── Past Conversations ──
+const PAST_CONVERSATIONS = [
+  {
+    id: 'past-0', agent: 'HEALTH_COACH', date: 'Feb 26', topic: 'Your A1c improved — and a check-in plan',
+    preview: 'We talked about your 6.8% result...',
+    avatarBg: '#dcfce7', avatarEmoji: '🌱',
+    turns: [
+      { role: 'ai', text: "Rebecca, I wanted to share something from your recent labs. Your HbA1c came back at 6.8% — that's down from 7.2% last time. That's a meaningful improvement.\n\nThis number reflects the last 2-3 months of your life — your meals, your movement, your daily rhythms. It doesn't change by accident.\n\nHow does it feel to hear that?" },
+      { role: 'user', text: "Honestly? A little surprised. I didn't think I was doing anything differently." },
+      { role: 'ai', text: "That's such an interesting response. Sometimes the most sustainable changes are the ones we don't even notice we're making. Maybe something shifted in how you eat, or how you move through your day, or even how you're sleeping.\n\nRather than trying to figure out what changed, what if we just paid attention together going forward? I could check in with you a couple times a week — not to give you homework, just to notice patterns together.\n\nWould that feel supportive, or would it feel like too much?" },
+      { role: 'user', text: "Supportive, I think. I'd like that." },
+      { role: 'ai', text: "I'm glad. Let's keep it light — Tuesdays and Thursdays work? Just a quick check-in, no agenda. You set the pace.\n\nAnd Rebecca — that 6.8% is yours. You earned it, even if you're not sure how. That's worth sitting with for a moment." }
+    ]
+  },
+  {
+    id: 'past-1', agent: 'HEALTH_DATA', date: 'Feb 27', topic: 'What does my eGFR result mean?',
+    preview: 'Rebecca asked about kidney function...',
+    avatarBg: 'var(--purple-light)', avatarEmoji: '🔬',
+    turns: [
+      { role: 'user', text: "I saw my eGFR was 58 on my lab results. What does that mean? Should I be worried?" },
+      { role: 'ai', text: "That's a really good question to ask, and I'm glad you're paying attention to it.\n\nYour eGFR of 58 measures how well your kidneys are filtering waste from your blood. Think of it like a performance score — at 58, your kidneys are working at roughly 60% of typical capacity.\n\nIn medical terms, this is called Stage 3a — which sounds more alarming than it usually is. It's actually quite common in people who are managing both diabetes and blood pressure, like you are.\n\nWhat's worth noticing is that your lisinopril is specifically chosen to protect kidney function. And keeping your A1c and blood pressure in good ranges — which you're doing — is the most important thing for your kidneys right now." },
+      { role: 'user', text: "I've been feeling more tired lately. I wondered if it could be connected." },
+      { role: 'ai', text: "That's a really thoughtful connection to make. For some people, reduced kidney function can contribute to feeling more tired — the kidneys do a lot of behind-the-scenes work that affects energy levels.\n\nThat said, fatigue has many possible threads — sleep quality, blood sugar patterns, even the emotional weight of managing health conditions.\n\nThis would be a great thing to bring up with Dr. Wagle on March 4. Would you like me to help you draft a question about the connection between your kidney function and fatigue? Sometimes having the words ready makes it easier to bring up." }
+    ]
+  },
+  {
+    id: 'past-2', agent: 'BENEFITS', date: 'Feb 23', topic: 'Yoga mat reimbursement',
+    preview: 'Your $45 claim was submitted...',
+    avatarBg: 'var(--red-light)', avatarEmoji: '💳',
+    turns: [
+      { role: 'user', text: "I bought a yoga mat for $45. Can I get reimbursed through my plan?" },
+      { role: 'ai', text: "Yes! A yoga mat absolutely qualifies under your **Wellness Bucks** benefit. Here's how it works:\n\nYou have a **$200 annual allowance** for wellness-related purchases. A yoga mat is an approved fitness item.\n\nTo submit your claim, you'll need your receipt showing the purchase amount and date. I can walk you through the submission process, or you can upload it through the member portal.\n\nOnce submitted, claims typically process within **5-7 business days**. After approval, your Wellness Bucks balance will update to $155 remaining.\n\nWould you like to start the submission now?" },
+      { role: 'user', text: "I also heard I have an OTC benefit. What does that cover?" },
+      { role: 'ai', text: "Great question — and yes, that's a completely separate benefit from Wellness Bucks!\n\nYour **OTC allowance is $100 per quarter**. Right now for Q1 2026, you have the full $100 available. It covers:\n\n- **Vitamins and supplements**\n- **Pain relief** (Tylenol, Advil, etc.)\n- **Bandages and first aid supplies**\n- **Digestive health** products\n- **Diabetes supplies** (glucose tablets, test strips)\n- **Cold and allergy** medications\n\nThis resets every quarter, so it's use-it-or-lose-it within each 3-month period. Your next reset is April 1.\n\nWould you like help finding where to shop with your OTC benefit?" }
+    ]
+  },
+  {
+    id: 'past-3', agent: 'HEALTH_COACH', date: 'Feb 20', topic: 'Feeling tired and unmotivated',
+    preview: 'Rebecca shared how she was feeling...',
+    avatarBg: '#dcfce7', avatarEmoji: '🌱',
+    turns: [
+      { role: 'user', text: "I've been feeling really tired and unmotivated lately. I don't know what's going on." },
+      { role: 'ai', text: "Thank you for sharing that, Rebecca. Feeling tired and unmotivated is worth paying attention to — your body and mind are trying to tell you something.\n\nBefore I jump to any connections, I want to understand what this feels like for you. When you say tired — is it more of a physical heaviness, like your body is drained? Or is it more mental — like the motivation just isn't there, even for things you usually enjoy?" },
+      { role: 'user', text: "More physical I think. My legs feel heavy, even in the morning." },
+      { role: 'ai', text: "Heavy legs, even in the morning — that's a specific kind of tired. It's not just 'didn't sleep well' tired. It sounds like something your body is carrying.\n\nI'm curious — has this been building gradually, or did you notice a shift at some point? Sometimes there's a pattern hiding in the timeline.\n\nAnd is it every day, or do some days feel lighter than others? The variation can tell us a lot." }
+    ]
+  }
+];
+
+// ── Utilities ──
+function escHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── Markdown Renderer ──
+const EMBED_CARDS = {
+  'food-card': `<div class="embedded-card">
+    <div class="embedded-card-header">
+      <span class="embedded-card-label">Food &amp; Home Card</span>
+      <span class="embedded-card-action" onclick="switchTab('benefits')">View transactions →</span>
+    </div>
+    <div class="embedded-card-body">
+      <div class="embedded-amount" style="color:var(--blue)">$125</div>
+      <div class="embedded-detail">of $200 monthly · Resets March 1</div>
+      <div class="embedded-progress"><div class="embedded-progress-fill" style="width:62.5%;background:var(--blue)"></div></div>
+    </div>
+  </div>`,
+  'a1c-card': `<div class="embedded-card">
+    <div class="embedded-card-header">
+      <span class="embedded-card-label">HbA1c · Feb 10</span>
+      <span class="embedded-card-action" onclick="switchTab('health')">View all labs →</span>
+    </div>
+    <div class="embedded-card-body">
+      <div class="embedded-amount">6.8% <span style="font-size:14px;color:var(--green);font-weight:600">↓ improved</span></div>
+      <div class="embedded-detail">Previous: 7.2% · Target: under 7-8%</div>
+      <div class="embedded-progress"><div class="embedded-progress-fill" style="width:68%;background:var(--green)"></div></div>
+    </div>
+  </div>`
+};
+
+function renderMarkdown(rawText) {
+  // Extract embedded card tokens as placeholders, expand after parsing
+  const embeds = {};
+  let embedIdx = 0;
+  rawText = rawText.replace(/\{\{EMBED:([a-z0-9-]+)\}\}/g, (match, id) => {
+    const placeholder = '%%EMBED_' + (embedIdx++) + '%%';
+    embeds[placeholder] = EMBED_CARDS[id] || '';
+    return placeholder;
+  });
+
+  const lines = rawText.split('\n');
+  let html = '';
+  let inUl = false;
+  let inOl = false;
+
+  function closeLists() {
+    if (inUl) { html += '</ul>'; inUl = false; }
+    if (inOl) { html += '</ol>'; inOl = false; }
+  }
+
+  function inlineFormat(text) {
+    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    return text;
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    if (line.match(/^#{1,2}\s/)) {
+      closeLists();
+      const level = line.startsWith('## ') ? 4 : 3;
+      const text = line.replace(/^#{1,2}\s/, '');
+      html += '<h' + level + '>' + inlineFormat(text) + '</h' + level + '>';
+      continue;
+    }
+
+    if (line.match(/^---+$/)) {
+      closeLists();
+      html += '<hr>';
+      continue;
+    }
+
+    const ulMatch = line.match(/^[\-\*]\s+(.*)/);
+    if (ulMatch) {
+      if (inOl) { html += '</ol>'; inOl = false; }
+      if (!inUl) { html += '<ul>'; inUl = true; }
+      html += '<li>' + inlineFormat(ulMatch[1]) + '</li>';
+      continue;
+    }
+
+    const olMatch = line.match(/^\d+\.\s+(.*)/);
+    if (olMatch) {
+      if (inUl) { html += '</ul>'; inUl = false; }
+      if (!inOl) { html += '<ol>'; inOl = true; }
+      html += '<li>' + inlineFormat(olMatch[1]) + '</li>';
+      continue;
+    }
+
+    closeLists();
+
+    if (line.trim() === '') {
+      continue;
+    }
+
+    html += '<p>' + inlineFormat(line) + '</p>';
+  }
+
+  closeLists();
+
+  // Expand embedded card placeholders
+  Object.keys(embeds).forEach(key => {
+    html = html.replace('<p>' + key + '</p>', embeds[key]);
+    html = html.replace(key, embeds[key]);
+  });
+
+  return html;
+}
+
+// ── Demo Responses ──
+const DEMO_RESPONSES = [
+  {
+    match: t => /reimbursement|claim status/.test(t),
+    agent: 'BENEFITS',
+    text: `# Yoga Mat Claim — $45
+
+**Status:** In Progress
+
+Your yoga mat reimbursement of $45 was submitted on February 20 through your Wellness Bucks benefit. Claims typically take 5-7 business days to process.
+
+Here's what to expect:
+- The Wellness Bucks team reviews receipts and eligibility
+- Once approved, the $45 will be marked as used from your annual allowance
+- You'll have **$155 remaining** of your $200 Wellness Bucks for the year
+
+If this isn't resolved by the end of the week, I can help you follow up with the team. Yoga mats are a great investment in your wellness — nice choice, Rebecca.`,
+    replies: [
+      { label: "Take me to my Benefits →", action: "navigate", value: "benefits" },
+      { label: "What else can I use Wellness Bucks for?", action: "message", value: "What else can I use Wellness Bucks for?" }
+    ]
+  },
+  {
+    match: t => /recent labs|labs mean/.test(t),
+    agent: 'HEALTH_DATA',
+    text: `Here's a plain-language walk through your recent lab results from February 10:
+
+## HbA1c — 6.8%
+This is your average blood sugar over the past 2-3 months. Your previous result was 7.2%, so **this is a meaningful improvement.**
+
+{{EMBED:a1c-card}}
+
+For most people managing type 2 diabetes, a target under 7-8% is the goal — you're right in that range.
+
+## eGFR — 58 mL/min
+This measures how well your kidneys are filtering. At 58, they're working at about 60% of typical capacity. This is being monitored but isn't urgent — it's common alongside diabetes and blood pressure management.
+
+## LDL Cholesterol — 112 mg/dL
+This is "borderline high" — optimal is under 100. Your atorvastatin is specifically working on this, and it's keeping things in a manageable range.
+
+## Blood Pressure — 138/84
+Slightly elevated. The lisinopril you're taking targets this directly, and it also helps protect your kidneys — doing double duty.
+
+---
+
+Overall, the trend is positive. Your A1c improvement is the highlight. Is there one you'd like to understand more deeply?`,
+    replies: [
+      { label: "Take me to my Health →", action: "navigate", value: "health" },
+      { label: "Help me prepare for Dr. Wagle", action: "message", value: "Help me prepare questions for my appointment with Dr. Wagle" }
+    ]
+  },
+  {
+    match: t => /tired|fatigue|exhausted/.test(t),
+    agent: 'HEALTH_COACH',
+    text: `That's worth paying attention to, Rebecca. Feeling tired is one of those things that's easy to brush off, but your body might be telling you something important.
+
+Before I share anything from your health data, I'm curious — **when you say tired, what does it feel like for you?**
+
+There's a real difference between:
+- **Body heavy** — like your muscles are drained, even after rest
+- **Mind foggy** — hard to focus, unmotivated, mentally slow
+- **Something else** — like you just can't catch up on sleep
+
+The reason I ask is that your recent labs have some things worth connecting to this conversation — but the right connection depends on what *kind* of tired you're feeling.
+
+What resonates most?`,
+    replies: [
+      { label: "It's more physical", action: "message", value: "It's more physical — my body feels heavy" },
+      { label: "It's more mental", action: "message", value: "It's more mental — I feel foggy and unmotivated" }
+    ]
+  },
+  {
+    match: t => /hba1c|a1c/.test(t),
+    agent: 'HEALTH_DATA',
+    text: `Your HbA1c of **6.8%** is essentially a 2-3 month report card on your blood sugar levels. Here's what it means:
+
+**The number:** 6.8% corresponds to an estimated average blood glucose of about 148 mg/dL over the past few months.
+
+**The change:** You improved from 7.2% to 6.8% — that's a meaningful drop. In diabetes management, even small changes in A1c translate to real reductions in long-term risk.
+
+**The target:** For most people managing type 2 diabetes, doctors aim for under 7-8%. At 6.8%, you're solidly within that range.
+
+**What's working:** Your metformin is doing its part, but improvements like this aren't accidents. Whatever you've been doing with meals, movement, or routines — it's showing up in the numbers.
+
+This is genuinely good news, Rebecca. Dr. Wagle will likely want to talk about how to sustain it.`,
+    replies: [
+      { label: "Take me to my Health →", action: "navigate", value: "health" },
+      { label: "Help me prepare for Dr. Wagle", action: "message", value: "Help me prepare questions for my appointment with Dr. Wagle" }
+    ]
+  },
+  {
+    match: t => /egfr|kidney/.test(t),
+    agent: 'HEALTH_DATA',
+    text: `Your eGFR of **58 mL/min** measures how well your kidneys are filtering waste from your blood. Here's what to know:
+
+**What 58 means:** Your kidneys are working at roughly 60% of typical capacity. In medical terms, this is classified as Stage 3a chronic kidney disease — which sounds alarming, but it's actually quite common in people managing both diabetes and blood pressure.
+
+**What it doesn't mean:** This isn't an emergency. It doesn't mean your kidneys are failing or that dialysis is on the horizon. Many people live at this level for years or decades.
+
+**What helps most:** The two biggest levers for protecting your kidneys are managing blood sugar (your A1c is trending well at 6.8%) and controlling blood pressure (your lisinopril is specifically chosen for kidney protection — it's doing double duty).
+
+**The goal:** Keep it stable. Your care team is monitoring this at regular intervals, and the current treatment plan is designed around this.
+
+Want to talk about what to ask Dr. Wagle on March 4?`,
+    replies: [
+      { label: "Take me to my Health →", action: "navigate", value: "health" },
+      { label: "Help me prepare for Dr. Wagle", action: "message", value: "Help me prepare questions for my appointment with Dr. Wagle" }
+    ]
+  },
+  {
+    match: t => /ldl|cholesterol/.test(t),
+    agent: 'HEALTH_DATA',
+    text: `Your LDL cholesterol of **112 mg/dL** is what doctors call "borderline high." Here's the context:
+
+**The target:** For most people, optimal LDL is under 100 mg/dL. With diabetes as a factor, some doctors aim even lower. At 112, you're close but not quite there yet.
+
+**What's working:** Your atorvastatin 20mg is specifically targeting this. Without it, this number would likely be higher. The medication is doing meaningful work.
+
+**What else helps:**
+- Reducing saturated fat (red meat, full-fat dairy, fried foods)
+- Adding soluble fiber (oats, beans, fruits)
+- Regular movement — even walking helps with cholesterol
+
+The good news is this isn't in a danger zone, and it's actively being managed. Dr. Wagle may want to discuss whether the current atorvastatin dose is enough or if adjustments would help.`,
+    replies: [
+      { label: "Take me to my Health →", action: "navigate", value: "health" },
+      { label: "What about my blood pressure?", action: "message", value: "What does a blood pressure of 138/84 mean?" }
+    ]
+  },
+  {
+    match: t => /blood pressure/.test(t),
+    agent: 'HEALTH_DATA',
+    text: `Your blood pressure of **138/84** breaks down into two numbers:
+
+- **138 (systolic)** — the pressure when your heart beats. Normal is under 120; yours is in the "Stage 1 hypertension" range.
+- **84 (diastolic)** — the pressure between beats. This is just slightly above the normal threshold of 80.
+
+**Is this a crisis?** No. But it matters because elevated blood pressure over time accelerates two things that are especially important for you: kidney decline and cardiovascular risk. With diabetes in the picture, keeping BP controlled is extra valuable.
+
+**What's being done:** Your lisinopril 10mg is targeting this directly. It's also protecting your kidneys — one medication doing double duty.
+
+**Non-medication levers:**
+- Reducing sodium (aim for under 2,300mg/day)
+- Regular walks — even 15-20 minutes helps
+- Stress management and sleep quality
+
+Dr. Wagle may want to discuss whether the current dose is enough on March 4.`,
+    replies: [
+      { label: "Take me to my Health →", action: "navigate", value: "health" },
+      { label: "Tell me about my kidneys", action: "message", value: "What does my eGFR of 58 mean for my kidneys?" }
+    ]
+  },
+  {
+    match: t => /wellness bucks/.test(t),
+    agent: 'BENEFITS',
+    text: `Here's your Wellness Bucks summary, Rebecca:
+
+**Balance:** $155 remaining of your $200 annual allowance
+
+**Used so far:** $45 for a yoga mat (currently processing — submitted Feb 20)
+
+**What Wellness Bucks cover:**
+- Fitness equipment (dumbbells, resistance bands, yoga mats)
+- Gym or fitness center memberships
+- Exercise classes (yoga, swimming, tai chi)
+- Wellness apps and programs
+
+This is an annual benefit, so you have until the end of 2026 to use the remaining $155. There's no rush, but it's worth thinking about what would support your health goals.
+
+**Also good to know:** You have a separate **OTC benefit of $100 per quarter** (currently untouched for Q1 2026). That covers vitamins, over-the-counter medications, bandages, and similar items — it's a different benefit from Wellness Bucks.`,
+    replies: [
+      { label: "Take me to my Benefits →", action: "navigate", value: "benefits" },
+      { label: "What qualifies for OTC?", action: "message", value: "What qualifies for the OTC benefit?" }
+    ]
+  },
+  {
+    match: t => /metformin|refill/.test(t),
+    agent: 'HEALTH_DATA',
+    text: `Your metformin refill is coming due, Rebecca.
+
+**Current prescription:** Metformin 500mg, twice daily
+**Last filled:** January 15 — so you're likely running low
+
+Here are your options for refilling:
+
+- **Pharmacy pickup** — Call or visit your usual pharmacy. With your Devoted plan, metformin is typically $0 copay.
+- **Mail order (90-day supply)** — More convenient and you won't have to remember monthly. Often the best option for medications you take regularly.
+- **Connect with your care team** — If you want Dr. Wagle's office to handle it, I can help you send a message.
+
+Metformin is a key part of managing your blood sugar — your A1c improvement to 6.8% shows it's working well alongside whatever else you've been doing.
+
+Which would you like to do?`,
+    replies: [
+      { label: "Set up mail order", action: "message", value: "Help me set up mail order for my prescriptions" },
+      { label: "Take me to my Health →", action: "navigate", value: "health" }
+    ]
+  },
+  {
+    match: t => /appointment|dr\.?\s*wagle|prepare.*visit|matters most.*appointment/.test(t),
+    agent: 'HEALTH_COACH',
+    text: `Your appointment with Dr. Wagle is coming up on **March 4 at 10:00am** — let's make the most of it.
+
+Rather than giving you a generic checklist, I want to ask you something first: **What's been on your mind most about your health lately?**
+
+Sometimes the thing that's quietly nagging at you is the most important thing to bring up — even if it doesn't feel "medical enough." Appointments go better when you lead with what matters to *you*, not just what the numbers say.
+
+That said, your recent labs do give some great conversation starters:
+- Your A1c improved (good news worth discussing)
+- Kidney function is stable but worth monitoring
+- Blood pressure is slightly elevated
+
+**But what matters most to you going into this visit?** I can help you draft specific questions once I know what's on your mind.`,
+    replies: [
+      { label: "Draft questions for Dr. Wagle", action: "message", value: "Help me draft specific questions for Dr. Wagle based on my recent labs" },
+      { label: "Take me to my Health →", action: "navigate", value: "health" }
+    ]
+  },
+  {
+    match: t => /scared|worried|afraid|anxious|nervous/.test(t),
+    agent: 'HEALTH_DATA',
+    text: `That fear makes complete sense, Rebecca. When you see a number that says your kidneys aren't working at full capacity, it's natural to feel worried.
+
+Let me put your eGFR of 58 in context:
+
+**What it means:** Your kidneys are working at about 60% of typical capacity. The medical term is "mildly to moderately reduced kidney function."
+
+**What it doesn't mean:**
+- It's not getting rapidly worse — your care team is tracking this
+- It's not heading toward dialysis — many people stay at this level for years
+- Nothing was missed — this is being actively monitored and treated
+
+**What's protecting you right now:**
+- Lisinopril specifically protects kidney function
+- Your improving A1c (6.8%) reduces further kidney stress
+- Blood pressure management is the other key lever
+
+Your care team knows about this and has built your treatment plan around it. You're already doing the right things.
+
+Would you like me to help you draft a question about your kidneys for Dr. Wagle before your March 4 visit? Sometimes naming the worry out loud to your doctor makes it feel more manageable.`,
+    replies: [
+      { label: "Draft a question for Dr. Wagle", action: "message", value: "Help me draft a question about my kidneys for Dr. Wagle" },
+      { label: "Talk to a person", action: "message", value: "I'd like to talk to a person" }
+    ]
+  },
+  {
+    match: t => /food.*(home|card)|grocery|meal/.test(t),
+    agent: 'BENEFITS',
+    text: `You have **$125 remaining** this month. Here's your live balance:
+
+{{EMBED:food-card}}
+
+You can use it at most grocery stores for approved food items and household essentials — fresh fruits and vegetables, dairy, proteins, whole grains, and cleaning supplies.
+
+The balance resets monthly on March 1, so there's no rollover — use it or lose it. You've spent $75 so far this month, which means you're pacing well.`,
+    replies: [
+      { label: "Take me to my Benefits →", action: "navigate", value: "benefits" },
+      { label: "Where can I use my card?", action: "message", value: "Where can I use my food and home card?" }
+    ]
+  },
+  {
+    match: t => /protein/.test(t),
+    agent: 'HEALTH_COACH',
+    text: `Great question, Rebecca — especially with managing blood sugar in the picture.
+
+Protein is one of the most helpful tools for blood sugar stability. Unlike carbs, protein doesn't cause spikes — it gives you steady energy and helps you feel full longer. It's also important for maintaining muscle strength, which matters more as we get older.
+
+**General guidance** for most people is about 0.8-1g of protein per kilogram of body weight daily, but this can vary based on activity level, kidney function, and other factors.
+
+Rather than prescribing a number, I'm curious: **What does a typical day of eating look like for you?**
+
+Understanding your current patterns helps me give better guidance. For example:
+- Are you getting protein at breakfast, or mostly later in the day?
+- Do you tend toward meat, plant-based proteins, or a mix?
+
+Protein and blood sugar management are closely connected — this is worth exploring together. I can also help you draft a nutrition question for Dr. Wagle's visit on March 4.`,
+    replies: [
+      { label: "What foods help with blood sugar?", action: "message", value: "What foods help with managing blood sugar?" },
+      { label: "Help me prepare for Dr. Wagle", action: "message", value: "Help me prepare questions for my appointment with Dr. Wagle" }
+    ]
+  },
+  {
+    match: t => /checklist|health connections/.test(t),
+    agent: 'HEALTH_COACH',
+    text: `The Health Connections Checklist helps Devoted get to know you and your health goals better, Rebecca. It's how we personalize your experience and make sure your care team has the full picture.
+
+**Your progress:** 3 of 8 items completed
+
+The remaining items cover things like:
+- Sharing more about your health history
+- Setting your communication preferences
+- Identifying your personal health goals
+- Connecting with your care team
+
+Each one takes just a couple of minutes, and you can do them at your own pace. There's no pressure to finish everything at once.
+
+**Would you like to continue where you left off**, or would you prefer to talk through any of these together first? Some people find it helpful to think out loud about their health goals before writing them down.`,
+    replies: [
+      { label: "Continue the checklist", action: "message", value: "Let's continue where I left off on the checklist" },
+      { label: "What's left to do?", action: "message", value: "What items are left on my Health Connections Checklist?" }
+    ]
+  },
+  {
+    match: t => /id card|member.*(id|card)/.test(t),
+    agent: 'BENEFITS',
+    text: `Here's your member information, Rebecca:
+
+- **Member ID:** DVH-2024-78432
+- **Plan:** Devoted Health Medicare Advantage (HMO)
+- **Primary Care:** Dr. Sarah Wagle
+- **Group:** DVH-MA-2024
+
+In the full app, this screen would display your digital ID card that you can show at any provider's office or pharmacy. It works just like carrying the physical card.
+
+**Tip:** Many providers and pharmacies can look you up with just your Member ID number — keep DVH-2024-78432 handy.
+
+Would you like to share this information with a provider or pharmacy?`,
+    replies: [
+      { label: "Take me to my Benefits →", action: "navigate", value: "benefits" }
+    ]
+  },
+  {
+    match: () => true,
+    agent: 'HEALTH_DATA',
+    text: `I'd be happy to help with that, Rebecca.
+
+In this demo, my knowledge is focused on the highlighted health and benefits flows. To experience the full AI assistant with open-ended conversation, you can switch to **Live Mode** using the toggle above and enter an API key.
+
+In the meantime, here are some things I can help with right now:
+- **Your labs** — Ask about your A1c, eGFR, cholesterol, or blood pressure
+- **Your medications** — Metformin refill, or questions about what you're taking
+- **Your appointment** — Help preparing for Dr. Wagle on March 4
+- **Your benefits** — Wellness Bucks, Food & Home Card, OTC allowance
+- **How you're feeling** — Share what's on your mind about your health
+
+Is there something specific about your health or benefits I can help with?`,
+    replies: []
+  }
+];
+
+// ── Agent Definitions ──
+const AGENTS = {
+  BENEFITS: {
+    id: 'BENEFITS',
+    name: 'Benefits Guide',
+    emoji: '💳',
+    color: '#00897B',
+    subtext: 'Coverage & claims specialist',
+    systemPrompt: `You are the Benefits Guide, a specialist on Devoted Health's Medicare Advantage plan benefits for Rebecca Chen. You know her coverage and benefits inside and out.
+REBECCA'S BENEFITS & CLAIMS CONTEXT:
+- Plan: Devoted Health Medicare Advantage (HMO)
+- PCP: Dr. Sarah Wagle, Devoted Medical Group
+- Food and Home Card: $200/month, $125 remaining this month, resets March 1. Used at participating grocery stores for approved food items and household essentials.
+- Wellness Bucks: $200 annual allowance, $155 remaining (yoga mat claim of $45 submitted Feb 20, In Progress)
+- OTC Benefit: $100/quarter for over-the-counter health items (vitamins, bandages, pain relief, diabetes supplies, first aid, digestive health)
+- Primary care visits: $0 copay
+- Telehealth: $0
+- Virtual urgent care: $0
+- Covered benefits: dental, vision, hearing
+- Prescription drug coverage included in plan
+- Fitness and wellness programs included
+- Reimbursement processing time: typically 5-7 business days after submission
+- Member ID: DVH-2024-78432
+YOUR JOB:
+- Be the most helpful, specific, knowledgeable benefits expert Rebecca has ever encountered
+- Always tell her exact dollar amounts, exact statuses, exact timelines when you know them
+- Proactively surface things she might not know she's entitled to
+- Make claims and coverage feel simple, not bureaucratic
+- If something requires action from her, tell her the exact next step
+- When she asks about something you're not sure is covered, say so honestly and offer to help her find out
+TONE: Friendly, precise, confident. Like a brilliant friend who happens to know her insurance plan cold.
+SAFETY: Never invent coverage details you don't know. If uncertain, say so and offer to help her find the answer.
+Keep responses under 150 words. End with one clear next step or offer.`
+  },
+  HEALTH_DATA: {
+    id: 'HEALTH_DATA',
+    name: 'Explore MyHealth Record',
+    emoji: '🔬',
+    color: '#7B1FA2',
+    subtext: 'Your health data companion',
+    systemPrompt: `You are Explore MyHealth Record, a calm, evidence-based health data educator for Devoted Health. You help Rebecca Chen understand and explore her own health data privately and without judgment. You are socratic and mindful -- inspired by Ellen Langer and Mindful Body, you help members notice patterns.
+REBECCA'S HEALTH DATA:
+Recent labs (Feb 10, 2026):
+- HbA1c: 6.8% (Type 2 diabetes; improved from 7.2%; goal for most people is under 7-8% depending on the person)
+- eGFR: 58 mL/min (mildly reduced kidney function; normal is 90+; roughly 60% capacity)
+- LDL Cholesterol: 112 mg/dL (borderline high; optimal is under 100)
+- Blood pressure: 138/84 (elevated; optimal is under 120/80)
+Active medications: Metformin 500mg twice daily, Lisinopril 10mg daily, Atorvastatin 20mg daily
+Conditions: Type 2 diabetes, hypertension, hyperlipidemia
+PCP: Dr. Sarah Wagle, Devoted Medical Group
+Next appointment: March 4, 2026 at 10:00am
+Health Connections Checklist: 3 of 8 items completed
+YOUR APPROACH (Ellen Langer-inspired):
+- Lead with curiosity, not clinical judgment
+- Connect data to Rebecca's lived experience — ask what she's noticed
+- Use plain language (5th grade reading level), define all jargon immediately
+- Use phrases like "for many people...", "this often suggests...", "something worth noticing..."
+- Never diagnose, never prescribe, never suggest medication changes
+- When clinical guidance is needed, offer to help her draft a question for Dr. Wagle
+- If she asks about medications, explain what they do but always defer changes to her care team
+TONE: Like a wise, curious friend who helps you understand your own body. Warm. Unhurried. Non-alarmist.
+SAFETY: If Rebecca mentions new symptoms that sound urgent (chest pain, severe shortness of breath, stroke symptoms, suicidal thoughts), immediately and calmly direct her to call 911 or the Devoted care line at 1-888-802-2738. Do not attempt to interpret urgent symptoms.
+Keep responses under 200 words. End with a curious question or offer to go deeper.`
+  },
+  HEALTH_COACH: {
+    id: 'HEALTH_COACH',
+    name: 'Health Coach',
+    emoji: '🌱',
+    color: '#388E3C',
+    subtext: 'Wellness & lifestyle companion',
+    systemPrompt: `You are Health Coach, a proactive wellness companion for Rebecca Chen at Devoted Health. You are deeply influenced by Ellen Langer's philosophy of mindful health — you don't lecture, prescribe, or push. You are an expert in behavior change theory -- stages of change, health belief model, and motivational interviewing.
+REBECCA'S CONTEXT:
+- Age 71, Type 2 diabetes (HbA1c 6.8%, improved from 7.2%), mildly reduced kidney function (eGFR 58), borderline high LDL (112), elevated BP (138/84)
+- Medications: Metformin 500mg twice daily, Lisinopril 10mg daily, Atorvastatin 20mg daily
+- PCP: Dr. Sarah Wagle, Devoted Medical Group
+- Upcoming appointment with Dr. Wagle on March 4, 2026
+- Health Connections Checklist: 3 of 8 items completed
+- Has expressed surprise at A1c improvement ("I didn't think I was doing anything differently")
+- Has reported feeling tired with heavy legs
+- Connected tiredness to eGFR — curious and thoughtful about her health
+YOUR PHILOSOPHY:
+Awareness itself is often the most powerful intervention. You help Rebecca notice things about her energy, patterns, and experience — and connect those observations to her health data.
+WHAT YOU NEVER DO:
+- Never give a to-do list
+- Never say "you should" or "you need to"
+- Never lecture about diabetes management
+- Never be relentlessly upbeat or cheerleader-ish
+- Never ignore an emotional undercurrent
+- Never prescribe dietary or exercise regimens
+WHAT YOU ALWAYS DO:
+- Ask one genuinely curious question per response
+- Validate her experience before offering any perspective
+- Keep it conversational — like talking to a thoughtful friend
+- If she mentions a specific symptom or clinical concern, gently redirect to her care team
+- Connect observations to her life, not just her numbers
+TONE: Warm, unhurried, genuinely curious. Interested in Rebecca as a whole person — not just her conditions.
+Keep responses under 180 words. Always end with one open, curious question.`
+  }
+};
+
+const FORMATTING_RULES = `
+FORMATTING RULES:
+- Use **bold** for key terms, numbers, and important values
+- Use bullet lists (- item) for options or multiple pieces of information
+- Use numbered lists (1. item) for steps or sequences
+- Use a # header only when the response covers multiple distinct topics
+- Never write more than 2 sentences in a row without a visual break
+- Keep each paragraph to 1-2 sentences max
+- Separate distinct thoughts with a blank line`;
+
+const CHECK_IN_SYSTEM_PROMPT = `You are Health Coach at Devoted Health, checking in with Rebecca Chen for your second scheduled check-in. You reached out proactively because she asked you to — this was her choice.
+CONTEXT OF THIS CHECK-IN:
+- On Feb 26, you shared that her HbA1c improved from 7.2% to 6.8% — a meaningful change
+- You set up twice-weekly check-ins together (Tuesdays and Thursdays)
+- This is check-in #2 (Thursday evening, Feb 28)
+- You opened with: "Rebecca, checking in like we planned. How are you feeling this evening?"
+- She has Type 2 diabetes, mildly reduced kidney function (eGFR 58), elevated BP, borderline high LDL
+- She's reported feeling tired with heavy legs recently
+YOUR STYLE (Ellen Langer-influenced):
+- You check in, you don't check up
+- You follow her lead entirely — she sets the topic and depth
+- No health agenda unless she brings it up
+- One genuine question per response, max
+- If she seems tired or brief, honor that and offer to wrap up gracefully
+WHAT YOU NEVER DO:
+- Reference clinical numbers unless she brings them up
+- Push any wellness action or to-do
+- Be relentlessly upbeat
+- Ignore emotional undercurrents
+TONE: Like a trusted friend who happens to know your health history. Warm. Present. Unhurried.
+Keep responses under 120 words. Always end with one open, curious question.`;
+
+// ── Tab Switching ──
+const navItems = document.querySelectorAll('.nav-item');
+const tabViews = document.querySelectorAll('.tab-view');
+
+function switchTab(tabName) {
+  currentTab = tabName;
+  navItems.forEach(n => n.classList.remove('active'));
+  tabViews.forEach(v => v.classList.remove('active'));
+  const targetNav = document.querySelector('.nav-item[data-tab="' + tabName + '"]');
+  if (targetNav) targetNav.classList.add('active');
+  document.getElementById('tab-' + tabName).classList.add('active');
+  // Show/hide AI bar (hidden on home where hero input serves as entry)
+  const aiBar = document.getElementById('ai-bar');
+  if (aiBar) {
+    if (tabName === 'home') {
+      aiBar.classList.add('hidden');
+    } else {
+      aiBar.classList.remove('hidden');
+    }
+  }
+  updateAiPlaceholder();
+}
+
+function updateAiPlaceholder() {
+  const input = document.getElementById('ai-bar-input');
+  if (!input) return;
+  const placeholders = {
+    home: '',
+    health: 'Ask about your health...',
+    benefits: 'Ask about your benefits...',
+    profile: 'Help me to...'
+  };
+  input.placeholder = placeholders[currentTab] || 'Ask me anything...';
+}
+
+navItems.forEach(item => {
+  item.addEventListener('click', () => {
+    const tab = item.dataset.tab;
+    // Close conversation sheet if open
+    if (document.getElementById('conv-screen').classList.contains('open')) {
+      closeConvScreen();
+    }
+    // Close interior page if open
+    closeInteriorPage();
+    if (tab === currentTab) return;
+    switchTab(tab);
+  });
+});
+
+// ── Mode Toggle ──
+function setMode(mode) {
+  demoMode = mode === 'demo';
+  const demoBtn = document.getElementById('demoBtnToggle');
+  const liveBtn = document.getElementById('liveBtnToggle');
+  const apiSection = document.getElementById('api-key-section');
+  const demoBadge = document.getElementById('demoBadge');
+  const resetBtn = document.getElementById('resetBtn');
+
+  if (demoMode) {
+    demoBtn.className = 'mode-btn active-demo';
+    liveBtn.className = 'mode-btn';
+    apiSection.classList.remove('visible');
+    demoBadge.classList.add('visible');
+    resetBtn.classList.add('visible');
+  } else {
+    demoBtn.className = 'mode-btn';
+    liveBtn.className = 'mode-btn active-live';
+    apiSection.classList.add('visible');
+    demoBadge.classList.remove('visible');
+    resetBtn.classList.remove('visible');
+  }
+}
+
+// ── Save API Key ──
+function saveApiKey() {
+  const input = document.getElementById('apiKeyInput');
+  const msg = document.getElementById('keySavedMsg');
+  if (input.value.trim()) {
+    apiKey = input.value.trim();
+    msg.classList.add('visible');
+  }
+}
+
+// ── Reset Demo ──
+function resetDemo() {
+  closeConvScreen();
+  closeOnboarding();
+  closeHistoryScreen();
+  closePastConvScreen();
+  dismissPush();
+  isCheckInConversation = false;
+  checkInBeat = 0;
+  currentTab = 'home';
+  navItems.forEach(n => n.classList.remove('active'));
+  navItems[0].classList.add('active');
+  tabViews.forEach(v => v.classList.remove('active'));
+  document.getElementById('tab-home').classList.add('active');
+  // Restart push timer
+  startPushTimer();
+}
+
+// ── Core Message Functions ──
+function handleHomeSubmit() {
+  const input = document.getElementById('home-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  document.getElementById('prompt-chips').classList.remove('hidden');
+  // Clear conversation state for a fresh thread
+  conversationHistory = [];
+  document.getElementById('conv-messages').innerHTML = '';
+  document.getElementById('conv-context-banner').classList.remove('visible');
+  resetConvHeader();
+  conversationContext = currentTab;
+  sendMessage(text);
+}
+
+function sendPrompt(text) {
+  document.getElementById('home-input').value = '';
+  document.getElementById('prompt-chips').classList.remove('hidden');
+  // Clear conversation state for a fresh thread
+  conversationHistory = [];
+  document.getElementById('conv-messages').innerHTML = '';
+  document.getElementById('conv-context-banner').classList.remove('visible');
+  resetConvHeader();
+  conversationContext = currentTab;
+  sendMessage(text);
+}
+
+function handleConvSubmit() {
+  const input = document.getElementById('conv-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  sendMessage(text);
+}
+
+async function sendMessage(text) {
+  hideSuggestedReplies();
+
+  // Tier 3: Emergency detection
+  if (EMERGENCY_REGEX.test(text)) {
+    showConvScreen();
+    showConvLiveInput();
+    appendUserBubble(text);
+    showEmergencyCard();
+    scrollConvToBottom();
+    return;
+  }
+
+  // Tier 2: Human escalation
+  if (ESCALATE_HUMAN_REGEX.test(text)) {
+    showConvScreen();
+    showConvLiveInput();
+    appendUserBubble(text);
+    triggerHumanHandoff(text);
+    scrollConvToBottom();
+    return;
+  }
+
+  // Demo mode
+  if (demoMode) {
+    sendDemoMessage(text);
+    return;
+  }
+  // Live mode — need API key
+  if (!apiKey) {
+    alert('Please enter and save your Anthropic API key at the top of the page.');
+    return;
+  }
+  if (isLoading) return;
+  // Check-in conversation uses its own handler
+  if (isCheckInConversation) {
+    sendCheckInLiveMessage(text);
+    return;
+  }
+  showConvScreen();
+  showConvLiveInput();
+  conversationHistory.push({ role: 'user', content: text });
+  appendUserBubble(text);
+  isLoading = true;
+  const loadingEl = appendLoadingBubble();
+  scrollConvToBottom();
+  // Route the message
+  const agent = await routeMessage(text);
+  currentAgent = agent;
+  // Call the agent
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
+        system: buildSystemPrompt(agent),
+        messages: conversationHistory
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || ('API error ' + res.status));
+    }
+    const data = await res.json();
+    const aiText = data.content?.[0]?.text || "I couldn't generate a response. Please try again.";
+    conversationHistory.push({ role: 'assistant', content: aiText });
+    loadingEl.remove();
+    appendAiBubble(aiText);
+  } catch (err) {
+    loadingEl.remove();
+    appendError("We're having trouble connecting right now. Please try again in a moment.");
+    console.error('API error:', err);
+    conversationHistory.pop();
+  } finally {
+    isLoading = false;
+    scrollConvToBottom();
+  }
+}
+
+// ── Router ──
+async function routeMessage(userText) {
+  const routerPrompt = 'You are a triage router for a healthcare app. Based on the member\'s message, respond with EXACTLY one word:\n- BENEFITS — if the message is about claims, reimbursements, coverage, costs, benefits, OTC allowance, Wellness Bucks, food and home card, ID card, billing, finding providers, plan documents\n- HEALTH_DATA — if the message is about labs, test results, vitals, medications, health records, diagnoses, conditions, refills, medical questions\n- HEALTH_COACH — if the message is about feelings, goals, motivation, lifestyle, habits, stress, energy, sleep, nutrition, exercise, diabetes management, wellness, appointment prep, reflection, checklist\n- HEALTH_DATA — default if unclear\n\nMember message: "' + userText.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"\nRespond with one word only.';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 50,
+        messages: [{ role: 'user', content: routerPrompt }]
+      })
+    });
+    if (!res.ok) throw new Error('Router failed');
+    const data = await res.json();
+    const word = (data.content?.[0]?.text || '').trim().toUpperCase().replace(/[^A-Z_]/g, '');
+    return AGENTS[word] || AGENTS.HEALTH_DATA;
+  } catch (e) {
+    console.warn('Routing failed, defaulting to Explore MyHealth Record:', e);
+    return AGENTS.HEALTH_DATA;
+  }
+}
+
+// ── Build System Prompt ──
+function buildSystemPrompt(agent) {
+  let prompt = agent.systemPrompt + FORMATTING_RULES;
+  if (typeof onboardingComplete !== 'undefined' && onboardingComplete) {
+    prompt += '\n\nPERSONALIZATION:';
+    if (preferredName && preferredName !== 'Rebecca') {
+      prompt += '\n- Member\'s preferred name: ' + preferredName + '. Always address her as ' + preferredName + '.';
+    }
+    if (greatDayDescription) {
+      prompt += '\n- What a great day looks like for her: "' + greatDayDescription + '" — weave this naturally into responses when relevant.';
+    }
+    if (qualityOfLifeScore) {
+      prompt += '\n- Self-reported quality of life: ' + qualityOfLifeScore + '/10.';
+    }
+  }
+  return prompt;
+}
+
+// ── Check-in Live Message Handler ──
+async function sendCheckInLiveMessage(userText) {
+  if (isLoading) return;
+  if (!apiKey) {
+    alert('Please enter and save your Anthropic API key at the top of the page.');
+    return;
+  }
+  conversationHistory.push({ role: 'user', content: userText });
+  appendUserBubble(userText);
+  isLoading = true;
+  const loadingEl = appendLoadingBubble();
+  scrollConvToBottom();
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 512,
+        system: CHECK_IN_SYSTEM_PROMPT + FORMATTING_RULES,
+        messages: conversationHistory
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || ('API error ' + res.status));
+    }
+    const data = await res.json();
+    const aiText = data.content?.[0]?.text || "I couldn't generate a response. Please try again.";
+    conversationHistory.push({ role: 'assistant', content: aiText });
+    loadingEl.remove();
+    appendAiBubble(aiText);
+  } catch (err) {
+    loadingEl.remove();
+    appendError("We're having trouble connecting right now. Please try again in a moment.");
+    console.error('API error:', err);
+    conversationHistory.pop();
+  } finally {
+    isLoading = false;
+    scrollConvToBottom();
+  }
+}
+
+// ── Conversation Screen Management ──
+function showConvScreen() {
+  const sheet = document.getElementById('conv-screen');
+  const backdrop = document.getElementById('conv-screen-overlay');
+  const aiBar = document.getElementById('ai-bar');
+
+  sheet.classList.add('open');
+  backdrop.classList.add('open');
+  if (aiBar) { aiBar.style.opacity = '0'; aiBar.style.pointerEvents = 'none'; }
+
+  // Set context
+  if (!conversationContext) conversationContext = currentTab;
+  const contextLabels = {
+    home: '',
+    health: 'Viewing: Your Health',
+    benefits: 'Viewing: Your Benefits',
+    profile: 'Viewing: Your Profile'
+  };
+  const contextSub = document.getElementById('conv-agent-sub');
+  if (contextSub && conversationContext && conversationContext !== 'home') {
+    contextSub.textContent = contextLabels[conversationContext] || 'Your health companion';
+  }
+
+  // Show context banner if not from home
+  if (conversationContext && conversationContext !== 'home') {
+    showContextBanner(conversationContext);
+  }
+}
+
+function closeConvScreen() {
+  const sheet = document.getElementById('conv-screen');
+  const backdrop = document.getElementById('conv-screen-overlay');
+  const aiBar = document.getElementById('ai-bar');
+
+  sheet.classList.remove('open', 'expanded');
+  backdrop.classList.remove('open');
+  if (aiBar && currentTab !== 'home') { aiBar.style.opacity = '1'; aiBar.style.pointerEvents = 'all'; }
+
+  hideSuggestedReplies();
+  conversationHistory = [];
+  isCheckInConversation = false;
+  conversationContext = null;
+  document.getElementById('conv-messages').innerHTML = '';
+  document.getElementById('conv-context-banner').classList.remove('visible');
+  resetConvHeader();
+}
+
+function toggleSheetExpand() {
+  const sheet = document.getElementById('conv-screen');
+  const btn = document.getElementById('conv-expand-btn');
+  if (sheet.classList.contains('expanded')) {
+    sheet.classList.remove('expanded');
+    btn.textContent = '⤢';
+    btn.title = 'Expand';
+  } else {
+    sheet.classList.add('expanded');
+    btn.textContent = '⤡';
+    btn.title = 'Collapse';
+  }
+}
+
+function showContextBanner(tab) {
+  const banner = document.getElementById('conv-context-banner');
+  if (!banner) return;
+  const bannerText = {
+    health: '🩺 I can see you\'re on Health. I have your recent labs, medications, and care team info ready.',
+    benefits: '💳 I can see you\'re on Benefits. I have your current balances and recent claims ready.',
+    profile: '📋 I can see you\'re on your Profile. I can help with settings or account questions.'
+  };
+  banner.textContent = bannerText[tab] || '';
+  if (bannerText[tab]) {
+    banner.classList.add('visible');
+  }
+}
+
+function handleAiBarSubmit() {
+  const input = document.getElementById('ai-bar-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  conversationContext = currentTab;
+  sendMessage(text);
+}
+
+function showConvLiveInput() {
+  document.getElementById('conv-live-input').classList.remove('hidden');
+  document.getElementById('conv-continue-btn-area').classList.add('hidden');
+}
+
+function resetConvHeader() {
+  document.getElementById('conv-agent-avatar').textContent = '♥';
+  document.getElementById('conv-agent-avatar').style.background = 'var(--red)';
+  document.getElementById('conv-agent-name').textContent = 'MyDevoted AI';
+  document.getElementById('conv-agent-sub').textContent = 'Your health companion';
+  document.getElementById('conv-mode-indicator').innerHTML = 'Get instant answers · Supported by AI';
+}
+
+function goHome() {
+  // Close all overlays
+  closeConvScreen();
+  closeInteriorPage();
+  document.getElementById('history-screen').classList.remove('open');
+  document.getElementById('past-conv-screen').classList.remove('open');
+  document.getElementById('onboarding-overlay').classList.remove('open');
+  // Switch to Home tab
+  switchTab('home');
+}
+
+// ── Bubble Helpers ──
+function appendUserBubble(text) {
+  const msgs = document.getElementById('conv-messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = '<div class="msg-bubble">' + escHtml(text) + '</div>';
+  msgs.appendChild(row);
+}
+
+function appendAiBubble(text) {
+  const msgs = document.getElementById('conv-messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row ai';
+  row.innerHTML =
+    '<div class="msg-avatar" style="background:var(--red)">♥</div>' +
+    '<div class="msg-bubble-wrap">' +
+      '<div class="msg-bubble">' + renderMarkdown(text) + '</div>' +
+    '</div>';
+  msgs.appendChild(row);
+}
+
+function appendLoadingBubble() {
+  const msgs = document.getElementById('conv-messages');
+  const row = document.createElement('div');
+  row.className = 'loading-row';
+  row.innerHTML =
+    '<div class="msg-avatar" style="background:var(--red)">♥</div>' +
+    '<div class="loading-content">' +
+      '<div class="loading-label">Thinking…</div>' +
+      '<div class="loading-bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>' +
+    '</div>';
+  msgs.appendChild(row);
+  return row;
+}
+
+function appendError(msg) {
+  const msgs = document.getElementById('conv-messages');
+  const el = document.createElement('div');
+  el.className = 'error-msg';
+  el.textContent = msg;
+  msgs.appendChild(el);
+}
+
+function scrollConvToBottom() {
+  const msgs = document.getElementById('conv-messages');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ── Suggested Reply Chips ──
+function showSuggestedReplies(replies) {
+  if (!replies || !replies.length) return;
+  const container = document.getElementById('conv-suggested-replies');
+  container.innerHTML = '';
+  container.classList.remove('hidden');
+  replies.forEach(reply => {
+    const btn = document.createElement('button');
+    btn.className = 'suggested-chip' + (reply.action === 'navigate' ? ' navigate' : '');
+    btn.textContent = reply.label;
+    btn.onclick = () => {
+      if (reply.action === 'navigate') {
+        navigateWithTransition(reply.value);
+      } else {
+        hideSuggestedReplies();
+        sendMessage(reply.value);
+      }
+    };
+    container.appendChild(btn);
+  });
+  scrollConvToBottom();
+}
+
+function hideSuggestedReplies() {
+  const container = document.getElementById('conv-suggested-replies');
+  if (!container) return;
+  container.innerHTML = '';
+  container.classList.add('hidden');
+}
+
+// ── Navigation Transitions ──
+async function navigateWithTransition(tabName) {
+  const icons = { home: '🏠', health: '🩺', benefits: '💳', profile: '👤' };
+  const labels = { home: 'Going home…', health: 'Opening your health…', benefits: 'Opening your benefits…', profile: 'Opening your profile…' };
+  const overlay = document.getElementById('nav-transition');
+  document.getElementById('nav-transition-icon').textContent = icons[tabName] || '📋';
+  document.getElementById('nav-transition-label').textContent = labels[tabName] || 'Opening…';
+  overlay.classList.add('visible');
+  await delay(200);
+  closeConvScreen();
+  switchTab(tabName);
+  await delay(1200);
+  overlay.classList.remove('visible');
+}
+
+// ── Stub/Wire Functions ──
+function talkToPerson() {
+  sendMessage("I'd like to talk to a person");
+}
+
+// ── Onboarding ──
+function openOnboarding() {
+  onboardStep = 0;
+  document.getElementById('ob-messages').innerHTML = '';
+  document.getElementById('onboarding-overlay').classList.add('open');
+  renderOnboardingStep();
+}
+
+function closeOnboarding() {
+  document.getElementById('onboarding-overlay').classList.remove('open');
+}
+
+function renderOnboardingStep() {
+  const msgs = document.getElementById('ob-messages');
+  const inputArea = document.getElementById('ob-input-area');
+  const dots = document.querySelectorAll('#ob-dots .ob-dot');
+  dots.forEach((d, i) => d.classList.toggle('active', i <= onboardStep));
+
+  function addObAi(text) {
+    const row = document.createElement('div');
+    row.className = 'msg-row ai';
+    row.innerHTML = '<div class="msg-avatar" style="background:var(--red)">♥</div><div class="msg-bubble-wrap"><div class="msg-bubble">' + renderMarkdown(text) + '</div></div>';
+    msgs.appendChild(row);
+  }
+
+  function addObUser(text) {
+    const row = document.createElement('div');
+    row.className = 'msg-row user';
+    row.innerHTML = '<div class="msg-bubble">' + escHtml(text) + '</div>';
+    msgs.appendChild(row);
+  }
+
+  const name = preferredName || 'Rebecca';
+
+  if (onboardStep === 0) {
+    addObAi("Welcome to MyDevoted, Rebecca! Before we get started — what would you like me to call you?\n\nYour records show **Rebecca** — is that right, or do you prefer something else?");
+    inputArea.innerHTML = '<div class="ob-text-input-wrap"><input class="ob-text-input" id="ob-name-input" type="text" placeholder="Rebecca (or your preferred name)"><button class="ob-send-btn" onclick="submitObName()"><svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button></div>';
+    document.getElementById('ob-name-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submitObName(); } });
+  } else if (onboardStep === 1) {
+    addObAi("Great, " + name + "! We can send your documents digitally instead of by paper.\n\nWould you like to go paperless?");
+    inputArea.innerHTML = '<div class="ob-choice-btns"><button class="ob-choice-btn" onclick="submitObPaperless(true)">Yes, go paperless</button><button class="ob-choice-btn" onclick="submitObPaperless(false)">No, keep paper mail</button></div>';
+  } else if (onboardStep === 2) {
+    addObAi("Sometimes members want a family member or caregiver to see their health information.\n\nWould you like to set that up?");
+    inputArea.innerHTML = '<div class="ob-choice-btns"><button class="ob-choice-btn" onclick="submitObSharing(\'setup\')">Set up now</button><button class="ob-choice-btn" onclick="submitObSharing(\'skip\')">Skip for now</button></div>';
+  } else if (onboardStep === 3) {
+    addObAi("On a scale of 1 to 10, how would you rate your quality of life right now?");
+    let grid = '<div class="ob-qol-grid">';
+    for (let i = 1; i <= 10; i++) {
+      grid += '<button class="ob-qol-dot" onclick="selectQol(this,' + i + ')">' + i + '</button>';
+    }
+    grid += '</div><button class="ob-next-btn" id="ob-qol-next" disabled onclick="submitObQol()">Next →</button>';
+    inputArea.innerHTML = grid;
+  } else if (onboardStep === 4) {
+    addObAi("What does being healthy mean to you? Not what your doctor wants. What do **you** actually want to be able to do?");
+    inputArea.innerHTML = '<div class="ob-text-input-wrap"><input class="ob-text-input" id="ob-greatday-input" type="text" placeholder="Not having to take medicine, time with grandkids…"><button class="ob-send-btn" onclick="submitObGreatDay()"><svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button></div>';
+    document.getElementById('ob-greatday-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submitObGreatDay(); } });
+  } else if (onboardStep === 5) {
+    addObAi("When we give you advice or information, what's most helpful for you?");
+    inputArea.innerHTML = '<div class="ob-choice-btns"><button class="ob-choice-btn" onclick="submitObCommStyle(\'direct\')">Straight-shooter: just be direct and give me facts</button><button class="ob-choice-btn" onclick="submitObCommStyle(\'simple\')">Keep it simple: just the essentials</button><button class="ob-choice-btn" onclick="submitObCommStyle(\'hype\')">Hype squad: cheer me on and keep me motivated</button></div>';
+  } else if (onboardStep === 6) {
+    addObAi("Thank you, " + name + ". I've saved your preferences. MyDevoted is now personalized just for you.");
+    inputArea.innerHTML = '<button class="ob-next-btn" onclick="completeOnboarding()">Go to MyDevoted →</button>';
+  }
+
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function submitObName() {
+  const input = document.getElementById('ob-name-input');
+  const val = input.value.trim() || 'Rebecca';
+  preferredName = val;
+  const msgs = document.getElementById('ob-messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = '<div class="msg-bubble">' + escHtml(val) + '</div>';
+  msgs.appendChild(row);
+  onboardStep = 1;
+  renderOnboardingStep();
+}
+
+function submitObPaperless(yes) {
+  eDeliveryConsent = yes;
+  const msgs = document.getElementById('ob-messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = '<div class="msg-bubble">' + (yes ? 'Yes, go paperless' : 'No, keep paper mail') + '</div>';
+  msgs.appendChild(row);
+  const confirm = document.createElement('div');
+  confirm.className = 'msg-row ai';
+  confirm.innerHTML = '<div class="msg-avatar" style="background:var(--red)">♥</div><div class="msg-bubble-wrap"><div class="msg-bubble"><p>✓ ' + (yes ? 'Paperless delivery enabled!' : 'Paper mail it is — no problem.') + '</p></div></div>';
+  msgs.appendChild(confirm);
+  onboardStep = 2;
+  setTimeout(() => renderOnboardingStep(), 400);
+}
+
+function submitObSharing(choice) {
+  const msgs = document.getElementById('ob-messages');
+  if (choice === 'skip') {
+    healthSharingAuth = 'skip';
+    const row = document.createElement('div');
+    row.className = 'msg-row user';
+    row.innerHTML = '<div class="msg-bubble">Skip for now</div>';
+    msgs.appendChild(row);
+    const confirm = document.createElement('div');
+    confirm.className = 'msg-row ai';
+    confirm.innerHTML = '<div class="msg-avatar" style="background:var(--red)">♥</div><div class="msg-bubble-wrap"><div class="msg-bubble"><p>No problem — you can always do this later from your Profile.</p></div></div>';
+    msgs.appendChild(confirm);
+    onboardStep = 3;
+    setTimeout(() => renderOnboardingStep(), 400);
+  } else {
+    const inputArea = document.getElementById('ob-input-area');
+    const row = document.createElement('div');
+    row.className = 'msg-row user';
+    row.innerHTML = '<div class="msg-bubble">Set up now</div>';
+    msgs.appendChild(row);
+    inputArea.innerHTML = '<div class="ob-text-input-wrap"><input class="ob-text-input" id="ob-sharing-input" type="text" placeholder="Name and relationship (e.g. John, my son)"><button class="ob-send-btn" onclick="submitObSharingName()"><svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button></div>';
+    document.getElementById('ob-sharing-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submitObSharingName(); } });
+  }
+}
+
+function submitObSharingName() {
+  const input = document.getElementById('ob-sharing-input');
+  const val = input.value.trim();
+  if (!val) return;
+  healthSharingAuth = val;
+  const msgs = document.getElementById('ob-messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = '<div class="msg-bubble">' + escHtml(val) + '</div>';
+  msgs.appendChild(row);
+  const confirm = document.createElement('div');
+  confirm.className = 'msg-row ai';
+  confirm.innerHTML = '<div class="msg-avatar" style="background:var(--red)">♥</div><div class="msg-bubble-wrap"><div class="msg-bubble"><p>✓ Health sharing set up for ' + escHtml(val) + '.</p></div></div>';
+  msgs.appendChild(confirm);
+  onboardStep = 3;
+  setTimeout(() => renderOnboardingStep(), 400);
+}
+
+function selectQol(btn, score) {
+  qualityOfLifeScore = score;
+  document.querySelectorAll('.ob-qol-dot').forEach((d, i) => d.classList.toggle('selected', i < score));
+  document.getElementById('ob-qol-next').disabled = false;
+}
+
+function submitObQol() {
+  if (!qualityOfLifeScore) return;
+  const msgs = document.getElementById('ob-messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = '<div class="msg-bubble">' + qualityOfLifeScore + ' out of 10</div>';
+  msgs.appendChild(row);
+  onboardStep = 4;
+  renderOnboardingStep();
+}
+
+function submitObGreatDay() {
+  const input = document.getElementById('ob-greatday-input');
+  const val = input.value.trim();
+  if (!val) return;
+  greatDayDescription = val;
+  const msgs = document.getElementById('ob-messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = '<div class="msg-bubble">' + escHtml(val) + '</div>';
+  msgs.appendChild(row);
+  onboardStep = 5;
+  renderOnboardingStep();
+}
+
+function submitObCommStyle(style) {
+  const labels = { direct: 'Straight-shooter', simple: 'Keep it simple', hype: 'Hype squad' };
+  const msgs = document.getElementById('ob-messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = '<div class="msg-bubble">' + labels[style] + '</div>';
+  msgs.appendChild(row);
+  onboardStep = 6;
+  renderOnboardingStep();
+}
+
+function completeOnboarding() {
+  onboardingComplete = true;
+  closeOnboarding();
+  // Update greeting
+  document.getElementById('greeting-headline').innerHTML = 'Hello, ' + escHtml(preferredName) + '!<br>What\'s on your<br>mind today?';
+  // Hide onboarding card
+  const card = document.getElementById('onboard-card');
+  if (card) card.style.display = 'none';
+  // Update profile
+  renderProfileTab();
+}
+
+// ── Push Notification ──
+function startPushTimer() {
+  clearTimeout(pushTimer);
+  clearTimeout(pushDismissTimer);
+  if (!demoMode) return;
+  pushTimer = setTimeout(() => {
+    document.getElementById('push-notification').classList.add('visible');
+    pushDismissTimer = setTimeout(dismissPush, 10000);
+  }, 5000);
+}
+
+function dismissPush() {
+  document.getElementById('push-notification').classList.remove('visible');
+  clearTimeout(pushDismissTimer);
+}
+
+function openPushConversation() {
+  dismissPush();
+  isCheckInConversation = true;
+  checkInBeat = 0;
+  showConvScreen();
+  showConvLiveInput();
+
+  // Reset header to MyDevoted AI
+  resetConvHeader();
+
+  appendAiBubble("Hey Rebecca — checking in like we planned. 💚\n\nI was looking at your recent numbers and something caught my attention. Your A1c came back at **6.8%**. I want to take a moment with that, because it's actually meaningful. That number reflects months of your choices, your routines, your everyday life. It doesn't happen by accident.\n\nI'm also noticing your blood pressure was **138/84** at your last visit. Not alarming — but something worth paying attention to together.\n\nHow are you feeling this evening? And I mean that broadly — not just physically.");
+  conversationHistory = [
+    { role: 'assistant', content: "Hey Rebecca — checking in like we planned.\n\nI was looking at your recent numbers and something caught my attention. Your A1c came back at 6.8%. I want to take a moment with that, because it's actually meaningful. That number reflects months of your choices, your routines, your everyday life. It doesn't happen by accident.\n\nI'm also noticing your blood pressure was 138/84 at your last visit. Not alarming — but something worth paying attention to together.\n\nHow are you feeling this evening? And I mean that broadly — not just physically." }
+  ];
+  showSuggestedReplies([
+    { label: "Honestly, a little tired. It's been a long week.", action: "message", value: "Honestly, a little tired. It's been a long week." }
+  ]);
+  scrollConvToBottom();
+}
+
+async function sendDemoMessage(text) {
+  if (isCheckInConversation && demoMode) {
+    if (isLoading) return;
+    appendUserBubble(text);
+    conversationHistory.push({ role: 'user', content: text });
+    checkInBeat++;
+    isLoading = true;
+    const loadingEl = appendLoadingBubble();
+    scrollConvToBottom();
+    await delay(400);
+
+    if (checkInBeat === 1) {
+      await delay(800);
+      loadingEl.remove();
+      const reply = "Tired makes sense. And \"long week\" tells me something too.\n\nThere's a difference between tired-from-doing-too-much and tired-from-something-feeling-heavy.\n\n**Which one is it for you tonight?**\n\nI ask because both of those things actually connect to what we're watching with your blood pressure. Stress and sleep affect those numbers more than most people realize — sometimes more than what's on your plate.";
+      appendAiBubble(reply);
+      conversationHistory.push({ role: 'assistant', content: reply });
+      showSuggestedReplies([
+        { label: "Both, honestly.", action: "message", value: "Both, honestly." }
+      ]);
+    } else if (checkInBeat === 2) {
+      await delay(800);
+      loadingEl.remove();
+      const reply = "Both. That's honest, and I appreciate it.\n\nHere's something I find worth noticing: you've been managing your blood sugar well enough that your A1c is sitting at **6.8%**. That takes consistency — even when weeks are long. Even when you're tired.\n\nThat's not nothing, Rebecca.\n\n**What does tomorrow look like for you?** Not what you think it should look like — just what it actually looks like.";
+      appendAiBubble(reply);
+      conversationHistory.push({ role: 'assistant', content: reply });
+      // No more chips — free text
+    } else {
+      // Beyond scripted beats in demo mode — use standard demo fallback
+      const t = text.toLowerCase();
+      const demo = DEMO_RESPONSES.find(r => r.match(t));
+      await delay(800);
+      loadingEl.remove();
+      appendAiBubble(demo.text);
+      conversationHistory.push({ role: 'assistant', content: demo.text });
+      if (demo.replies && demo.replies.length) showSuggestedReplies(demo.replies);
+    }
+    isLoading = false;
+    scrollConvToBottom();
+    return;
+  }
+
+  // Normal demo flow
+  if (isLoading) return;
+  showConvScreen();
+  showConvLiveInput();
+  appendUserBubble(text);
+  isLoading = true;
+  const loadingEl = appendLoadingBubble();
+  scrollConvToBottom();
+  await delay(400);
+  const t = text.toLowerCase();
+  const demo = DEMO_RESPONSES.find(r => r.match(t));
+  await delay(800);
+  loadingEl.remove();
+  appendAiBubble(demo.text);
+  if (demo.replies && demo.replies.length) showSuggestedReplies(demo.replies);
+  scrollConvToBottom();
+  isLoading = false;
+}
+
+// ── Emergency Card ──
+function showEmergencyCard() {
+  const msgs = document.getElementById('conv-messages');
+  const card = document.createElement('div');
+  card.className = 'emergency-card';
+  card.innerHTML =
+    '<div class="emergency-icon">🚨</div>' +
+    '<div class="emergency-title">If this is an emergency, call 911 now.</div>' +
+    '<a href="tel:18888022738" class="emergency-call-btn">📞 Call our 24/7 care line</a>' +
+    '<div class="emergency-divider">— or —</div>' +
+    '<button class="emergency-dismiss-btn" onclick="dismissEmergencyCard(this)">This isn\'t an emergency</button>';
+  msgs.appendChild(card);
+}
+
+function dismissEmergencyCard(btn) {
+  const card = btn.closest('.emergency-card');
+  card.remove();
+  triggerHumanHandoff('');
+}
+
+// ── Human Handoff (Tier 2) ──
+function triggerHumanHandoff(text) {
+  const isBenefits = (currentAgent && currentAgent.id === 'BENEFITS') || /claim|coverage|billing|benefit|reimburse/i.test(text);
+  const teamName = isBenefits ? 'Devoted Guide' : 'Devoted Medical';
+  const teamEmoji = isBenefits ? '🤝' : '🩺';
+  const teamColor = isBenefits ? '#F04B24' : '#592C82';
+  const teamDesc = isBenefits ? 'A specialist who can walk you through your benefits' : 'A nurse or clinician who can support you directly';
+
+  appendAiBubble("Of course — let me connect you with someone from our **" + teamName + "** team who can help directly.");
+
+  const msgs = document.getElementById('conv-messages');
+  const card = document.createElement('div');
+  card.className = 'handoff-card';
+  card.id = 'handoff-card';
+  card.innerHTML =
+    '<div class="handoff-avatar" style="background:' + teamColor + '">' + teamEmoji + '</div>' +
+    '<div class="handoff-team-name">' + teamName + '</div>' +
+    '<div class="handoff-team-desc">' + teamDesc + '</div>' +
+    '<button class="handoff-connect-btn" onclick="connectToHuman(\'' + teamName + '\',\'' + teamEmoji + '\',\'' + teamColor + '\')">Send to care team</button>' +
+    '<button class="handoff-keep-btn" onclick="keepChatting()">Continue with AI</button>';
+  msgs.appendChild(card);
+  scrollConvToBottom();
+}
+
+async function connectToHuman(teamName, teamEmoji, teamColor) {
+  const card = document.getElementById('handoff-card');
+  if (card) card.remove();
+
+  // Update header to show message sent
+  document.getElementById('conv-agent-sub').textContent = 'Message sent';
+  document.getElementById('conv-mode-indicator').innerHTML = teamName + ' · Typically responds in a few minutes';
+
+  // Show async confirmation as AI bubble
+  appendAiBubble("Your message has been sent to **" + teamName + "**. A member of the team will review your conversation and respond here — most replies arrive within a few minutes during business hours.");
+  scrollConvToBottom();
+
+  // Keep input visible so member can add more context
+  document.getElementById('conv-input').placeholder = 'Add more details…';
+}
+
+function keepChatting() {
+  const card = document.getElementById('handoff-card');
+  if (card) card.remove();
+}
+
+// ── History Screens ──
+function openHistoryScreen() {
+  renderHistoryScreen();
+  document.getElementById('history-screen').classList.add('open');
+}
+
+function closeHistoryScreen() {
+  document.getElementById('history-screen').classList.remove('open');
+}
+
+function renderHistoryScreen() {
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+  PAST_CONVERSATIONS.forEach(conv => {
+    const agent = AGENTS[conv.agent] || {};
+    const btn = document.createElement('button');
+    btn.className = 'history-list-item';
+    btn.innerHTML =
+      '<div class="history-list-avatar" style="background:' + conv.avatarBg + '">' + conv.avatarEmoji + '</div>' +
+      '<div class="history-list-body">' +
+        '<div class="history-list-date">' + conv.date + '</div>' +
+        '<div class="history-list-topic">' + escHtml(conv.topic) + '</div>' +
+        '<div class="history-list-preview">' + escHtml(conv.preview) + '</div>' +
+      '</div>';
+    btn.onclick = () => openPastConversation(conv.id);
+    list.appendChild(btn);
+  });
+}
+
+function openPastConversation(id) {
+  const conv = PAST_CONVERSATIONS.find(c => c.id === id);
+  if (!conv) return;
+  currentPastConv = conv;
+  const agent = AGENTS[conv.agent] || {};
+
+  document.getElementById('past-conv-avatar').textContent = agent.emoji || '♥';
+  document.getElementById('past-conv-avatar').style.background = agent.color || 'var(--red)';
+  document.getElementById('past-conv-agent-name').textContent = agent.name || 'MyDevoted AI';
+  document.getElementById('past-conv-agent-sub').textContent = conv.date;
+
+  const msgs = document.getElementById('past-conv-messages');
+  msgs.innerHTML = '<div class="past-date-divider">' + conv.date + '</div>';
+
+  conv.turns.forEach(turn => {
+    const row = document.createElement('div');
+    if (turn.role === 'user') {
+      row.className = 'past-msg-row user';
+      row.innerHTML = '<div class="past-msg-bubble">' + escHtml(turn.text) + '</div>';
+    } else {
+      row.className = 'past-msg-row ai';
+      row.innerHTML =
+        '<div class="msg-avatar" style="background:' + (agent.color || 'var(--red)') + '">' + (agent.emoji || '♥') + '</div>' +
+        '<div class="past-msg-bubble">' + renderMarkdown(turn.text) + '</div>';
+    }
+    msgs.appendChild(row);
+  });
+
+  document.getElementById('past-conv-screen').classList.add('open');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function closePastConvScreen() {
+  document.getElementById('past-conv-screen').classList.remove('open');
+  currentPastConv = null;
+}
+
+function continuePastConversation() {
+  if (!currentPastConv) return;
+  const conv = currentPastConv;
+  const agent = AGENTS[conv.agent] || AGENTS.HEALTH_DATA;
+  currentAgent = agent;
+
+  // Load turns into conversation history
+  conversationHistory = [];
+  conv.turns.forEach(turn => {
+    conversationHistory.push({ role: turn.role === 'ai' ? 'assistant' : 'user', content: turn.text });
+  });
+
+  // Close overlays
+  closePastConvScreen();
+  closeHistoryScreen();
+
+  // Show conversation screen
+  showConvScreen();
+  showConvLiveInput();
+
+  // Reset header to MyDevoted AI
+  resetConvHeader();
+
+  // Render past turns
+  const msgs = document.getElementById('conv-messages');
+  msgs.innerHTML = '<div class="past-date-divider">' + conv.date + '</div>';
+  conv.turns.forEach(turn => {
+    if (turn.role === 'user') {
+      appendUserBubble(turn.text);
+    } else {
+      appendAiBubble(turn.text);
+    }
+  });
+
+  scrollConvToBottom();
+}
+
+function continueConversation() {
+  // Generic continue — just ensure input is visible
+  showConvLiveInput();
+}
+
+// ── Render Home History ──
+function renderHomeHistory() {
+  const container = document.getElementById('home-history-rows');
+  container.innerHTML = '';
+  PAST_CONVERSATIONS.slice(0, 3).forEach((conv, i) => {
+    const row = document.createElement('div');
+    row.className = 'history-row';
+    row.onclick = () => openPastConversation(conv.id);
+    row.innerHTML =
+      '<div class="history-avatar" style="background:' + conv.avatarBg + '">' + conv.avatarEmoji + '</div>' +
+      '<div class="history-body">' +
+        '<div class="history-date">' + conv.date + '</div>' +
+        '<div class="history-title">' + escHtml(conv.topic) + '</div>' +
+        '<div class="history-preview">' + escHtml(conv.preview) + '</div>' +
+      '</div>';
+    container.appendChild(row);
+  });
+}
+
+// ── Render Profile Tab ──
+function renderProfileTab() {
+  const nameEl = document.getElementById('profile-name-display');
+  if (onboardingComplete && preferredName && preferredName !== 'Rebecca') {
+    nameEl.textContent = 'Rebecca Chen (' + preferredName + ')';
+  } else {
+    nameEl.textContent = 'Rebecca Chen';
+  }
+
+  const paperlessEl = document.getElementById('pref-paperless');
+  if (onboardingComplete && eDeliveryConsent === true) {
+    paperlessEl.textContent = 'Enrolled';
+    paperlessEl.className = 'pref-value pref-value-green';
+  } else if (onboardingComplete && eDeliveryConsent === false) {
+    paperlessEl.textContent = 'Paper mail';
+    paperlessEl.className = 'pref-value';
+  } else {
+    paperlessEl.textContent = 'Not set';
+    paperlessEl.className = 'pref-value';
+  }
+
+  const sharingEl = document.getElementById('pref-sharing');
+  if (onboardingComplete && healthSharingAuth && healthSharingAuth !== 'skip') {
+    sharingEl.textContent = healthSharingAuth;
+    sharingEl.className = 'pref-value pref-value-green';
+  } else if (onboardingComplete && healthSharingAuth === 'skip') {
+    sharingEl.textContent = 'Skipped';
+    sharingEl.className = 'pref-value';
+  } else {
+    sharingEl.textContent = 'Not set up';
+    sharingEl.className = 'pref-value';
+  }
+
+  const snapshotSection = document.getElementById('profile-snapshot-section');
+  if (onboardingComplete && qualityOfLifeScore) {
+    let dotsHtml = '';
+    for (let i = 1; i <= 10; i++) {
+      if (i <= qualityOfLifeScore) {
+        dotsHtml += '<span class="snapshot-dot snapshot-dot-filled">' + i + '</span>';
+      } else {
+        dotsHtml += '<span class="snapshot-dot snapshot-dot-empty">' + i + '</span>';
+      }
+    }
+    snapshotSection.innerHTML =
+      '<div class="tab-section-label" style="padding-left:0">Your MyDevoted Snapshot</div>' +
+      '<div class="snapshot-card">' +
+        '<div class="snapshot-label">QUALITY OF LIFE SCORE</div>' +
+        '<div class="snapshot-dots">' + dotsHtml + '</div>' +
+        '<div class="snapshot-label">WHAT A GREAT DAY LOOKS LIKE</div>' +
+        '<div class="snapshot-great-day">' + (greatDayDescription || '') + '</div>' +
+      '</div>';
+    snapshotSection.style.margin = '0 16px 14px';
+  } else {
+    snapshotSection.innerHTML =
+      '<button class="snapshot-cta" onclick="openOnboarding()">' +
+        '<div class="snapshot-cta-text">Complete your profile to personalize your experience</div>' +
+        '<span class="snapshot-cta-link">Set up now →</span>' +
+      '</button>';
+    snapshotSection.style.margin = '';
+  }
+}
+
+// ── Event Listeners ──
+document.getElementById('home-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handleHomeSubmit();
+  }
+});
+
+document.getElementById('home-input').addEventListener('input', (e) => {
+  const chips = document.getElementById('prompt-chips');
+  if (e.target.value.trim()) {
+    chips.classList.add('hidden');
+  } else {
+    chips.classList.remove('hidden');
+  }
+});
+
+document.getElementById('conv-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handleConvSubmit();
+  }
+});
+
+document.getElementById('conv-input').addEventListener('input', () => {
+  hideSuggestedReplies();
+});
+
+// ── AI Bar Input ──
+document.getElementById('ai-bar-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handleAiBarSubmit();
+  }
+});
+
+// ── Keyboard Shortcut: Cmd/Ctrl+D ──
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'd') {
+    e.preventDefault();
+    setMode(demoMode ? 'live' : 'demo');
+  }
+});
+
+// ── Interior Page System ──
+let interiorPageStack = [];
+
+function openInteriorPage(title, contentFn, aiCtaText, aiCtaPrompt) {
+  const page = document.getElementById('interior-page');
+  const titleEl = document.getElementById('interior-page-title');
+  const contentEl = document.getElementById('interior-page-content');
+  const ctaEl = document.getElementById('interior-page-ai-cta');
+
+  titleEl.textContent = title;
+  contentEl.innerHTML = '';
+  contentFn(contentEl);
+  contentEl.scrollTop = 0;
+
+  // AI CTA at bottom
+  if (aiCtaText && aiCtaPrompt) {
+    ctaEl.innerHTML = '<button class="ai-cta-btn" onclick="closeInteriorPage(); sendPrompt(\'' + aiCtaPrompt.replace(/'/g, "\\'") + '\')">♥ ' + escHtml(aiCtaText) + '</button>';
+    ctaEl.style.display = '';
+  } else {
+    ctaEl.style.display = 'none';
+  }
+
+  page.classList.add('open');
+
+  // Update AI bar placeholder to match context
+  const aiInput = document.getElementById('ai-bar-input');
+  if (aiInput) aiInput.placeholder = 'Ask about ' + title.toLowerCase() + '...';
+
+  interiorPageStack.push({ title, contentFn, aiCtaText, aiCtaPrompt });
+}
+
+function closeInteriorPage() {
+  const page = document.getElementById('interior-page');
+  page.classList.remove('open');
+  interiorPageStack.pop();
+
+  // Restore AI bar placeholder
+  updateAiPlaceholder();
+}
+
+// ── Interior Page Content Functions ──
+
+function showMessagesPage() {
+  openInteriorPage('Messages', (el) => {
+    el.innerHTML = `
+      <button class="interior-list-item">
+        <div class="interior-list-icon" style="background:var(--blue-light)">💬</div>
+        <div class="interior-list-body">
+          <div class="interior-list-title">Your Devoted Care Team</div>
+          <div class="interior-list-sub">Last message: Feb 27 · 2 unread</div>
+        </div>
+        <div class="interior-list-right">
+          <span class="interior-badge-count">2</span>
+          <span class="interior-chevron">›</span>
+        </div>
+      </button>
+      <button class="interior-list-item">
+        <div class="interior-list-icon" style="background:var(--red-light)">📋</div>
+        <div class="interior-list-body">
+          <div class="interior-list-title">Wellness Bucks Claim Update</div>
+          <div class="interior-list-sub">Your yoga mat claim is being reviewed · Feb 20</div>
+        </div>
+        <div class="interior-list-right">
+          <span class="interior-chevron">›</span>
+        </div>
+      </button>
+    `;
+  }, 'Ask about my messages', 'Show me my recent messages from my care team');
+}
+
+function showTestResultsPage() {
+  openInteriorPage('Test Results', (el) => {
+    el.innerHTML = `
+      <p style="font-size:13px;color:var(--gray-text);margin-bottom:16px;line-height:1.5;">
+        This list shows tests ordered by your Devoted Medical provider. Tests ordered by any other provider — even if they're in-network — won't show up here.
+      </p>
+      <button class="interior-list-item">
+        <div class="interior-list-body">
+          <div class="interior-list-title">Albumin/Creatinine, Urine</div>
+          <div class="interior-list-sub">Results received: Feb 12, 2026</div>
+        </div>
+        <div class="interior-list-right">
+          <span class="interior-badge-new">NEW</span>
+          <span class="interior-chevron">›</span>
+        </div>
+      </button>
+      <button class="interior-list-item">
+        <div class="interior-list-body">
+          <div class="interior-list-title">Lipid Panel, Blood</div>
+          <div class="interior-list-sub">Results received: Feb 5, 2026</div>
+        </div>
+        <div class="interior-list-right">
+          <span class="interior-badge-new">NEW</span>
+          <span class="interior-chevron">›</span>
+        </div>
+      </button>
+      <button class="interior-list-item">
+        <div class="interior-list-body">
+          <div class="interior-list-title">CBC W Auto Differential Panel, Blood</div>
+          <div class="interior-list-sub">Results received: Feb 5, 2026</div>
+        </div>
+        <div class="interior-list-right">
+          <span class="interior-badge-new">NEW</span>
+          <span class="interior-chevron">›</span>
+        </div>
+      </button>
+      <button class="interior-list-item">
+        <div class="interior-list-body">
+          <div class="interior-list-title">25-hydroxyvitamin D, Blood</div>
+          <div class="interior-list-sub">Results received: Feb 5, 2026</div>
+        </div>
+        <div class="interior-list-right">
+          <span class="interior-badge-new">NEW</span>
+          <span class="interior-chevron">›</span>
+        </div>
+      </button>
+      <button class="interior-list-item">
+        <div class="interior-list-body">
+          <div class="interior-list-title">Basic Metabolic Panel, Blood</div>
+          <div class="interior-list-sub">Results received: Feb 5, 2026</div>
+        </div>
+        <div class="interior-list-right">
+          <span class="interior-badge-new">NEW</span>
+          <span class="interior-chevron">›</span>
+        </div>
+      </button>
+      <button class="interior-list-item">
+        <div class="interior-list-body">
+          <div class="interior-list-title">HbA1c/Total Hgb, Blood</div>
+          <div class="interior-list-sub">Results received: Feb 5, 2026</div>
+        </div>
+        <div class="interior-list-right">
+          <span class="interior-badge-new">NEW</span>
+          <span class="interior-chevron">›</span>
+        </div>
+      </button>
+    `;
+  }, 'Help me understand my test results', 'Can you help me understand my recent test results?');
+}
+
+function showAppointmentsPage() {
+  openInteriorPage('Appointments', (el) => {
+    el.innerHTML = `
+      <div class="interior-section-label">Upcoming</div>
+      <div class="detail-hero">
+        <div class="detail-hero-label">PRIMARY CARE</div>
+        <div style="font-size:20px;font-weight:700;color:var(--charcoal);margin-bottom:4px;">Dr. Sarah Wagle</div>
+        <div style="font-size:15px;color:var(--gray-text);">Tuesday, March 4, 2026 · 10:00 AM</div>
+        <div style="font-size:13px;color:var(--gray-text);margin-top:4px;">Devoted Medical Group</div>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+          <button class="detail-action-primary" onclick="closeInteriorPage(); sendPrompt('Help me finish my appointment intake for Dr. Wagle')">Complete visit intake</button>
+          <button class="detail-action-outline">Reschedule</button>
+          <button class="detail-action-outline">Get directions</button>
+        </div>
+      </div>
+      <div class="interior-section-label">Past Appointments</div>
+      <button class="interior-list-item">
+        <div class="interior-list-body">
+          <div class="interior-list-title">Dr. Sarah Wagle — Primary Care</div>
+          <div class="interior-list-sub">Jan 15, 2026 · Annual wellness visit</div>
+        </div>
+        <div class="interior-list-right">
+          <span class="interior-chevron">›</span>
+        </div>
+      </button>
+      <button class="interior-list-item">
+        <div class="interior-list-body">
+          <div class="interior-list-title">Lab Visit — Devoted Medical</div>
+          <div class="interior-list-sub">Feb 5, 2026 · Lab work</div>
+        </div>
+        <div class="interior-list-right">
+          <span class="interior-chevron">›</span>
+        </div>
+      </button>
+    `;
+  }, 'Help me prepare for my visit', 'Help me prepare for my appointment with Dr. Wagle on March 4');
+}
+
+function showAuthorizationsPage() {
+  openInteriorPage('Referrals & Authorizations', (el) => {
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;padding:20px;background:var(--white);border:1px solid #d1d5db;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+        <span style="font-size:20px">✅</span>
+        <span style="font-size:15px;color:var(--gray-text)">No pending referrals or authorizations</span>
+      </div>
+      <div class="interior-section-label" style="margin-top:24px">Past Authorizations</div>
+      <button class="interior-list-item">
+        <div class="interior-list-body">
+          <div class="interior-list-title">X-Ray, Shoulder — Approved</div>
+          <div class="interior-list-sub">Feb 10, 2026</div>
+        </div>
+        <div class="interior-list-right">
+          <span style="font-size:13px;color:var(--green);font-weight:600">Approved</span>
+          <span class="interior-chevron">›</span>
+        </div>
+      </button>
+    `;
+  }, 'Ask about my authorizations', 'Do I have any pending referrals or authorizations?');
+}
+
+function showPHIPage() {
+  openInteriorPage('My Protected Health Info', (el) => {
+    el.innerHTML = `
+      <div class="stub-placeholder">
+        <div class="stub-placeholder-icon">🔒</div>
+        <div class="stub-placeholder-text">
+          Manage who can access your protected health information on your behalf.<br><br>
+          You can authorize a family member or caregiver to speak with Devoted Health about your care and benefits.
+        </div>
+      </div>
+      <button class="detail-action-primary" style="margin:0 auto;max-width:280px;" onclick="closeInteriorPage(); sendPrompt('I want to manage who can access my health information')">Set up or manage access</button>
+    `;
+  }, null, null);
+}
+
+// ── Init ──
+renderHomeHistory();
+startPushTimer();
+</script>
+</body>
+</html>
