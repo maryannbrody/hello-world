@@ -3341,7 +3341,7 @@ small, .small-text {
           <div class="benefit-sub">remaining this month</div>
           <div class="benefit-bar-track"><div class="benefit-bar-fill bar-blue" style="width:62.5%"></div></div>
           <div class="benefit-note">$200 monthly · Resets March 1</div>
-          <button class="benefit-outline-btn benefit-outline-btn-blue" onclick="sendPrompt('How much do I have left on my food and home card and what can I buy with it?')">Check balance or find eligible items →</button>
+          <button class="benefit-outline-btn benefit-outline-btn-blue" onclick="showFoodAndHomePage()">See details →</button>
         </div>
 
         <!-- Wellness Bucks -->
@@ -3358,7 +3358,7 @@ small, .small-text {
               <div class="claim-status-detail">In Progress · Submitted Feb 20</div>
             </div>
           </div>
-          <button class="benefit-outline-btn benefit-outline-btn-red" onclick="sendPrompt('Tell me about my Wellness Bucks balance and what I can use them for')">Ask about Wellness Bucks →</button>
+          <button class="benefit-outline-btn benefit-outline-btn-red" onclick="showWellnessBucksPage()">See details →</button>
         </div>
 
         <!-- OTC -->
@@ -3558,6 +3558,17 @@ small, .small-text {
         <button class="push-dismiss" onclick="event.stopPropagation(); dismissPush()">✕</button>
       </div>
       <div class="push-body">Rebecca, checking in like we planned. How are you feeling this evening?</div>
+    </div>
+
+    <!-- Interior Page (detail pages for benefits, etc.) -->
+    <div id="interior-page" style="display:none;flex-direction:column;position:absolute;top:0;left:0;right:0;bottom:0;background:#F8F7F5;z-index:45;border-radius:40px;">
+      <div style="height:54px;flex-shrink:0;"></div>
+      <div style="display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid #E8E3DE;flex-shrink:0;gap:10px;">
+        <button onclick="closeInteriorPage()" style="width:44px;height:44px;min-width:44px;min-height:44px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:20px;color:#595959;">←</button>
+        <div id="interior-page-title" style="font-family:'Libre Franklin',Arial,sans-serif;font-size:18px;font-weight:700;color:#1D252C;flex:1;"></div>
+      </div>
+      <div id="interior-page-content" style="flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch;"></div>
+      <div id="interior-page-cta" style="padding:12px 16px;border-top:1px solid #E8E3DE;background:white;flex-shrink:0;"></div>
     </div>
 
     <!-- History Screen -->
@@ -4338,6 +4349,7 @@ navItems.forEach(item => {
     if (document.getElementById('conv-screen').classList.contains('open')) {
       closeConvScreen();
     }
+    if (document.getElementById('interior-page')) document.getElementById('interior-page').style.display = 'none';
     if (tab === currentTab) return;
     switchTab(tab);
   });
@@ -4711,6 +4723,7 @@ function resetConvHeader() {
 function goHome() {
   // Close all overlays
   closeConvScreen();
+  if (document.getElementById('interior-page')) document.getElementById('interior-page').style.display = 'none';
   document.getElementById('history-screen').classList.remove('open');
   document.getElementById('past-conv-screen').classList.remove('open');
   document.getElementById('onboarding-overlay').classList.remove('open');
@@ -5403,6 +5416,197 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+
+// ── Interior Page ──
+function openInteriorPage(title, contentHtml, ctaHtml) {
+  const page = document.getElementById('interior-page');
+  document.getElementById('interior-page-title').textContent = title;
+  document.getElementById('interior-page-content').innerHTML = contentHtml;
+  document.getElementById('interior-page-content').scrollTop = 0;
+  document.getElementById('interior-page-cta').innerHTML = ctaHtml || '';
+  document.getElementById('interior-page-cta').style.display = ctaHtml ? '' : 'none';
+  page.style.display = 'flex';
+}
+
+function closeInteriorPage() {
+  document.getElementById('interior-page').style.display = 'none';
+  updateAiPlaceholder();
+}
+
+function showFoodAndHomePage() {
+  openInteriorPage('Food & Home Card', `
+    <!-- Balance hero -->
+    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+      <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#00A0DD;margin-bottom:4px;">FOOD & HOME CARD</div>
+      <div style="font-family:'Libre Franklin',sans-serif;font-size:36px;font-weight:700;color:#00A0DD;line-height:1.1;">$125</div>
+      <div style="font-size:14px;color:#595959;margin-top:4px;">remaining this month</div>
+      <div style="height:8px;background:#F0EFED;border-radius:4px;margin:12px 0;">
+        <div style="height:100%;width:62.5%;background:#00A0DD;border-radius:4px;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:#595959;">
+        <span>$75 spent</span>
+        <span>$200/month</span>
+      </div>
+      <div style="font-size:13px;color:#595959;margin-top:8px;">Next reload: <strong>$200 on April 1, 2026</strong></div>
+    </div>
+
+    <!-- My card -->
+    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+      <div style="font-size:14px;font-weight:700;color:#1D252C;margin-bottom:8px;">My Card</div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F0EFED;font-size:14px;">
+        <span style="color:#595959;">Card serial number</span>
+        <span style="font-weight:600;color:#1D252C;">3XXX-XXXX</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px;">
+        <span style="color:#595959;">Activated</span>
+        <span style="font-weight:600;color:#1D252C;">Dec 26, 2025</span>
+      </div>
+    </div>
+
+    <!-- How to spend -->
+    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+      <div style="font-size:14px;font-weight:700;color:#1D252C;margin-bottom:10px;">How to Spend</div>
+      <div style="font-size:14px;color:#1D252C;line-height:1.6;">
+        <div style="display:flex;gap:10px;margin-bottom:12px;">
+          <span style="flex-shrink:0;">🥦</span>
+          <div><strong>Healthy foods</strong> — Swipe your card as CREDIT at participating stores. You can also shop online at OTC Health Solutions.</div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <span style="flex-shrink:0;">🏠</span>
+          <div><strong>Utilities or rent</strong> — Pay your provider directly using your 16-digit card number. If your provider doesn't take Visa, you can pay upfront and get reimbursed.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+      <div style="font-size:14px;font-weight:700;color:#1D252C;margin-bottom:10px;">Tips</div>
+      <div style="font-size:14px;color:#595959;line-height:1.6;">
+        <div style="display:flex;gap:10px;margin-bottom:8px;">
+          <span style="flex-shrink:0;">💡</span>
+          <div>Don't throw your card away — we automatically refill it each month.</div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <span style="flex-shrink:0;">💡</span>
+          <div>Spend the full amount each month. Unused money does not roll over.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Common questions -->
+    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+      <div style="font-size:14px;font-weight:700;color:#1D252C;margin-bottom:10px;">Common Questions</div>
+      <div style="font-size:14px;color:#595959;line-height:1.6;">
+        <div style="padding:10px 0;border-bottom:1px solid #F0EFED;color:#1D252C;font-weight:500;">Where's my card?</div>
+        <div style="padding:10px 0;border-bottom:1px solid #F0EFED;color:#1D252C;font-weight:500;">Why doesn't my card work?</div>
+        <div style="padding:10px 0;border-bottom:1px solid #F0EFED;color:#1D252C;font-weight:500;">What if my card is lost or stolen?</div>
+        <div style="padding:10px 0;color:#1D252C;font-weight:500;">Can I do a one-time rollover?</div>
+      </div>
+      <div style="font-size:13px;color:#595959;margin-top:10px;text-align:center;">Tap any question above or ask MyDevoted AI below</div>
+    </div>
+
+    <!-- Contact -->
+    <div style="background:#F5F0EB;border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:#595959;line-height:1.5;">
+      <strong style="color:#1D252C;">Questions about the Food & Home card?</strong><br>
+      Call 1-855-904-3663 (TTY 711)
+    </div>
+  `,
+  `<button onclick="closeInteriorPage(); sendPrompt('I have a question about my Food and Home card')" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px;background:rgba(240,75,36,0.06);border:1px solid rgba(240,75,36,0.15);border-radius:24px;font-family:inherit;font-size:14px;font-weight:500;color:#F04B24;cursor:pointer;padding:10px 16px;">♥ Ask about your Food & Home card</button>`
+  );
+}
+
+function showWellnessBucksPage() {
+  openInteriorPage('Wellness Bucks', `
+    <!-- Balance hero -->
+    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+      <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#F04B24;margin-bottom:4px;">WELLNESS BUCKS</div>
+      <div style="font-family:'Libre Franklin',sans-serif;font-size:36px;font-weight:700;color:#F04B24;line-height:1.1;">$155</div>
+      <div style="font-size:14px;color:#595959;margin-top:4px;">remaining of $200 annual allowance</div>
+      <div style="height:8px;background:#F0EFED;border-radius:4px;margin:12px 0;">
+        <div style="height:100%;width:77.5%;background:#166534;border-radius:4px;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:#595959;">
+        <span>$45 used</span>
+        <span>$200/year</span>
+      </div>
+    </div>
+
+    <!-- Reimbursements in progress -->
+    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+      <div style="font-size:14px;font-weight:700;color:#1D252C;margin-bottom:12px;">Reimbursements</div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #F0EFED;">
+        <span style="font-size:18px;">🧘</span>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:#1D252C;">Yoga Mat</div>
+          <div style="font-size:13px;color:#595959;">Submitted Feb 20, 2026</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:14px;font-weight:700;color:#1D252C;">$45.00</div>
+          <span style="font-size:12px;font-weight:700;color:#B45309;background:#FFFBEB;padding:2px 8px;border-radius:12px;">In Progress</span>
+        </div>
+      </div>
+      <div style="padding-top:12px;text-align:center;">
+        <button onclick="closeInteriorPage(); sendPrompt('I want to submit a Wellness Bucks reimbursement')" style="background:none;border:none;font-family:inherit;font-size:14px;font-weight:600;color:#F04B24;cursor:pointer;min-height:44px;">+ Submit a new reimbursement</button>
+      </div>
+    </div>
+
+    <!-- What's covered -->
+    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+      <div style="font-size:14px;font-weight:700;color:#1D252C;margin-bottom:10px;">What's Covered</div>
+      <div style="font-size:14px;color:#1D252C;line-height:1.6;">
+        <div style="display:flex;gap:10px;margin-bottom:8px;">
+          <span style="flex-shrink:0;">🏋️</span>
+          <div><strong>Fitness equipment</strong> — dumbbells, resistance bands, yoga mats, exercise balls</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:8px;">
+          <span style="flex-shrink:0;">🏊</span>
+          <div><strong>Gym & classes</strong> — memberships, fitness classes, yoga, swimming, tai chi</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:8px;">
+          <span style="flex-shrink:0;">📱</span>
+          <div><strong>Wellness apps</strong> — approved digital wellness and fitness programs</div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <span style="flex-shrink:0;">👟</span>
+          <div><strong>Athletic shoes</strong> — one pair per year</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid #F0EFED;text-align:center;">
+        <button onclick="closeInteriorPage(); sendPrompt('What qualifies for Wellness Bucks reimbursement?')" style="background:none;border:none;font-family:inherit;font-size:14px;font-weight:500;color:#F04B24;cursor:pointer;min-height:44px;">Not sure if something qualifies? Ask MyDevoted AI →</button>
+      </div>
+    </div>
+
+    <!-- How it works -->
+    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+      <div style="font-size:14px;font-weight:700;color:#1D252C;margin-bottom:10px;">How It Works</div>
+      <div style="font-size:14px;color:#595959;line-height:1.7;">
+        <div style="display:flex;gap:10px;margin-bottom:8px;">
+          <span style="font-weight:700;color:#F04B24;flex-shrink:0;width:24px;text-align:center;">1.</span>
+          <div>Buy an eligible wellness item</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:8px;">
+          <span style="font-weight:700;color:#F04B24;flex-shrink:0;width:24px;text-align:center;">2.</span>
+          <div>Save your receipt</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:8px;">
+          <span style="font-weight:700;color:#F04B24;flex-shrink:0;width:24px;text-align:center;">3.</span>
+          <div>Submit for reimbursement (we can help)</div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <span style="font-weight:700;color:#F04B24;flex-shrink:0;width:24px;text-align:center;">4.</span>
+          <div>Typically processed in 5-7 business days</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reminder -->
+    <div style="background:#F5F0EB;border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:#595959;line-height:1.5;">
+      <strong style="color:#1D252C;">Remember:</strong> Wellness Bucks is a reimbursement benefit — you pay first, then submit your receipt to get paid back. This is separate from your OTC allowance and Food & Home card.
+    </div>
+  `,
+  `<button onclick="closeInteriorPage(); sendPrompt('I have a question about my Wellness Bucks')" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px;background:rgba(240,75,36,0.06);border:1px solid rgba(240,75,36,0.15);border-radius:24px;font-family:inherit;font-size:14px;font-weight:500;color:#F04B24;cursor:pointer;padding:10px 16px;">♥ Ask about your Wellness Bucks</button>`
+  );
+}
 
 // ── Init ──
 renderHomeHistory();
