@@ -678,7 +678,7 @@ small, .small-text {
   display: flex;
   gap: 10px;
   overflow-x: auto;
-  padding: 0 20px 8px;
+  padding: 0 0 8px 20px;
   scroll-snap-type: x mandatory;
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -693,8 +693,8 @@ small, .small-text {
   border: 1.5px solid #E8E3DE;
   border-radius: 12px;
   min-height: 64px;
-  min-width: 160px;
-  max-width: 170px;
+  min-width: 170px;
+  max-width: 180px;
   padding: 12px 14px;
   font-family: inherit;
   font-size: 15px;
@@ -717,11 +717,6 @@ small, .small-text {
   background: var(--red-light);
 }
 
-.prompt-chip-emoji {
-  font-size: 20px;
-  margin-right: 10px;
-  flex-shrink: 0;
-}
 
 /* Attention section */
 .attention-section {
@@ -3204,18 +3199,10 @@ small, .small-text {
         <div class="prompt-chips" id="prompt-chips">
           <div class="prompt-chips-label">You could ask:</div>
           <div class="prompt-chips-inner" id="prompt-chips-scroll">
-            <button class="prompt-chip" onclick="sendPrompt('How can I have more energy?')">
-              <span class="prompt-chip-emoji">⚡</span>How can I have more energy?
-            </button>
-            <button class="prompt-chip" onclick="sendPrompt('How much is left on my food and home card?')">
-              <span class="prompt-chip-emoji">💳</span>Food & Home Card balance
-            </button>
-            <button class="prompt-chip" onclick="sendPrompt('What do my recent labs mean?')">
-              <span class="prompt-chip-emoji">🔬</span>What do my labs mean?
-            </button>
-            <button class="prompt-chip" onclick="sendPrompt('Help me prepare for my appointment with Dr. Wagle')">
-              <span class="prompt-chip-emoji">📅</span>Prepare for Dr. Wagle
-            </button>
+            <button class="prompt-chip" onclick="sendPrompt('How can I have more energy?')">How can I have more energy?</button>
+            <button class="prompt-chip" onclick="sendPrompt('How much is left on my food and home card?')">Food & Home Card balance</button>
+            <button class="prompt-chip" onclick="sendPrompt('What do my recent labs mean?')">What do my labs mean?</button>
+            <button class="prompt-chip" onclick="sendPrompt('Help me prepare for my appointment with Dr. Wagle')">Prepare for Dr. Wagle</button>
           </div>
           <div class="scroll-dots" id="prompt-scroll-dots">
             <span class="scroll-dot-pill active"></span>
