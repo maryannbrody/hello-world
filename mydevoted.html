@@ -653,7 +653,7 @@ small, .small-text {
 
 /* Prompt chips */
 .prompt-chips {
-  padding: 20px 0 4px;
+  padding: 16px 0 4px;
   transition: opacity 0.25s, max-height 0.3s;
   max-height: 400px;
   overflow: visible;
@@ -668,16 +668,18 @@ small, .small-text {
 }
 
 .prompt-chips-label {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--gray-text);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  padding: 0 20px;
 }
 
 .prompt-chips-inner {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   overflow-x: auto;
-  padding: 0 20px 4px;
+  padding: 0 20px 8px;
+  scroll-snap-type: x mandatory;
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
@@ -687,14 +689,17 @@ small, .small-text {
 .prompt-chip {
   display: flex;
   align-items: center;
-  white-space: nowrap;
   background: var(--white);
   border: 1.5px solid #E8E3DE;
-  border-radius: 24px;
-  min-height: 44px;
-  padding: 8px 16px;
+  border-radius: 12px;
+  min-height: 64px;
+  min-width: 160px;
+  max-width: 170px;
+  padding: 12px 14px;
   font-family: inherit;
   font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
   color: var(--charcoal);
   cursor: pointer;
   text-align: left;
@@ -702,11 +707,20 @@ small, .small-text {
   box-shadow: none;
   transition: border-color 0.2s, background 0.2s;
   flex-shrink: 0;
+  scroll-snap-align: start;
+  white-space: normal;
+  word-wrap: break-word;
 }
 
 .prompt-chip:hover {
   border-color: var(--red);
   background: var(--red-light);
+}
+
+.prompt-chip-emoji {
+  font-size: 20px;
+  margin-right: 10px;
+  flex-shrink: 0;
 }
 
 /* Attention section */
@@ -1037,18 +1051,36 @@ small, .small-text {
 /* Scroll dot indicators */
 .scroll-dots {
   display: flex;
+  align-items: center;
   justify-content: center;
   gap: 6px;
-  padding-bottom: 8px;
+  padding: 6px 0 2px;
 }
-.scroll-dot {
-  width: 6px;
-  height: 6px;
+
+.scroll-dot-pill {
+  width: 24px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--red);
+  opacity: 0.4;
+  transition: opacity 0.3s, width 0.3s;
+}
+
+.scroll-dot-pill.active {
+  opacity: 1;
+}
+
+.scroll-dot-circle {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--gray-mid);
+  background: var(--red);
+  opacity: 0.25;
+  transition: opacity 0.3s;
 }
-.scroll-dot.active {
-  background: var(--charcoal);
+
+.scroll-dot-circle.active {
+  opacity: 0.6;
 }
 
 .action-item {
@@ -3170,20 +3202,25 @@ small, .small-text {
 
         <!-- 3. Prompt chips ("You could ask:") -->
         <div class="prompt-chips" id="prompt-chips">
-          <div class="prompt-chips-label" style="padding: 0 20px;">You could ask:</div>
-          <div class="prompt-chips-inner">
+          <div class="prompt-chips-label">You could ask:</div>
+          <div class="prompt-chips-inner" id="prompt-chips-scroll">
+            <button class="prompt-chip" onclick="sendPrompt('How can I have more energy?')">
+              <span class="prompt-chip-emoji">⚡</span>How can I have more energy?
+            </button>
             <button class="prompt-chip" onclick="sendPrompt('How much is left on my food and home card?')">
-              💳 Food & Home balance
+              <span class="prompt-chip-emoji">💳</span>Food & Home Card balance
             </button>
             <button class="prompt-chip" onclick="sendPrompt('What do my recent labs mean?')">
-              🔬 What do my labs mean?
-            </button>
-            <button class="prompt-chip" onclick="sendPrompt('How much protein should I eat?')">
-              🌱 Protein guidance
+              <span class="prompt-chip-emoji">🔬</span>What do my labs mean?
             </button>
             <button class="prompt-chip" onclick="sendPrompt('Help me prepare for my appointment with Dr. Wagle')">
-              📅 Prepare for Dr. Wagle
+              <span class="prompt-chip-emoji">📅</span>Prepare for Dr. Wagle
             </button>
+          </div>
+          <div class="scroll-dots" id="prompt-scroll-dots">
+            <span class="scroll-dot-pill active"></span>
+            <span class="scroll-dot-circle"></span>
+            <span class="scroll-dot-circle"></span>
           </div>
         </div>
 
@@ -3261,7 +3298,7 @@ small, .small-text {
 
         <!-- 3. Action Items -->
         <div class="tab-section-label">Action Items</div>
-        <div class="action-scroll">
+        <div class="action-scroll" id="action-scroll">
           <button class="action-item action-item-border-purple" onclick="sendPrompt('Help me with my Health Connections Checklist')">
             <div class="action-item-title">📋 Complete your checklist</div>
             <div class="action-item-sub">3 of 8 done</div>
@@ -3275,10 +3312,10 @@ small, .small-text {
             <div class="action-item-sub">For Mar 4 visit</div>
           </button>
         </div>
-        <div class="scroll-dots">
-          <div class="scroll-dot active"></div>
-          <div class="scroll-dot"></div>
-          <div class="scroll-dot"></div>
+        <div class="scroll-dots" id="action-scroll-dots">
+          <span class="scroll-dot-pill active"></span>
+          <span class="scroll-dot-circle"></span>
+          <span class="scroll-dot-circle"></span>
         </div>
 
         <!-- 5. Lab Highlights -->
@@ -5630,6 +5667,34 @@ function showWellnessBucksPage() {
   `<button onclick="closeInteriorPage(); sendPrompt('I have a question about my Wellness Bucks')" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px;background:rgba(240,75,36,0.06);border:1px solid rgba(240,75,36,0.15);border-radius:24px;font-family:inherit;font-size:14px;font-weight:500;color:#F04B24;cursor:pointer;padding:10px 16px;">♥ Ask about your Wellness Bucks</button>`
   );
 }
+
+// ── Scroll Dot Indicators ──
+function initScrollDots(scrollId, dotsId, totalDots) {
+  const scrollEl = document.getElementById(scrollId);
+  if (!scrollEl) return;
+  scrollEl.addEventListener('scroll', function() {
+    var scrollLeft = scrollEl.scrollLeft;
+    var scrollWidth = scrollEl.scrollWidth - scrollEl.clientWidth;
+    var progress = scrollWidth > 0 ? scrollLeft / scrollWidth : 0;
+    var container = document.getElementById(dotsId);
+    if (!container) return;
+    var activeIndex = 0;
+    if (progress >= 0.66) activeIndex = totalDots - 1;
+    else if (progress >= 0.33) activeIndex = 1;
+    var html = '';
+    for (var i = 0; i < totalDots; i++) {
+      if (i === activeIndex) {
+        html += '<span class="scroll-dot-pill active"></span>';
+      } else {
+        html += '<span class="scroll-dot-circle"></span>';
+      }
+    }
+    container.innerHTML = html;
+  });
+}
+
+initScrollDots('prompt-chips-scroll', 'prompt-scroll-dots', 3);
+initScrollDots('action-scroll', 'action-scroll-dots', 3);
 
 // ── Init ──
 renderHomeHistory();
