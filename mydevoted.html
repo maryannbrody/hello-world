@@ -735,6 +735,12 @@ small, .small-text {
   margin-bottom: 14px;
 }
 
+.section-header.whats-happening-header {
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--gray-text);
+}
+
 .attention-card {
   display: flex;
   flex-direction: column;
@@ -3199,7 +3205,7 @@ small, .small-text {
 
         <!-- 3. Prompt chips ("You could ask:") -->
         <div class="prompt-chips" id="prompt-chips">
-          <div class="prompt-chips-label">You could ask:</div>
+          <div class="prompt-chips-label">You could ask</div>
           <div class="prompt-chips-inner" id="prompt-chips-scroll">
             <button class="prompt-chip" onclick="sendPrompt('How can I have more energy?')">How can I have more energy?</button>
             <button class="prompt-chip" onclick="sendPrompt('How much is left on my food and home card?')">Food & Home Card balance</button>
@@ -3215,7 +3221,7 @@ small, .small-text {
 
         <!-- 4. Recent Activity -->
         <div class="attention-section">
-          <div class="section-header">To Dos</div>
+          <div class="section-header whats-happening-header">What's Happening</div>
 
           <!-- Card 1: Onboarding -->
           <button class="attention-card" id="onboard-card" onclick="openOnboarding()">
