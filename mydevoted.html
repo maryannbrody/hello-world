@@ -641,25 +641,6 @@ small, .small-text {
   stroke-linejoin: round;
 }
 
-/* Talk to person link */
-.talk-person-link {
-  display: block;
-  text-align: center;
-  padding: 10px 20px 4px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--gray-text);
-  cursor: pointer;
-  background: none;
-  border: none;
-  font-family: inherit;
-  width: 100%;
-  min-height: 44px;
-}
-
-.talk-person-link:hover {
-  color: var(--charcoal);
-}
 
 /* Prompt chips */
 .prompt-chips {
@@ -748,11 +729,7 @@ small, .small-text {
   box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
 }
 
-/* Clinical/action card: checklist gets purple left border on white */
-#onboard-card {
-  background: var(--white);
-  border-left: 4px solid var(--purple);
-}
+/* All attention cards use same taupe style — no overrides */
 
 .card-accent {
   width: 4px;
@@ -1007,21 +984,36 @@ small, .small-text {
   font-style: italic;
 }
 
-/* Balance strip on home screen */
-.balance-strip {
-  padding: 10px 0 0;
-}
-
 /* Action items horizontal scroll */
 .action-scroll {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding: 0 16px 12px;
+  padding: 0 0 12px 16px;
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 .action-scroll::-webkit-scrollbar { display: none; }
+.action-scroll .action-item:last-child {
+  margin-right: 16px;
+}
+
+/* Scroll dot indicators */
+.scroll-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding-bottom: 8px;
+}
+.scroll-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gray-mid);
+}
+.scroll-dot.active {
+  background: var(--charcoal);
+}
 
 .action-item {
   background: var(--white);
@@ -3048,28 +3040,21 @@ small, .small-text {
           </button>
         </div>
 
-        <!-- 3. Talk to person -->
-        <button class="talk-person-link" onclick="talkToPerson()">Or talk to a person →</button>
-
-        <!-- 4. Balance widget -->
-        <div class="balance-strip">
-          <div class="action-scroll">
-            <button class="action-item action-item-border-blue" onclick="switchTab('benefits')">
-              <div class="action-item-title">Food & Home</div>
-              <div class="action-item-sub">$125 left</div>
-            </button>
-            <button class="action-item action-item-border-red" onclick="switchTab('benefits')">
-              <div class="action-item-title">Wellness Bucks</div>
-              <div class="action-item-sub">$155 left</div>
-            </button>
-            <button class="action-item action-item-border-blue" onclick="switchTab('benefits')">
-              <div class="action-item-title">OTC</div>
-              <div class="action-item-sub">$100 left</div>
-            </button>
-          </div>
+        <!-- 3. Prompt chips ("You could ask:") -->
+        <div class="prompt-chips" id="prompt-chips">
+          <div class="prompt-chips-label">You could ask:</div>
+          <button class="prompt-chip" onclick="sendPrompt('How much do I have left on my food and home card?')">
+            <span class="prompt-chip-emoji">💳</span>How much is left on my food and home card?
+          </button>
+          <button class="prompt-chip" onclick="sendPrompt('What do my recent labs mean?')">
+            <span class="prompt-chip-emoji">🔬</span>What do my recent labs mean?
+          </button>
+          <button class="prompt-chip" onclick="sendPrompt('How much protein should I eat?')">
+            <span class="prompt-chip-emoji">🌱</span>How much protein should I eat?
+          </button>
         </div>
 
-        <!-- 5. Needs your attention -->
+        <!-- 4. Recent Activity -->
         <div class="attention-section">
           <div class="section-header">Recent Activity</div>
 
@@ -3104,21 +3089,7 @@ small, .small-text {
           </button>
         </div>
 
-        <!-- 6. Prompt chips -->
-        <div class="prompt-chips" id="prompt-chips">
-          <div class="prompt-chips-label">You could ask:</div>
-          <button class="prompt-chip" onclick="sendPrompt('How much do I have left on my food and home card?')">
-            <span class="prompt-chip-emoji">💳</span>How much is left on my food and home card?
-          </button>
-          <button class="prompt-chip" onclick="sendPrompt('What do my recent labs mean?')">
-            <span class="prompt-chip-emoji">🔬</span>What do my recent labs mean?
-          </button>
-          <button class="prompt-chip" onclick="sendPrompt('How much protein should I eat?')">
-            <span class="prompt-chip-emoji">🌱</span>How much protein should I eat?
-          </button>
-        </div>
-
-        <!-- 6. Recent conversations -->
+        <!-- 5. Recent conversations -->
         <div class="recent-section">
           <div class="recent-header">
             <div class="section-header">Recent Chats</div>
@@ -3188,6 +3159,11 @@ small, .small-text {
             <div class="action-item-title">📝 Finish visit intake</div>
             <div class="action-item-sub">For Mar 4 visit</div>
           </button>
+        </div>
+        <div class="scroll-dots">
+          <div class="scroll-dot active"></div>
+          <div class="scroll-dot"></div>
+          <div class="scroll-dot"></div>
         </div>
 
         <!-- 4. Recent Labs -->
