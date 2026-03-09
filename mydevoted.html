@@ -19,8 +19,9 @@
   --charcoal: #1D252C;
   --gray-text: #595959;
   --gray-bg: #F8F7F5;
-  --bg-input: #F0EFED;
-  --gray-mid: #D9D6D0;
+  --bg-input: #F2EFEA;
+  --gray-mid: #E0DBD5;
+  --border-warm: #E8E3DE;
   --white: #FFFFFF;
   --amber: #B45309;
   --amber-bg: #FFFBEB;
@@ -35,8 +36,8 @@
 
 body {
   font-family: 'Public Sans', Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.65;
+  font-size: 17px;
+  line-height: 1.7;
   background: #C8C8D2;
   min-height: 100vh;
   display: flex;
@@ -542,15 +543,23 @@ small, .small-text {
 
 /* ── Home Tab ── */
 .greeting-section {
-  padding: 6px 20px 18px;
+  padding: 6px 20px 24px;
 }
 
 .greeting-headline {
   font-family: 'Libre Franklin', Arial, sans-serif;
-  font-size: 30px;
+  font-size: 34px;
   font-weight: 700;
   line-height: 1.2;
   color: var(--red);
+}
+
+.greeting-sub {
+  font-family: 'Libre Franklin', Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--gray-text);
+  margin-top: 4px;
 }
 
 /* Home input */
@@ -600,7 +609,7 @@ small, .small-text {
   border: none;
   background: transparent;
   font-family: inherit;
-  font-size: 16px;
+  font-size: 17px;
   color: var(--charcoal);
   outline: none;
   padding: 0 8px;
@@ -644,7 +653,7 @@ small, .small-text {
 
 /* Prompt chips */
 .prompt-chips {
-  padding: 14px 20px 4px;
+  padding: 20px 0 4px;
   transition: opacity 0.25s, max-height 0.3s;
   max-height: 400px;
   overflow: visible;
@@ -664,69 +673,102 @@ small, .small-text {
   margin-bottom: 8px;
 }
 
+.prompt-chips-inner {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 20px 4px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.prompt-chips-inner::-webkit-scrollbar { display: none; }
+
 .prompt-chip {
   display: flex;
   align-items: center;
-  width: 100%;
+  white-space: nowrap;
   background: var(--white);
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  min-height: 56px;
-  padding: 10px 16px;
+  border: 1.5px solid #E8E3DE;
+  border-radius: 24px;
+  min-height: 44px;
+  padding: 8px 16px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 15px;
   color: var(--charcoal);
   cursor: pointer;
   text-align: left;
-  margin-bottom: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
-  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  margin-bottom: 0;
+  box-shadow: none;
+  transition: border-color 0.2s, background 0.2s;
+  flex-shrink: 0;
 }
 
 .prompt-chip:hover {
   border-color: var(--red);
   background: var(--red-light);
-  box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.prompt-chip-emoji {
-  font-size: 20px;
-  margin-right: 12px;
-  flex-shrink: 0;
 }
 
 /* Attention section */
 .attention-section {
-  padding: 18px 20px 4px;
+  padding: 28px 20px 4px;
 }
 
 .section-header {
   font-family: 'Libre Franklin', Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--gray-text);
-  margin-bottom: 10px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--charcoal);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-bottom: 14px;
 }
 
 .attention-card {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   background: #F5F0EB;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
   cursor: pointer;
   border: none;
   width: 100%;
   text-align: left;
   font-family: inherit;
-  min-height: 56px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
-  transition: box-shadow 0.2s;
+  box-shadow: none;
+  transition: background 0.2s;
 }
 
 .attention-card:hover {
-  box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+  background: #EDE8E2;
+}
+
+.card-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  width: fit-content;
+}
+
+.card-badge-purple {
+  background: var(--purple-light);
+  color: var(--purple);
+}
+
+.card-badge-amber {
+  background: #FFFBEB;
+  color: #B45309;
+}
+
+.card-badge-blue {
+  background: var(--blue-light);
+  color: var(--blue);
 }
 
 /* All attention cards use same taupe style — no overrides */
@@ -778,14 +820,14 @@ small, .small-text {
 .card-label-blue { color: var(--blue); }
 
 .card-title {
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 700;
   color: var(--charcoal);
   line-height: 1.3;
 }
 
 .card-subtitle {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--gray-text);
   line-height: 1.4;
 }
@@ -799,7 +841,7 @@ small, .small-text {
 
 /* Recent conversations */
 .recent-section {
-  padding: 18px 20px 24px;
+  padding: 28px 20px 24px;
 }
 
 .recent-header {
@@ -833,32 +875,26 @@ small, .small-text {
 
 .history-row {
   display: flex;
-  align-items: center;
-  padding: 12px 0;
+  flex-direction: column;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--bg-input);
+  border-left: 4px solid transparent;
   cursor: pointer;
   min-height: 56px;
+  margin: 0 4px;
+  border-radius: 4px;
 }
 
 .history-row:last-child {
   border-bottom: none;
 }
 
-.history-row:hover .history-title {
-  color: var(--red);
+.history-row:hover {
+  background: rgba(0,0,0,0.02);
 }
 
-.history-avatar {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  margin-right: 12px;
-  flex-shrink: 0;
+.history-row:hover .history-title {
+  color: var(--red);
 }
 
 .history-body {
@@ -867,12 +903,12 @@ small, .small-text {
 }
 
 .history-date {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--gray-text);
 }
 
 .history-title {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--charcoal);
   line-height: 1.3;
@@ -880,7 +916,7 @@ small, .small-text {
 }
 
 .history-preview {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--gray-text);
   white-space: nowrap;
   overflow: hidden;
@@ -890,7 +926,7 @@ small, .small-text {
 /* ── Shared Tab Header ── */
 .tab-header {
   font-family: 'Libre Franklin', Arial, sans-serif;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--charcoal);
   padding: 16px 20px 12px;
@@ -898,7 +934,7 @@ small, .small-text {
 
 .tab-section-label {
   font-family: 'Libre Franklin', Arial, sans-serif;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
   color: var(--charcoal);
   padding: 4px 16px 8px;
@@ -907,7 +943,7 @@ small, .small-text {
 /* ── Health Tab ── */
 .care-team-card {
   background: var(--white);
-  border: 1px solid #d1d5db;
+  border: 1px solid #E8E3DE;
   border-radius: 8px;
   padding: 16px;
   margin: 0 16px 16px;
@@ -932,13 +968,13 @@ small, .small-text {
 }
 
 .care-team-name {
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 700;
   color: var(--charcoal);
 }
 
 .care-team-detail {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--gray-text);
 }
 
@@ -1059,7 +1095,7 @@ small, .small-text {
 
 .lab-card {
   background: var(--white);
-  border: 1px solid #d1d5db;
+  border: 1px solid #E8E3DE;
   border-radius: 8px;
   padding: 16px;
   cursor: pointer;
@@ -1076,12 +1112,12 @@ small, .small-text {
 }
 
 .lab-metric {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--gray-text);
 }
 
 .lab-value {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--charcoal);
   line-height: 1.3;
@@ -1129,7 +1165,7 @@ small, .small-text {
 .bar-amber { background: var(--amber); }
 
 .lab-tap {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--red);
 }
@@ -1146,7 +1182,7 @@ small, .small-text {
   display: flex;
   align-items: center;
   background: var(--white);
-  border: 1px solid #d1d5db;
+  border: 1px solid #E8E3DE;
   border-radius: 8px;
   padding: 16px;
   gap: 16px;
@@ -1165,13 +1201,13 @@ small, .small-text {
 }
 
 .med-name {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--charcoal);
 }
 
 .med-detail {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--gray-text);
 }
 
@@ -1191,7 +1227,7 @@ small, .small-text {
   display: flex;
   align-items: center;
   background: var(--white);
-  border: 1px solid #d1d5db;
+  border: 1px solid #E8E3DE;
   border-radius: 8px;
   padding: 16px;
   margin: 0 16px 16px;
@@ -1264,7 +1300,7 @@ small, .small-text {
 /* ── Benefits Tab ── */
 .benefit-card {
   background: var(--white);
-  border: 1px solid #d1d5db;
+  border: 1px solid #E8E3DE;
   border-radius: 8px;
   padding: 16px;
   margin: 0 16px 16px;
@@ -1284,7 +1320,7 @@ small, .small-text {
 .benefit-label-red { color: var(--red); }
 
 .benefit-value {
-  font-size: 38px;
+  font-size: 42px;
   font-weight: 700;
   line-height: 1.1;
 }
@@ -1298,7 +1334,7 @@ small, .small-text {
 }
 
 .benefit-sub {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--gray-text);
 }
 
@@ -1320,7 +1356,7 @@ small, .small-text {
 .bar-green { background: var(--green); }
 
 .benefit-note {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--gray-text);
   margin-top: 6px;
 }
@@ -1385,7 +1421,7 @@ small, .small-text {
   display: flex;
   align-items: center;
   background: var(--white);
-  border: 1px solid #d1d5db;
+  border: 1px solid #E8E3DE;
   border-radius: 8px;
   padding: 16px;
   margin: 0 16px 16px;
@@ -1430,7 +1466,7 @@ small, .small-text {
 /* Plan highlights */
 .plan-card {
   background: var(--white);
-  border: 1px solid #d1d5db;
+  border: 1px solid #E8E3DE;
   border-radius: 8px;
   padding: 16px;
   margin: 0 16px 16px;
@@ -1443,7 +1479,7 @@ small, .small-text {
   gap: 10px;
   padding: 10px 0;
   border-bottom: 1px solid var(--bg-input);
-  font-size: 15px;
+  font-size: 16px;
   color: var(--charcoal);
 }
 
@@ -1486,7 +1522,7 @@ small, .small-text {
 
 .quick-tool-card {
   background: var(--white);
-  border: 1px solid #d1d5db;
+  border: 1px solid #E8E3DE;
   border-radius: 8px;
   padding: 16px;
   cursor: pointer;
@@ -1503,7 +1539,7 @@ small, .small-text {
 }
 
 .quick-tool-title {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--charcoal);
 }
@@ -1519,7 +1555,7 @@ small, .small-text {
   display: flex;
   align-items: center;
   background: var(--white);
-  border: 1px solid #d1d5db;
+  border: 1px solid #E8E3DE;
   border-radius: 8px;
   padding: 16px;
   margin: 0 16px 16px;
@@ -1582,7 +1618,7 @@ small, .small-text {
 }
 
 .profile-name {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--white);
 }
@@ -1618,7 +1654,7 @@ small, .small-text {
 /* Prefs card */
 .prefs-card {
   background: var(--white);
-  border: 1px solid #d1d5db;
+  border: 1px solid #E8E3DE;
   border-radius: 8px;
   padding: 16px;
   margin: 0 16px 16px;
@@ -1686,7 +1722,7 @@ small, .small-text {
 /* Snapshot completed card */
 .snapshot-card {
   background: var(--white);
-  border: 1px solid #d1d5db;
+  border: 1px solid #E8E3DE;
   border-radius: 8px;
   padding: 16px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
@@ -1737,7 +1773,7 @@ small, .small-text {
 /* Account links card */
 .account-card {
   background: var(--white);
-  border: 1px solid #d1d5db;
+  border: 1px solid #E8E3DE;
   border-radius: 8px;
   margin: 0 16px 16px;
   overflow: hidden;
@@ -1752,7 +1788,7 @@ small, .small-text {
   border-bottom: 1px solid var(--bg-input);
   cursor: pointer;
   min-height: 48px;
-  font-size: 15px;
+  font-size: 16px;
   color: var(--charcoal);
   background: none;
   border-left: none;
@@ -1911,7 +1947,7 @@ small, .small-text {
 
 .conv-agent-name {
   font-family: 'Libre Franklin', Arial, sans-serif;
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--charcoal);
 }
@@ -1956,7 +1992,7 @@ small, .small-text {
   padding: 12px 16px;
   max-width: 82%;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.55;
 }
 
@@ -1991,7 +2027,7 @@ small, .small-text {
   border-radius: 18px;
   border-top-left-radius: 6px;
   padding: 12px 16px;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.55;
   color: var(--charcoal);
 }
@@ -2158,7 +2194,7 @@ small, .small-text {
   border-radius: 20px;
   padding: 10px 16px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 15px;
   cursor: pointer;
   white-space: nowrap;
   color: var(--charcoal);
@@ -2489,7 +2525,7 @@ small, .small-text {
 .ob-choice-btn {
   width: 100%;
   min-height: 52px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #E8E3DE;
   background: var(--white);
   border-radius: 8px;
   font-family: inherit;
@@ -2953,7 +2989,7 @@ small, .small-text {
 /* Detail page styles */
 .detail-hero {
   background: var(--white);
-  border: 1px solid #d1d5db;
+  border: 1px solid #E8E3DE;
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 16px;
@@ -3031,7 +3067,7 @@ small, .small-text {
 
 .detail-action-outline {
   background: transparent;
-  border: 2px solid #d1d5db;
+  border: 2px solid #E8E3DE;
   color: var(--charcoal);
 }
 
@@ -3117,7 +3153,8 @@ small, .small-text {
       <div class="tab-view active" id="tab-home">
         <!-- 1. Greeting -->
         <div class="greeting-section">
-          <div class="greeting-headline" id="greeting-headline">Good morning, Rebecca!<br>What's on your<br>mind today?</div>
+          <div class="greeting-headline" id="greeting-headline">Hello, Rebecca!</div>
+          <div class="greeting-sub">How can we help you today?</div>
         </div>
 
         <!-- 2. Input box -->
@@ -3133,83 +3170,70 @@ small, .small-text {
 
         <!-- 3. Prompt chips ("You could ask:") -->
         <div class="prompt-chips" id="prompt-chips">
-          <div class="prompt-chips-label">You could ask:</div>
-          <button class="prompt-chip" onclick="sendPrompt('How much do I have left on my food and home card?')">
-            <span class="prompt-chip-emoji">💳</span>How much is left on my food and home card?
-          </button>
-          <button class="prompt-chip" onclick="sendPrompt('What do my recent labs mean?')">
-            <span class="prompt-chip-emoji">🔬</span>What do my recent labs mean?
-          </button>
-          <button class="prompt-chip" onclick="sendPrompt('How much protein should I eat?')">
-            <span class="prompt-chip-emoji">🌱</span>How much protein should I eat?
-          </button>
+          <div class="prompt-chips-label" style="padding: 0 20px;">You could ask:</div>
+          <div class="prompt-chips-inner">
+            <button class="prompt-chip" onclick="sendPrompt('How much is left on my food and home card?')">
+              💳 Food & Home balance
+            </button>
+            <button class="prompt-chip" onclick="sendPrompt('What do my recent labs mean?')">
+              🔬 What do my labs mean?
+            </button>
+            <button class="prompt-chip" onclick="sendPrompt('How much protein should I eat?')">
+              🌱 Protein guidance
+            </button>
+            <button class="prompt-chip" onclick="sendPrompt('Help me prepare for my appointment with Dr. Wagle')">
+              📅 Prepare for Dr. Wagle
+            </button>
+          </div>
         </div>
 
         <!-- 4. Recent Activity -->
         <div class="attention-section">
-          <div class="section-header">Recent Activity</div>
+          <div class="section-header">To Dos</div>
 
           <!-- Card 1: Onboarding -->
           <button class="attention-card" id="onboard-card" onclick="openOnboarding()">
-            <div class="card-icon card-icon-purple">🌟</div>
-            <div class="card-body">
-              <div class="card-label card-label-purple">Get Started</div>
-              <div class="card-title">Complete your Health Connections Checklist</div>
-              <div class="card-subtitle">Takes about 2 minutes · Tap to begin</div>
-            </div>
+            <span class="card-badge card-badge-purple">Not Started</span>
+            <div class="card-title">🌟 Health Connections Checklist</div>
+            <div class="card-subtitle">Personalize your experience. Takes about 2 minutes.</div>
           </button>
 
           <!-- Card 2: Claim -->
           <button class="attention-card" onclick="switchTab('benefits')">
-            <div class="card-icon card-icon-red">💳</div>
-            <div class="card-body">
-              <div class="card-label card-label-red">Reimbursement</div>
-              <div class="card-title">Yoga Mat Claim — $45</div>
-              <div class="card-subtitle">In Progress · Received Feb 20 · Tap to review</div>
-            </div>
+            <span class="card-badge card-badge-amber">In Progress</span>
+            <div class="card-title">💳 Yoga Mat Reimbursement</div>
+            <div class="card-subtitle">Received February 20 · $45</div>
           </button>
 
           <!-- Card 3: Appointment -->
           <button class="attention-card" onclick="switchTab('health')">
-            <div class="card-icon card-icon-blue">📅</div>
-            <div class="card-body">
-              <div class="card-label card-label-blue">Appointment</div>
-              <div class="card-title">Dr. Wagle — Primary Care</div>
-              <div class="card-subtitle">March 4, 10:00am · Tap to prepare</div>
-            </div>
+            <span class="card-badge card-badge-blue">Upcoming Appointment</span>
+            <div class="card-title">📅 Complete visit intake</div>
+            <div class="card-subtitle">March 4, 10am · Dr. Wagle · Primary Care</div>
           </button>
         </div>
 
         <!-- 5. Recent conversations -->
         <div class="recent-section">
           <div class="recent-header">
-            <div class="section-header">Recent Chats</div>
+            <div class="section-header">Recent MyDevoted Chats</div>
             <button class="see-all-btn" onclick="openHistoryScreen()">See all →</button>
           </div>
           <div id="home-history-rows">
-            <div class="history-row" onclick="openPastConversation(1)">
-              <div class="history-avatar" style="background: #dcfce7;">🌱</div>
-              <div class="history-body">
-                <div class="history-date">Feb 26</div>
-                <div class="history-title">Your A1c improved — and a check-in plan</div>
-                <div class="history-preview">We talked about your 6.8% result...</div>
-              </div>
+            <div class="history-row" style="border-left-color: #166534;" onclick="openPastConversation(1)">
+              <div class="history-date">Feb 26</div>
+              <div class="history-title">Your A1c improved — and a check-in plan</div>
+              <div class="history-preview">We talked about your 6.8% result...</div>
             </div>
-            <div class="history-row" onclick="openPastConversation(2)">
-              <div class="history-avatar" style="background: var(--purple-light);">🔬</div>
-              <div class="history-body">
-                <div class="history-date">Feb 27</div>
-                <div class="history-title">What does my eGFR result mean?</div>
-                <div class="history-preview">Rebecca asked about kidney function...</div>
-              </div>
+            <div class="history-row" style="border-left-color: #592C82;" onclick="openPastConversation(2)">
+              <div class="history-date">Feb 27</div>
+              <div class="history-title">What does my eGFR result mean?</div>
+              <div class="history-preview">Rebecca asked about kidney function...</div>
             </div>
-            <div class="history-row" onclick="openPastConversation(3)">
-              <div class="history-avatar" style="background: var(--red-light);">💳</div>
-              <div class="history-body">
-                <div class="history-date">Feb 23</div>
-                <div class="history-title">Yoga mat reimbursement</div>
-                <div class="history-preview">Your $45 claim was submitted...</div>
-              </div>
+            <div class="history-row" style="border-left-color: #F04B24;" onclick="openPastConversation(3)">
+              <div class="history-date">Feb 23</div>
+              <div class="history-title">Yoga mat reimbursement</div>
+              <div class="history-preview">Your $45 claim was submitted...</div>
             </div>
           </div>
         </div>
@@ -5013,7 +5037,7 @@ function completeOnboarding() {
   onboardingComplete = true;
   closeOnboarding();
   // Update greeting
-  document.getElementById('greeting-headline').innerHTML = 'Hello, ' + escHtml(preferredName) + '!<br>What\'s on your<br>mind today?';
+  document.getElementById('greeting-headline').textContent = 'Hello, ' + escHtml(preferredName) + '!';
   // Hide onboarding card
   const card = document.getElementById('onboard-card');
   if (card) card.style.display = 'none';
@@ -5295,17 +5319,16 @@ function continueConversation() {
 function renderHomeHistory() {
   const container = document.getElementById('home-history-rows');
   container.innerHTML = '';
+  const borderColors = { 'HEALTH_COACH': '#166534', 'HEALTH_DATA': '#592C82', 'BENEFITS': '#F04B24' };
   PAST_CONVERSATIONS.slice(0, 3).forEach((conv, i) => {
     const row = document.createElement('div');
     row.className = 'history-row';
+    row.style.borderLeftColor = borderColors[conv.agent] || '#E8E3DE';
     row.onclick = () => openPastConversation(conv.id);
     row.innerHTML =
-      '<div class="history-avatar" style="background:' + conv.avatarBg + '">' + conv.avatarEmoji + '</div>' +
-      '<div class="history-body">' +
-        '<div class="history-date">' + conv.date + '</div>' +
-        '<div class="history-title">' + escHtml(conv.topic) + '</div>' +
-        '<div class="history-preview">' + escHtml(conv.preview) + '</div>' +
-      '</div>';
+      '<div class="history-date">' + conv.date + '</div>' +
+      '<div class="history-title">' + escHtml(conv.topic) + '</div>' +
+      '<div class="history-preview">' + escHtml(conv.preview) + '</div>';
     container.appendChild(row);
   });
 }
@@ -5436,7 +5459,7 @@ function closeInteriorPage() {
 function showFoodAndHomePage() {
   openInteriorPage('Food & Home Card', `
     <!-- Balance hero -->
-    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+    <div style="background:white;border:1px solid #E8E3DE;border-radius:8px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
       <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#00A0DD;margin-bottom:4px;">FOOD & HOME CARD</div>
       <div style="font-family:'Libre Franklin',sans-serif;font-size:36px;font-weight:700;color:#00A0DD;line-height:1.1;">$125</div>
       <div style="font-size:14px;color:#595959;margin-top:4px;">remaining this month</div>
@@ -5451,7 +5474,7 @@ function showFoodAndHomePage() {
     </div>
 
     <!-- My card -->
-    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+    <div style="background:white;border:1px solid #E8E3DE;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
       <div style="font-size:14px;font-weight:700;color:#1D252C;margin-bottom:8px;">My Card</div>
       <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F0EFED;font-size:14px;">
         <span style="color:#595959;">Card serial number</span>
@@ -5464,7 +5487,7 @@ function showFoodAndHomePage() {
     </div>
 
     <!-- How to spend -->
-    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+    <div style="background:white;border:1px solid #E8E3DE;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
       <div style="font-size:14px;font-weight:700;color:#1D252C;margin-bottom:10px;">How to Spend</div>
       <div style="font-size:14px;color:#1D252C;line-height:1.6;">
         <div style="display:flex;gap:10px;margin-bottom:12px;">
@@ -5479,7 +5502,7 @@ function showFoodAndHomePage() {
     </div>
 
     <!-- Tips -->
-    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+    <div style="background:white;border:1px solid #E8E3DE;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
       <div style="font-size:14px;font-weight:700;color:#1D252C;margin-bottom:10px;">Tips</div>
       <div style="font-size:14px;color:#595959;line-height:1.6;">
         <div style="display:flex;gap:10px;margin-bottom:8px;">
@@ -5494,7 +5517,7 @@ function showFoodAndHomePage() {
     </div>
 
     <!-- Common questions -->
-    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+    <div style="background:white;border:1px solid #E8E3DE;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
       <div style="font-size:14px;font-weight:700;color:#1D252C;margin-bottom:10px;">Common Questions</div>
       <div style="font-size:14px;color:#595959;line-height:1.6;">
         <div style="padding:10px 0;border-bottom:1px solid #F0EFED;color:#1D252C;font-weight:500;">Where's my card?</div>
@@ -5518,7 +5541,7 @@ function showFoodAndHomePage() {
 function showWellnessBucksPage() {
   openInteriorPage('Wellness Bucks', `
     <!-- Balance hero -->
-    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+    <div style="background:white;border:1px solid #E8E3DE;border-radius:8px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
       <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#F04B24;margin-bottom:4px;">WELLNESS BUCKS</div>
       <div style="font-family:'Libre Franklin',sans-serif;font-size:36px;font-weight:700;color:#F04B24;line-height:1.1;">$155</div>
       <div style="font-size:14px;color:#595959;margin-top:4px;">remaining of $200 annual allowance</div>
@@ -5532,7 +5555,7 @@ function showWellnessBucksPage() {
     </div>
 
     <!-- Reimbursements in progress -->
-    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+    <div style="background:white;border:1px solid #E8E3DE;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
       <div style="font-size:14px;font-weight:700;color:#1D252C;margin-bottom:12px;">Reimbursements</div>
       <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #F0EFED;">
         <span style="font-size:18px;">🧘</span>
@@ -5551,7 +5574,7 @@ function showWellnessBucksPage() {
     </div>
 
     <!-- What's covered -->
-    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+    <div style="background:white;border:1px solid #E8E3DE;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
       <div style="font-size:14px;font-weight:700;color:#1D252C;margin-bottom:10px;">What's Covered</div>
       <div style="font-size:14px;color:#1D252C;line-height:1.6;">
         <div style="display:flex;gap:10px;margin-bottom:8px;">
@@ -5577,7 +5600,7 @@ function showWellnessBucksPage() {
     </div>
 
     <!-- How it works -->
-    <div style="background:white;border:1px solid #d1d5db;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+    <div style="background:white;border:1px solid #E8E3DE;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
       <div style="font-size:14px;font-weight:700;color:#1D252C;margin-bottom:10px;">How It Works</div>
       <div style="font-size:14px;color:#595959;line-height:1.7;">
         <div style="display:flex;gap:10px;margin-bottom:8px;">
