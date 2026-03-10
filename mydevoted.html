@@ -2006,6 +2006,78 @@ small, .small-text {
 }
 #conv-messages::-webkit-scrollbar { display: none; }
 
+/* Thread list inside sheet */
+#conv-thread-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 12px 16px;
+  display: none;
+  flex-direction: column;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+#conv-thread-list::-webkit-scrollbar { display: none; }
+#conv-thread-list.visible {
+  display: flex;
+}
+.conv-new-thread-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  margin: 12px 0 8px;
+  background: rgba(240, 75, 36, 0.06);
+  border: 1px solid rgba(240, 75, 36, 0.15);
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--red);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.conv-new-thread-btn:hover {
+  background: rgba(240, 75, 36, 0.1);
+}
+.conv-thread-row {
+  padding: 12px 14px;
+  border-left: 4px solid #E8E3DE;
+  border-radius: 0 10px 10px 0;
+  background: var(--white);
+  border-bottom: 1px solid #F2EFEA;
+  cursor: pointer;
+}
+.conv-thread-row:hover {
+  background: #F8F7F5;
+}
+.conv-thread-row:last-child {
+  border-bottom: none;
+}
+.conv-back-btn {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: var(--gray-text);
+  flex-shrink: 0;
+}
+.conv-back-btn:hover {
+  background: rgba(0,0,0,0.05);
+}
+.conv-back-btn.visible {
+  display: flex;
+}
+
 /* Message animations */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(8px); }
@@ -3516,10 +3588,13 @@ small, .small-text {
     </div>
 
     <!-- Conversation Screen Overlay -->
-    <div id="conv-screen-overlay" onclick="closeConvScreen()"></div>
+    <div id="conv-screen-overlay" onclick="handleSheetClose()"></div>
     <div id="conv-screen">
       <div class="conv-grab-handle"></div>
       <div class="conv-header">
+        <button class="conv-back-btn" id="conv-back-btn" onclick="showConvThreadList()" title="Back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
         <div class="conv-header-info">
           <div class="conv-agent-avatar" id="conv-agent-avatar">♥</div>
           <div>
@@ -3529,10 +3604,11 @@ small, .small-text {
         </div>
         <div class="conv-header-actions">
           <button class="conv-header-btn" onclick="toggleSheetExpand()" id="conv-expand-btn" title="Expand">⤢</button>
-          <button class="conv-header-btn" onclick="closeConvScreen()" title="Close">✕</button>
+          <button class="conv-header-btn" id="conv-close-btn" onclick="handleSheetClose()" title="Close">✕</button>
         </div>
       </div>
       <div class="conv-context-banner" id="conv-context-banner"></div>
+      <div id="conv-thread-list"></div>
       <div id="conv-messages"></div>
       <div id="conv-suggested-replies" class="hidden"></div>
       <button class="conv-talk-person" id="conv-talk-to-person" onclick="talkToPerson()">👤 Talk to a person</button>
@@ -4866,6 +4942,9 @@ function showConvScreen() {
   // Set context
   if (!conversationContext) conversationContext = currentTab;
 
+  // Show back button (goes to thread list)
+  document.getElementById('conv-back-btn').classList.add('visible');
+
   // Update subtitle based on active thread
   const contextSub = document.getElementById('conv-agent-sub');
   if (activeThreadId) {
@@ -4900,6 +4979,14 @@ function closeConvScreen() {
 
   hideSuggestedReplies();
 
+  // Reset thread list state
+  sheetShowingThreadList = false;
+  document.getElementById('conv-thread-list').classList.remove('visible');
+  document.getElementById('conv-messages').style.display = '';
+  document.getElementById('conv-back-btn').classList.remove('visible');
+  document.getElementById('conv-agent-avatar').style.display = '';
+  document.getElementById('conv-talk-to-person').style.display = '';
+
   // Deactivate but don't destroy thread
   activeThreadId = null;
   conversationHistory = [];
@@ -4911,6 +4998,164 @@ function closeConvScreen() {
 
   // Refresh home screen conversation list
   renderHomeConversations();
+}
+
+// ── Thread List View inside Sheet ──
+let sheetShowingThreadList = false;
+
+function showConvThreadList() {
+  sheetShowingThreadList = true;
+
+  // Hide conversation content
+  document.getElementById('conv-messages').style.display = 'none';
+  document.getElementById('conv-context-banner').classList.remove('visible');
+  document.getElementById('conv-suggested-replies').classList.add('hidden');
+  document.getElementById('conv-live-input').classList.add('hidden');
+  document.getElementById('conv-continue-btn-area').classList.add('hidden');
+  document.getElementById('conv-talk-to-person').style.display = 'none';
+
+  // Show thread list
+  const threadList = document.getElementById('conv-thread-list');
+  threadList.classList.add('visible');
+  renderConvThreadList();
+
+  // Update header
+  document.getElementById('conv-agent-avatar').style.display = 'none';
+  document.getElementById('conv-agent-name').textContent = 'Conversations';
+  document.getElementById('conv-agent-sub').textContent = '';
+  document.getElementById('conv-back-btn').classList.remove('visible');
+}
+
+function renderConvThreadList() {
+  const container = document.getElementById('conv-thread-list');
+  container.innerHTML = '';
+
+  // New conversation button
+  const newBtn = document.createElement('button');
+  newBtn.className = 'conv-new-thread-btn';
+  newBtn.innerHTML = '+ New conversation';
+  newBtn.onclick = () => startNewThreadFromList();
+  container.appendChild(newBtn);
+
+  // All threads sorted by lastActivityAt
+  const sorted = [...conversationThreads]
+    .sort((a, b) => {
+      const dateA = new Date(a.lastActivityAt);
+      const dateB = new Date(b.lastActivityAt);
+      if (isNaN(dateA) && isNaN(dateB)) return 0;
+      if (isNaN(dateA)) return 1;
+      if (isNaN(dateB)) return -1;
+      return dateB - dateA;
+    });
+
+  sorted.forEach(thread => {
+    const color = THREAD_COLORS[thread.category] || '#E8E3DE';
+    const label = THREAD_LABELS[thread.category] || '';
+    const lastMsg = thread.messages[thread.messages.length - 1];
+    const preview = lastMsg ? lastMsg.text.substring(0, 60) + (lastMsg.text.length > 60 ? '...' : '') : '';
+
+    const row = document.createElement('div');
+    row.className = 'conv-thread-row';
+    row.style.borderLeftColor = color;
+    row.onclick = () => openThreadFromList(thread.id);
+    row.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;">' +
+        '<div style="font-size:17px;font-weight:700;color:var(--charcoal);line-height:1.3;">' + escHtml(thread.title || 'New conversation') + '</div>' +
+        '<div style="font-size:13px;color:var(--gray-text);flex-shrink:0;margin-left:8px;">' + escHtml(formatThreadDate(thread.lastActivityAt)) + '</div>' +
+      '</div>' +
+      '<div style="font-size:12px;font-weight:600;color:' + color + ';margin:2px 0 4px;">' + label +
+        (thread.status === 'waiting' ? ' · <span style="color:#00A0DD;">Awaiting reply</span>' : '') +
+      '</div>' +
+      '<div style="font-size:15px;color:var(--gray-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(preview) + '</div>';
+    container.appendChild(row);
+  });
+}
+
+function openThreadFromList(threadId) {
+  hideConvThreadList();
+  openThreadInSheet(threadId);
+}
+
+function startNewThreadFromList() {
+  hideConvThreadList();
+  activeThreadId = null;
+  conversationHistory = [];
+  document.getElementById('conv-messages').innerHTML = '';
+  document.getElementById('conv-context-banner').classList.remove('visible');
+  resetConvHeader();
+  showConvLiveInput();
+
+  // Show back button and update header for new conversation
+  document.getElementById('conv-back-btn').classList.add('visible');
+  document.getElementById('conv-agent-avatar').style.display = '';
+  document.getElementById('conv-agent-sub').textContent = 'New conversation';
+  document.getElementById('conv-talk-to-person').style.display = '';
+
+  // Focus the input
+  setTimeout(() => document.getElementById('conv-input').focus(), 100);
+}
+
+function hideConvThreadList() {
+  sheetShowingThreadList = false;
+  document.getElementById('conv-thread-list').classList.remove('visible');
+  document.getElementById('conv-messages').style.display = '';
+  document.getElementById('conv-agent-avatar').style.display = '';
+  document.getElementById('conv-talk-to-person').style.display = '';
+}
+
+function openThreadInSheet(threadId) {
+  const thread = conversationThreads.find(t => t.id === threadId);
+  if (!thread) return;
+
+  activeThreadId = threadId;
+
+  // Set header with back button
+  document.getElementById('conv-back-btn').classList.add('visible');
+  document.getElementById('conv-agent-name').textContent = 'MyDevoted AI';
+  document.getElementById('conv-agent-sub').textContent = thread.title || 'New conversation';
+  document.getElementById('conv-agent-avatar').style.display = '';
+
+  // Render existing messages
+  const msgs = document.getElementById('conv-messages');
+  msgs.innerHTML = '';
+
+  thread.messages.forEach(msg => {
+    if (msg.role === 'user') {
+      appendUserBubble(msg.text);
+    } else {
+      appendAiBubble(msg.text);
+    }
+  });
+
+  // If thread is waiting for care team, show banner
+  if (thread.status === 'waiting') {
+    const banner = document.createElement('div');
+    banner.style.cssText = 'text-align:center;padding:12px;font-size:13px;color:#00A0DD;font-weight:500;';
+    banner.textContent = 'Your care team will respond in this conversation';
+    msgs.appendChild(banner);
+  }
+
+  showConvLiveInput();
+  scrollConvToBottom();
+
+  // Set conversation history for live mode continuation
+  conversationHistory = thread.messages.map(m => ({
+    role: m.role === 'user' ? 'user' : 'assistant',
+    content: m.text
+  }));
+}
+
+function handleSheetClose() {
+  if (sheetShowingThreadList) {
+    // Close the sheet entirely from thread list view
+    closeConvScreen();
+  } else if (activeThreadId || document.getElementById('conv-messages').children.length > 0) {
+    // Show thread list instead of closing
+    showConvThreadList();
+  } else {
+    // Empty state — just close
+    closeConvScreen();
+  }
 }
 
 function toggleSheetExpand() {
