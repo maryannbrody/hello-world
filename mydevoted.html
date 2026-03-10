@@ -3245,28 +3245,13 @@ small, .small-text {
           </button>
         </div>
 
-        <!-- 5. Recent conversations -->
+        <!-- 5. Conversations -->
         <div class="recent-section">
           <div class="recent-header">
-            <div class="section-header">Recent MyDevoted Chats</div>
+            <div class="section-header">Conversations</div>
             <button class="see-all-btn" onclick="openHistoryScreen()">See all →</button>
           </div>
           <div id="home-history-rows">
-            <div class="history-row" style="border-left-color: #166534;" onclick="openPastConversation(1)">
-              <div class="history-date">Feb 26</div>
-              <div class="history-title">Your A1c improved — and a check-in plan</div>
-              <div class="history-preview">We talked about your 6.8% result...</div>
-            </div>
-            <div class="history-row" style="border-left-color: #592C82;" onclick="openPastConversation(2)">
-              <div class="history-date">Feb 27</div>
-              <div class="history-title">What does my eGFR result mean?</div>
-              <div class="history-preview">Rebecca asked about kidney function...</div>
-            </div>
-            <div class="history-row" style="border-left-color: #F04B24;" onclick="openPastConversation(3)">
-              <div class="history-date">Feb 23</div>
-              <div class="history-title">Yoga mat reimbursement</div>
-              <div class="history-preview">Your $45 claim was submitted...</div>
-            </div>
           </div>
         </div>
       </div>
@@ -3698,6 +3683,148 @@ let pushDismissTimer = null;
 let currentPastConv = null;
 let conversationContext = null;
 
+// ── Thread Data Model ──
+let conversationThreads = [];
+let activeThreadId = null;
+
+const THREAD_COLORS = {
+  health: '#592C82',
+  wellness: '#166534',
+  benefits: '#F04B24',
+  'care-team': '#00A0DD'
+};
+
+const THREAD_LABELS = {
+  health: 'Health',
+  wellness: 'Wellness',
+  benefits: 'Benefits',
+  'care-team': 'Care Team'
+};
+
+function createThread(options) {
+  const thread = {
+    id: 'thread-' + Date.now(),
+    title: options.title || null,
+    category: options.category || 'health',
+    status: 'active',
+    createdAt: options.createdAt || new Date().toISOString(),
+    lastActivityAt: new Date().toISOString(),
+    participants: ['ai'],
+    messages: [],
+    initiatedBy: options.initiatedBy || 'member',
+    escalatedTo: null,
+  };
+  conversationThreads.unshift(thread);
+  return thread;
+}
+
+function generateThreadTitle(firstMessage, category) {
+  if (firstMessage.length <= 40) return firstMessage;
+  const truncated = firstMessage.substring(0, 40).replace(/\s+\S*$/, '');
+  return truncated + '...';
+}
+
+function detectCategory(text) {
+  const t = text.toLowerCase();
+  if (/benefit|claim|reimburse|food.*home|otc|wellness bucks|id card|plan|copay|coverage|billing/.test(t)) return 'benefits';
+  if (/tired|energy|sleep|stress|feeling|mood|exercise|walk|motivat/.test(t)) return 'wellness';
+  if (/lab|a1c|egfr|cholesterol|blood pressure|medication|metformin|kidney|refill/.test(t)) return 'health';
+  return 'health';
+}
+
+function formatThreadDate(dateStr) {
+  if (typeof dateStr === 'string' && dateStr.match(/^(Feb|Mar|Jan)/)) return dateStr;
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now - d;
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return diffMins + 'm ago';
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return diffHours + 'h ago';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function ensureActiveThread(text) {
+  if (!activeThreadId) {
+    const category = detectCategory(text);
+    const thread = createThread({
+      category: category,
+      initiatedBy: 'member'
+    });
+    activeThreadId = thread.id;
+  }
+}
+
+function addMessageToActiveThread(role, text) {
+  const thread = conversationThreads.find(t => t.id === activeThreadId);
+  if (!thread) return;
+  thread.messages.push({
+    role: role,
+    text: text,
+    timestamp: new Date().toISOString(),
+    sender: role === 'user' ? 'member' : 'ai'
+  });
+  thread.lastActivityAt = new Date().toISOString();
+
+  // Auto-title if this is the first user message and no title yet
+  if (role === 'user' && !thread.title) {
+    thread.title = generateThreadTitle(text, thread.category);
+    // Update sheet subtitle
+    const sub = document.getElementById('conv-agent-sub');
+    if (sub) sub.textContent = thread.title;
+  }
+
+  renderHomeConversations();
+}
+
+function openThread(threadId) {
+  const thread = conversationThreads.find(t => t.id === threadId);
+  if (!thread) return;
+
+  activeThreadId = threadId;
+
+  // Close any overlays
+  closeHistoryScreen();
+  closePastConvScreen();
+
+  // Open conversation sheet
+  showConvScreen();
+  showConvLiveInput();
+
+  // Set header
+  document.getElementById('conv-agent-name').textContent = 'MyDevoted AI';
+  document.getElementById('conv-agent-sub').textContent = thread.title || 'New conversation';
+
+  // Render existing messages
+  const msgs = document.getElementById('conv-messages');
+  msgs.innerHTML = '';
+
+  thread.messages.forEach(msg => {
+    if (msg.role === 'user') {
+      appendUserBubble(msg.text);
+    } else {
+      appendAiBubble(msg.text);
+    }
+  });
+
+  // If thread is waiting for care team, show banner
+  if (thread.status === 'waiting') {
+    const banner = document.createElement('div');
+    banner.style.cssText = 'text-align:center;padding:12px;font-size:13px;color:#00A0DD;font-weight:500;';
+    banner.textContent = 'Your care team will respond in this conversation';
+    msgs.appendChild(banner);
+  }
+
+  scrollConvToBottom();
+
+  // Set conversation history for live mode continuation
+  conversationHistory = thread.messages.map(m => ({
+    role: m.role === 'user' ? 'user' : 'assistant',
+    content: m.text
+  }));
+}
+
 // Profile / onboarding state
 let onboardingComplete = false;
 let preferredName = 'Rebecca';
@@ -3758,6 +3885,33 @@ const PAST_CONVERSATIONS = [
     ]
   }
 ];
+
+// ── Convert past conversations to threads ──
+PAST_CONVERSATIONS.forEach(conv => {
+  const categoryMap = {
+    'HEALTH_COACH': 'wellness',
+    'HEALTH_DATA': 'health',
+    'BENEFITS': 'benefits'
+  };
+  const thread = {
+    id: conv.id,
+    title: conv.topic,
+    category: categoryMap[conv.agent] || 'health',
+    status: 'resolved',
+    createdAt: conv.date,
+    lastActivityAt: conv.date,
+    participants: ['ai'],
+    messages: conv.turns.map(t => ({
+      role: t.role === 'ai' ? 'assistant' : 'user',
+      text: t.text,
+      timestamp: conv.date,
+      sender: t.role === 'ai' ? 'ai' : 'member'
+    })),
+    initiatedBy: conv.turns[0].role === 'ai' ? 'ai' : 'member',
+    escalatedTo: null,
+  };
+  conversationThreads.push(thread);
+});
 
 // ── Utilities ──
 function escHtml(s) {
@@ -4433,11 +4587,37 @@ function resetDemo() {
   dismissPush();
   isCheckInConversation = false;
   checkInBeat = 0;
+  activeThreadId = null;
+
+  // Re-initialize threads from past conversations
+  conversationThreads = [];
+  PAST_CONVERSATIONS.forEach(conv => {
+    const categoryMap = { 'HEALTH_COACH': 'wellness', 'HEALTH_DATA': 'health', 'BENEFITS': 'benefits' };
+    conversationThreads.push({
+      id: conv.id,
+      title: conv.topic,
+      category: categoryMap[conv.agent] || 'health',
+      status: 'resolved',
+      createdAt: conv.date,
+      lastActivityAt: conv.date,
+      participants: ['ai'],
+      messages: conv.turns.map(t => ({
+        role: t.role === 'ai' ? 'assistant' : 'user',
+        text: t.text,
+        timestamp: conv.date,
+        sender: t.role === 'ai' ? 'ai' : 'member'
+      })),
+      initiatedBy: conv.turns[0].role === 'ai' ? 'ai' : 'member',
+      escalatedTo: null,
+    });
+  });
+
   currentTab = 'home';
   navItems.forEach(n => n.classList.remove('active'));
   navItems[0].classList.add('active');
   tabViews.forEach(v => v.classList.remove('active'));
   document.getElementById('tab-home').classList.add('active');
+  renderHomeConversations();
   // Restart push timer
   startPushTimer();
 }
@@ -4449,7 +4629,9 @@ function handleHomeSubmit() {
   if (!text) return;
   input.value = '';
   document.getElementById('prompt-chips').classList.remove('hidden');
-  // Clear conversation state for a fresh thread
+
+  // Always start a new thread from home input
+  activeThreadId = null;
   conversationHistory = [];
   document.getElementById('conv-messages').innerHTML = '';
   document.getElementById('conv-context-banner').classList.remove('visible');
@@ -4461,7 +4643,9 @@ function handleHomeSubmit() {
 function sendPrompt(text) {
   document.getElementById('home-input').value = '';
   document.getElementById('prompt-chips').classList.remove('hidden');
-  // Clear conversation state for a fresh thread
+
+  // Always start a new thread from prompts
+  activeThreadId = null;
   conversationHistory = [];
   document.getElementById('conv-messages').innerHTML = '';
   document.getElementById('conv-context-banner').classList.remove('visible');
@@ -4483,9 +4667,11 @@ async function sendMessage(text) {
 
   // Tier 3: Emergency detection
   if (EMERGENCY_REGEX.test(text)) {
+    ensureActiveThread(text);
     showConvScreen();
     showConvLiveInput();
     appendUserBubble(text);
+    addMessageToActiveThread('user', text);
     showEmergencyCard();
     scrollConvToBottom();
     return;
@@ -4493,13 +4679,18 @@ async function sendMessage(text) {
 
   // Tier 2: Human escalation
   if (ESCALATE_HUMAN_REGEX.test(text)) {
+    ensureActiveThread(text);
     showConvScreen();
     showConvLiveInput();
     appendUserBubble(text);
+    addMessageToActiveThread('user', text);
     triggerHumanHandoff(text);
     scrollConvToBottom();
     return;
   }
+
+  // Ensure we have an active thread
+  ensureActiveThread(text);
 
   // Demo mode
   if (demoMode) {
@@ -4521,6 +4712,7 @@ async function sendMessage(text) {
   showConvLiveInput();
   conversationHistory.push({ role: 'user', content: text });
   appendUserBubble(text);
+  addMessageToActiveThread('user', text);
   isLoading = true;
   const loadingEl = appendLoadingBubble();
   scrollConvToBottom();
@@ -4553,6 +4745,7 @@ async function sendMessage(text) {
     conversationHistory.push({ role: 'assistant', content: aiText });
     loadingEl.remove();
     appendAiBubble(aiText);
+    addMessageToActiveThread('assistant', aiText);
   } catch (err) {
     loadingEl.remove();
     appendError("We're having trouble connecting right now. Please try again in a moment.");
@@ -4619,6 +4812,7 @@ async function sendCheckInLiveMessage(userText) {
   }
   conversationHistory.push({ role: 'user', content: userText });
   appendUserBubble(userText);
+  addMessageToActiveThread('user', userText);
   isLoading = true;
   const loadingEl = appendLoadingBubble();
   scrollConvToBottom();
@@ -4647,6 +4841,7 @@ async function sendCheckInLiveMessage(userText) {
     conversationHistory.push({ role: 'assistant', content: aiText });
     loadingEl.remove();
     appendAiBubble(aiText);
+    addMessageToActiveThread('assistant', aiText);
   } catch (err) {
     loadingEl.remove();
     appendError("We're having trouble connecting right now. Please try again in a moment.");
@@ -4670,15 +4865,22 @@ function showConvScreen() {
 
   // Set context
   if (!conversationContext) conversationContext = currentTab;
-  const contextLabels = {
-    home: '',
-    health: 'Viewing: Your Health',
-    benefits: 'Viewing: Your Benefits',
-    profile: 'Viewing: Your Profile'
-  };
+
+  // Update subtitle based on active thread
   const contextSub = document.getElementById('conv-agent-sub');
-  if (contextSub && conversationContext && conversationContext !== 'home') {
-    contextSub.textContent = contextLabels[conversationContext] || 'Your health companion';
+  if (activeThreadId) {
+    const thread = conversationThreads.find(t => t.id === activeThreadId);
+    if (thread) {
+      if (thread.status === 'waiting') {
+        contextSub.textContent = 'Waiting for your care team';
+      } else if (thread.title) {
+        contextSub.textContent = thread.title;
+      } else {
+        contextSub.textContent = 'New conversation';
+      }
+    }
+  } else {
+    contextSub.textContent = 'New conversation';
   }
 
   // Show context banner if not from home
@@ -4697,12 +4899,18 @@ function closeConvScreen() {
   if (aiBar && currentTab !== 'home') { aiBar.style.opacity = '1'; aiBar.style.pointerEvents = 'all'; }
 
   hideSuggestedReplies();
+
+  // Deactivate but don't destroy thread
+  activeThreadId = null;
   conversationHistory = [];
   isCheckInConversation = false;
   conversationContext = null;
   document.getElementById('conv-messages').innerHTML = '';
   document.getElementById('conv-context-banner').classList.remove('visible');
   resetConvHeader();
+
+  // Refresh home screen conversation list
+  renderHomeConversations();
 }
 
 function toggleSheetExpand() {
@@ -4738,6 +4946,12 @@ function handleAiBarSubmit() {
   const text = input.value.trim();
   if (!text) return;
   input.value = '';
+  // Always start a new thread from AI bar
+  activeThreadId = null;
+  conversationHistory = [];
+  document.getElementById('conv-messages').innerHTML = '';
+  document.getElementById('conv-context-banner').classList.remove('visible');
+  resetConvHeader();
   conversationContext = currentTab;
   sendMessage(text);
 }
@@ -5076,15 +5290,28 @@ function openPushConversation() {
   dismissPush();
   isCheckInConversation = true;
   checkInBeat = 0;
+
+  // Create a new thread for the check-in
+  const checkInThread = createThread({
+    title: 'Health Coach check-in',
+    category: 'wellness',
+    initiatedBy: 'ai'
+  });
+  activeThreadId = checkInThread.id;
+
+  const openingMessage = "Hey Rebecca — checking in like we planned. 💚\n\nI was looking at your recent numbers and something caught my attention. Your A1c came back at **6.8%**. I want to take a moment with that, because it's actually meaningful. That number reflects months of your choices, your routines, your everyday life. It doesn't happen by accident.\n\nI'm also noticing your blood pressure was **138/84** at your last visit. Not alarming — but something worth paying attention to together.\n\nHow are you feeling this evening? And I mean that broadly — not just physically.";
+
   showConvScreen();
   showConvLiveInput();
 
   // Reset header to MyDevoted AI
-  resetConvHeader();
+  document.getElementById('conv-agent-name').textContent = 'MyDevoted AI';
+  document.getElementById('conv-agent-sub').textContent = 'Health Coach check-in';
 
-  appendAiBubble("Hey Rebecca — checking in like we planned. 💚\n\nI was looking at your recent numbers and something caught my attention. Your A1c came back at **6.8%**. I want to take a moment with that, because it's actually meaningful. That number reflects months of your choices, your routines, your everyday life. It doesn't happen by accident.\n\nI'm also noticing your blood pressure was **138/84** at your last visit. Not alarming — but something worth paying attention to together.\n\nHow are you feeling this evening? And I mean that broadly — not just physically.");
+  appendAiBubble(openingMessage);
+  addMessageToActiveThread('assistant', openingMessage);
   conversationHistory = [
-    { role: 'assistant', content: "Hey Rebecca — checking in like we planned.\n\nI was looking at your recent numbers and something caught my attention. Your A1c came back at 6.8%. I want to take a moment with that, because it's actually meaningful. That number reflects months of your choices, your routines, your everyday life. It doesn't happen by accident.\n\nI'm also noticing your blood pressure was 138/84 at your last visit. Not alarming — but something worth paying attention to together.\n\nHow are you feeling this evening? And I mean that broadly — not just physically." }
+    { role: 'assistant', content: openingMessage.replace(/\*\*/g, '') }
   ];
   showSuggestedReplies([
     { label: "Honestly, a little tired. It's been a long week.", action: "message", value: "Honestly, a little tired. It's been a long week." }
@@ -5097,6 +5324,7 @@ async function sendDemoMessage(text) {
     if (isLoading) return;
     appendUserBubble(text);
     conversationHistory.push({ role: 'user', content: text });
+    addMessageToActiveThread('user', text);
     checkInBeat++;
     isLoading = true;
     const loadingEl = appendLoadingBubble();
@@ -5109,6 +5337,7 @@ async function sendDemoMessage(text) {
       const reply = "Tired makes sense. And \"long week\" tells me something too.\n\nThere's a difference between tired-from-doing-too-much and tired-from-something-feeling-heavy.\n\n**Which one is it for you tonight?**\n\nI ask because both of those things actually connect to what we're watching with your blood pressure. Stress and sleep affect those numbers more than most people realize — sometimes more than what's on your plate.";
       appendAiBubble(reply);
       conversationHistory.push({ role: 'assistant', content: reply });
+      addMessageToActiveThread('assistant', reply);
       showSuggestedReplies([
         { label: "Both, honestly.", action: "message", value: "Both, honestly." }
       ]);
@@ -5118,6 +5347,7 @@ async function sendDemoMessage(text) {
       const reply = "Both. That's honest, and I appreciate it.\n\nHere's something I find worth noticing: you've been managing your blood sugar well enough that your A1c is sitting at **6.8%**. That takes consistency — even when weeks are long. Even when you're tired.\n\nThat's not nothing, Rebecca.\n\n**What does tomorrow look like for you?** Not what you think it should look like — just what it actually looks like.";
       appendAiBubble(reply);
       conversationHistory.push({ role: 'assistant', content: reply });
+      addMessageToActiveThread('assistant', reply);
       // No more chips — free text
     } else {
       // Beyond scripted beats in demo mode — use standard demo fallback
@@ -5127,6 +5357,7 @@ async function sendDemoMessage(text) {
       loadingEl.remove();
       appendAiBubble(demo.text);
       conversationHistory.push({ role: 'assistant', content: demo.text });
+      addMessageToActiveThread('assistant', demo.text);
       if (demo.replies && demo.replies.length) showSuggestedReplies(demo.replies);
     }
     isLoading = false;
@@ -5139,6 +5370,7 @@ async function sendDemoMessage(text) {
   showConvScreen();
   showConvLiveInput();
   appendUserBubble(text);
+  addMessageToActiveThread('user', text);
   isLoading = true;
   const loadingEl = appendLoadingBubble();
   scrollConvToBottom();
@@ -5148,6 +5380,7 @@ async function sendDemoMessage(text) {
   await delay(800);
   loadingEl.remove();
   appendAiBubble(demo.text);
+  addMessageToActiveThread('assistant', demo.text);
   if (demo.replies && demo.replies.length) showSuggestedReplies(demo.replies);
   scrollConvToBottom();
   isLoading = false;
@@ -5201,13 +5434,36 @@ async function connectToHuman(teamName, teamEmoji, teamColor) {
   const card = document.getElementById('handoff-card');
   if (card) card.remove();
 
+  // Update active thread status
+  if (activeThreadId) {
+    const thread = conversationThreads.find(t => t.id === activeThreadId);
+    if (thread) {
+      thread.status = 'waiting';
+      thread.escalatedTo = teamName;
+      if (!thread.participants.includes('care-team')) {
+        thread.participants.push('care-team');
+      }
+    }
+  }
+
   // Update header to show message sent
-  document.getElementById('conv-agent-sub').textContent = 'Message sent';
+  document.getElementById('conv-agent-sub').textContent = 'Waiting for your care team';
   document.getElementById('conv-mode-indicator').innerHTML = teamName + ' · Typically responds in a few minutes';
 
+  // Show thread-level banner
+  const msgs = document.getElementById('conv-messages');
+  const banner = document.createElement('div');
+  banner.style.cssText = 'text-align:center;padding:12px;font-size:13px;color:#00A0DD;font-weight:500;';
+  banner.textContent = 'Your care team will respond in this conversation';
+  msgs.appendChild(banner);
+
   // Show async confirmation as AI bubble
-  appendAiBubble("Your message has been sent to **" + teamName + "**. A member of the team will review your conversation and respond here — most replies arrive within a few minutes during business hours.");
+  const confirmMsg = "Your message has been sent to **" + teamName + "**. A member of the team will review your conversation and respond here — most replies arrive within a few minutes during business hours.";
+  appendAiBubble(confirmMsg);
+  addMessageToActiveThread('assistant', confirmMsg);
   scrollConvToBottom();
+
+  renderHomeConversations();
 
   // Keep input visible so member can add more context
   document.getElementById('conv-input').placeholder = 'Add more details…';
@@ -5231,18 +5487,39 @@ function closeHistoryScreen() {
 function renderHistoryScreen() {
   const list = document.getElementById('history-list');
   list.innerHTML = '';
-  PAST_CONVERSATIONS.forEach(conv => {
-    const agent = AGENTS[conv.agent] || {};
+
+  const sorted = [...conversationThreads]
+    .sort((a, b) => {
+      const dateA = new Date(a.lastActivityAt);
+      const dateB = new Date(b.lastActivityAt);
+      if (isNaN(dateA) && isNaN(dateB)) return 0;
+      if (isNaN(dateA)) return 1;
+      if (isNaN(dateB)) return -1;
+      return dateB - dateA;
+    });
+
+  sorted.forEach(thread => {
+    const color = THREAD_COLORS[thread.category] || '#E8E3DE';
+    const label = THREAD_LABELS[thread.category] || '';
+    const lastMsg = thread.messages[thread.messages.length - 1];
+    const preview = lastMsg ? lastMsg.text.substring(0, 60) + (lastMsg.text.length > 60 ? '...' : '') : '';
+
     const btn = document.createElement('button');
     btn.className = 'history-list-item';
+    btn.style.borderLeft = '4px solid ' + color;
+    btn.style.textAlign = 'left';
     btn.innerHTML =
-      '<div class="history-list-avatar" style="background:' + conv.avatarBg + '">' + conv.avatarEmoji + '</div>' +
       '<div class="history-list-body">' +
-        '<div class="history-list-date">' + conv.date + '</div>' +
-        '<div class="history-list-topic">' + escHtml(conv.topic) + '</div>' +
-        '<div class="history-list-preview">' + escHtml(conv.preview) + '</div>' +
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;">' +
+          '<div class="history-list-topic">' + escHtml(thread.title || 'New conversation') + '</div>' +
+          '<div class="history-list-date">' + escHtml(formatThreadDate(thread.lastActivityAt)) + '</div>' +
+        '</div>' +
+        '<div style="font-size:12px;font-weight:600;color:' + color + ';margin:2px 0 4px;">' + label +
+          (thread.status === 'waiting' ? ' · <span style="color:#00A0DD;">Awaiting reply</span>' : '') +
+        '</div>' +
+        '<div class="history-list-preview">' + escHtml(preview) + '</div>' +
       '</div>';
-    btn.onclick = () => openPastConversation(conv.id);
+    btn.onclick = () => openThread(thread.id);
     list.appendChild(btn);
   });
 }
@@ -5287,27 +5564,31 @@ function closePastConvScreen() {
 function continuePastConversation() {
   if (!currentPastConv) return;
   const conv = currentPastConv;
+
+  // Find the matching thread
+  const thread = conversationThreads.find(t => t.id === conv.id);
+  if (thread) {
+    closePastConvScreen();
+    closeHistoryScreen();
+    openThread(thread.id);
+    return;
+  }
+
+  // Fallback: use old behavior
   const agent = AGENTS[conv.agent] || AGENTS.HEALTH_DATA;
   currentAgent = agent;
 
-  // Load turns into conversation history
   conversationHistory = [];
   conv.turns.forEach(turn => {
     conversationHistory.push({ role: turn.role === 'ai' ? 'assistant' : 'user', content: turn.text });
   });
 
-  // Close overlays
   closePastConvScreen();
   closeHistoryScreen();
-
-  // Show conversation screen
   showConvScreen();
   showConvLiveInput();
-
-  // Reset header to MyDevoted AI
   resetConvHeader();
 
-  // Render past turns
   const msgs = document.getElementById('conv-messages');
   msgs.innerHTML = '<div class="past-date-divider">' + conv.date + '</div>';
   conv.turns.forEach(turn => {
@@ -5326,20 +5607,41 @@ function continueConversation() {
   showConvLiveInput();
 }
 
-// ── Render Home History ──
-function renderHomeHistory() {
+// ── Render Home Conversations ──
+function renderHomeConversations() {
   const container = document.getElementById('home-history-rows');
   container.innerHTML = '';
-  const borderColors = { 'HEALTH_COACH': '#166534', 'HEALTH_DATA': '#592C82', 'BENEFITS': '#F04B24' };
-  PAST_CONVERSATIONS.slice(0, 3).forEach((conv, i) => {
+
+  const recent = [...conversationThreads]
+    .sort((a, b) => {
+      const dateA = new Date(a.lastActivityAt);
+      const dateB = new Date(b.lastActivityAt);
+      if (isNaN(dateA) && isNaN(dateB)) return 0;
+      if (isNaN(dateA)) return 1;
+      if (isNaN(dateB)) return -1;
+      return dateB - dateA;
+    })
+    .slice(0, 3);
+
+  recent.forEach(thread => {
+    const color = THREAD_COLORS[thread.category] || '#E8E3DE';
+    const label = THREAD_LABELS[thread.category] || '';
+    const lastMsg = thread.messages[thread.messages.length - 1];
+    const preview = lastMsg ? lastMsg.text.substring(0, 60) + (lastMsg.text.length > 60 ? '...' : '') : '';
+
     const row = document.createElement('div');
     row.className = 'history-row';
-    row.style.borderLeftColor = borderColors[conv.agent] || '#E8E3DE';
-    row.onclick = () => openPastConversation(conv.id);
+    row.style.borderLeftColor = color;
+    row.onclick = () => openThread(thread.id);
     row.innerHTML =
-      '<div class="history-date">' + conv.date + '</div>' +
-      '<div class="history-title">' + escHtml(conv.topic) + '</div>' +
-      '<div class="history-preview">' + escHtml(conv.preview) + '</div>';
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;">' +
+        '<div class="history-title">' + escHtml(thread.title || 'New conversation') + '</div>' +
+        '<div class="history-date">' + escHtml(thread.lastActivityAt ? formatThreadDate(thread.lastActivityAt) : '') + '</div>' +
+      '</div>' +
+      '<div style="font-size:12px;font-weight:600;color:' + color + ';margin:2px 0 4px;">' + label +
+        (thread.status === 'waiting' ? ' · <span style="color:#00A0DD;">Awaiting reply</span>' : '') +
+      '</div>' +
+      '<div class="history-preview">' + escHtml(preview) + '</div>';
     container.appendChild(row);
   });
 }
@@ -5668,10 +5970,9 @@ function initScrollDots(scrollId, dotsId, totalDots) {
 }
 
 initScrollDots('prompt-chips-scroll', 'prompt-scroll-dots', 3);
-initScrollDots('action-scroll', 'action-scroll-dots', 3);
 
 // ── Init ──
-renderHomeHistory();
+renderHomeConversations();
 startPushTimer();
 </script>
 </body>
