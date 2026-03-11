@@ -5270,7 +5270,14 @@ function appendError(msg) {
 
 function scrollConvToBottom() {
   const msgs = document.getElementById('conv-messages');
-  msgs.scrollTop = msgs.scrollHeight;
+  // Scroll so the top of the last message is visible near the top of the container
+  const lastMsg = msgs.lastElementChild;
+  if (lastMsg) {
+    const msgTop = lastMsg.offsetTop - msgs.offsetTop;
+    msgs.scrollTop = msgTop - 12;
+  } else {
+    msgs.scrollTop = msgs.scrollHeight;
+  }
 }
 
 // ── Suggested Reply Chips ──
