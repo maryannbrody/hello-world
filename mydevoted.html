@@ -895,11 +895,10 @@ small, .small-text {
   flex-direction: column;
   padding: 14px 16px;
   border-bottom: 1px solid var(--bg-input);
-  border-left: 4px solid transparent;
   cursor: pointer;
   min-height: 56px;
   margin: 0 4px;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 .history-row:last-child {
@@ -2028,27 +2027,27 @@ small, .small-text {
   gap: 8px;
   width: 100%;
   min-height: 48px;
-  margin: 12px 0 8px;
-  background: rgba(240, 75, 36, 0.06);
-  border: 1px solid rgba(240, 75, 36, 0.15);
-  border-radius: 12px;
+  margin: 12px 0 12px;
+  background: var(--red);
+  border: none;
+  border-radius: 50px;
   font-family: inherit;
   font-size: 15px;
   font-weight: 600;
-  color: var(--red);
+  color: var(--white);
   cursor: pointer;
   flex-shrink: 0;
 }
 .conv-new-thread-btn:hover {
-  background: rgba(240, 75, 36, 0.1);
+  background: var(--red-dark);
 }
 .conv-thread-row {
-  padding: 12px 14px;
-  border-left: 4px solid #E8E3DE;
-  border-radius: 0 10px 10px 0;
+  padding: 14px 16px;
   background: var(--white);
   border-bottom: 1px solid #F2EFEA;
   cursor: pointer;
+  border-radius: 8px;
+  margin-bottom: 2px;
 }
 .conv-thread-row:hover {
   background: #F8F7F5;
@@ -2076,6 +2075,90 @@ small, .small-text {
 }
 .conv-back-btn.visible {
   display: flex;
+}
+
+/* Human message bubble */
+.msg-row.human {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  animation: fadeInUp 0.25s ease;
+}
+
+.msg-row.human .msg-bubble {
+  background: var(--white);
+  border: 1px solid #E8E3DE;
+  border-radius: 18px;
+  border-top-left-radius: 6px;
+  padding: 12px 16px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--charcoal);
+}
+
+.human-attribution {
+  font-size: 13px;
+  color: var(--gray-text);
+  margin-top: 4px;
+  padding-left: 40px;
+}
+
+/* System message divider (handoff) */
+.system-msg-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  animation: fadeInUp 0.25s ease;
+}
+
+.system-msg-divider::before,
+.system-msg-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--gray-mid);
+}
+
+.system-msg-divider span {
+  font-size: 13px;
+  color: var(--gray-text);
+  white-space: nowrap;
+}
+
+/* Active thread banner */
+.active-thread-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  margin: 8px 12px;
+  background: #FFF8F5;
+  border: 1px solid rgba(240, 75, 36, 0.15);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--charcoal);
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.active-thread-banner:hover {
+  background: #FFF0EB;
+}
+
+.active-thread-banner .banner-arrow {
+  color: var(--red);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* Thread status indicator */
+.thread-status-text {
+  font-size: 13px;
+  color: var(--gray-text);
+  font-style: italic;
+  margin-top: 2px;
 }
 
 /* Message animations */
@@ -3323,6 +3406,7 @@ small, .small-text {
             <div class="section-header">Conversations</div>
             <button class="see-all-btn" onclick="openHistoryScreen()">See all →</button>
           </div>
+          <div id="home-active-banner"></div>
           <div id="home-history-rows">
           </div>
         </div>
@@ -3612,6 +3696,7 @@ small, .small-text {
       <div id="conv-messages"></div>
       <div id="conv-suggested-replies" class="hidden"></div>
       <button class="conv-talk-person" id="conv-talk-to-person" onclick="talkToPerson()">👤 Talk to a person</button>
+      <div id="conv-active-banner-area"></div>
       <div id="conv-live-input">
         <div class="conv-mode-indicator" id="conv-mode-indicator">Get instant answers · Supported by AI</div>
         <div class="conv-input-wrap">
@@ -3673,7 +3758,7 @@ small, .small-text {
         <button class="back-btn" onclick="closeHistoryScreen()">
           <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
-        <div class="history-screen-title">Conversation History</div>
+        <div class="history-screen-title">Conversations</div>
       </div>
       <div class="history-list" id="history-list"></div>
     </div>
@@ -3763,54 +3848,167 @@ let conversationContext = null;
 let conversationThreads = [];
 let activeThreadId = null;
 
-const THREAD_COLORS = {
-  health: '#592C82',
-  wellness: '#166534',
-  benefits: '#F04B24',
-  'care-team': '#00A0DD'
-};
+const SEEDED_THREADS = [
+  {
+    id: 'thread-1',
+    title: 'Your A1c improved to 6.8%',
+    status: 'resolved',
+    lastActivityAt: '2026-02-26T18:30:00',
+    messages: [
+      { role: 'ai', sender: 'MyDevoted', text: "Rebecca, I wanted to share something from your recent labs. Your HbA1c came back at 6.8% — that's down from 7.2% last time. That's a meaningful improvement.\n\nThis number reflects the last 2-3 months of your life — your meals, your movement, your daily rhythms. It doesn't change by accident.\n\nHow does it feel to hear that?" },
+      { role: 'user', text: "Honestly? A little surprised. I didn't think I was doing anything differently." },
+      { role: 'ai', sender: 'MyDevoted', text: "That's such an interesting response. Sometimes the most sustainable changes are the ones we don't even notice we're making.\n\nRather than trying to figure out what changed, what if we just paid attention together going forward? I could check in with you a couple times a week — not to give you homework, just to notice patterns together.\n\nWould that feel supportive, or would it feel like too much?" },
+      { role: 'user', text: "Supportive, I think. I'd like that." },
+      { role: 'ai', sender: 'MyDevoted', text: "I'm glad. Let's keep it light — Tuesdays and Thursdays work? Just a quick check-in, no agenda. You set the pace.\n\nAnd Rebecca — that 6.8% is yours. You earned it, even if you're not sure how. That's worth sitting with for a moment." }
+    ]
+  },
+  {
+    id: 'thread-2',
+    title: 'What does my eGFR of 58 mean?',
+    status: 'resolved',
+    lastActivityAt: '2026-02-27T14:20:00',
+    messages: [
+      { role: 'user', text: "I saw my eGFR was 58 on my lab results. What does that mean? Should I be worried?" },
+      { role: 'ai', sender: 'MyDevoted', text: "That's a really good question to ask, and I'm glad you're paying attention to it.\n\nYour eGFR of 58 measures how well your kidneys are filtering waste from your blood. Think of it like a performance score — at 58, your kidneys are working at roughly 60% of typical capacity.\n\nIn medical terms, this is called Stage 3a — which sounds more alarming than it usually is. It's actually quite common in people who are managing both diabetes and blood pressure, like you are.\n\nYour lisinopril is specifically chosen to protect kidney function. And keeping your A1c and blood pressure in good ranges — which you're doing — is the most important thing for your kidneys right now." },
+      { role: 'user', text: "I've been feeling more tired lately. I wondered if it could be connected." },
+      { role: 'ai', sender: 'MyDevoted', text: "That's a really thoughtful connection to make. For some people, reduced kidney function can contribute to feeling more tired.\n\nThat said, fatigue has many possible threads — sleep quality, blood sugar patterns, even the emotional weight of managing health conditions.\n\nThis would be a great thing to bring up with Dr. Wagle on March 4. Would you like me to help you draft a question about the connection between your kidney function and fatigue?" }
+    ]
+  },
+  {
+    id: 'thread-3',
+    title: 'Yoga mat reimbursement — $45',
+    status: 'resolved',
+    lastActivityAt: '2026-02-23T11:15:00',
+    messages: [
+      { role: 'user', text: "I bought a yoga mat for $45. Can I get reimbursed through my plan?" },
+      { role: 'ai', sender: 'MyDevoted', text: "Yes! A yoga mat absolutely qualifies under your **Wellness Bucks** benefit. You have a **$200 annual allowance** for wellness-related purchases.\n\nTo submit your claim, you'll need your receipt showing the purchase amount and date. Once submitted, claims typically process within **5-7 business days**.\n\nWould you like to start the submission now?" },
+      { role: 'user', text: "Yes, let's do it." },
+      { role: 'ai', sender: 'MyDevoted', text: "Great — I've started the reimbursement process. Your $45 yoga mat claim has been submitted. You should see it reflected in your Wellness Bucks balance within 5-7 business days.\n\nYour remaining balance will be **$155 of $200** once this is processed." }
+    ]
+  },
+  {
+    id: 'thread-4',
+    title: 'Billing question about specialist visit',
+    status: 'waiting-guide',
+    lastActivityAt: '2026-03-10T16:45:00',
+    escalatedTo: { name: 'Mary Ann B.', team: 'Devoted Guide', role: 'guide' },
+    messages: [
+      { role: 'user', text: "I got a bill for $150 from a specialist visit last month. I thought my plan covered specialist visits?" },
+      { role: 'ai', sender: 'MyDevoted', text: "I can help look into this. Your Devoted Health plan does cover specialist visits, but the copay amount depends on the type of specialist and whether they're in-network.\n\nCan you tell me the specialist's name or the type of visit? That will help me check the specific coverage details." },
+      { role: 'user', text: "It was Dr. Pham, a dermatologist. My PCP referred me." },
+      { role: 'ai', sender: 'MyDevoted', text: "Thank you. With a PCP referral, in-network dermatology visits should have a $30 copay under your plan. A $150 bill sounds like it may have been processed incorrectly — either as out-of-network or without the referral on file.\n\nWould you like me to connect you with a Devoted Guide who can look into the claim details and help resolve this?" },
+      { role: 'user', text: "Yes please, I'd like to talk to someone about this." },
+      { role: 'ai', sender: 'MyDevoted', text: "Of course — I'm connecting you with a Devoted Guide who specializes in billing questions. They'll be able to see our conversation and pick up right where we left off." },
+      { role: 'system', type: 'handoff', text: 'Mary Ann B. from Devoted Guide has joined this conversation.' },
+      { role: 'human', sender: 'Mary Ann B., Devoted Guide', avatar: 'guide', text: "Hi Rebecca — I'm Mary Ann, a Devoted Guide. I can see you're asking about a $150 bill from Dr. Pham's dermatology visit. I'm going to pull up your claim details now. This usually takes a few minutes — I'll get back to you here shortly." }
+    ]
+  },
+  {
+    id: 'thread-5',
+    title: 'Feeling dizzy after taking medication',
+    status: 'waiting-medical',
+    lastActivityAt: '2026-03-11T09:30:00',
+    escalatedTo: { name: 'Dr. Alison Holliday', team: 'Devoted Medical', role: 'clinical' },
+    messages: [
+      { role: 'user', text: "I've been feeling dizzy the last few mornings after taking my medications. Is that normal?" },
+      { role: 'ai', sender: 'MyDevoted', text: "I'm glad you're telling me about this, Rebecca. Dizziness after taking medication is something worth paying attention to.\n\nYou're currently taking Metformin, Lisinopril, and Atorvastatin. Dizziness can sometimes be related to blood pressure medication — your Lisinopril works by lowering blood pressure, and if it drops too low, especially in the morning when you're getting up, that can cause lightheadedness.\n\n**A couple of things to notice:**\n- Does the dizziness happen right when you stand up?\n- How long does it last — seconds, or longer?\n- Have you noticed it getting worse over time?\n\nI want to make sure you get the right guidance on this. Would you like me to connect you with a clinician from Devoted Medical who can review your medications?" },
+      { role: 'user', text: "Yes, I think I should talk to someone. It happens when I stand up and lasts about 30 seconds." },
+      { role: 'ai', sender: 'MyDevoted', text: "That's really helpful detail — the positional pattern (when standing) and the 30-second duration are both important for your care team to know.\n\nI'm connecting you with a clinician from Devoted Medical now. They'll see our full conversation." },
+      { role: 'system', type: 'handoff', text: 'Dr. Alison Holliday from Devoted Medical has joined this conversation.' },
+      { role: 'human', sender: 'Dr. Alison Holliday, Devoted Medical', avatar: 'clinical', text: "Hi Rebecca, I'm Dr. Holliday with Devoted Medical. I've read through your conversation — the dizziness when standing with your current medications is something we should address.\n\nBased on what you've described, this sounds like it could be orthostatic hypotension — a temporary blood pressure drop when you change positions. This can happen with Lisinopril.\n\nI have a few questions before I make a recommendation. Are you taking all three medications at the same time in the morning? And have you had your blood pressure checked recently outside of a doctor's visit?" },
+      { role: 'user', text: "Yes, I take them all together with breakfast. I haven't checked my blood pressure at home." },
+      { role: 'human', sender: 'Dr. Alison Holliday, Devoted Medical', avatar: 'clinical', text: "That's helpful. Taking them all at once could be contributing. Here's what I'd recommend:\n\n1. **Try splitting your medications** — take the Lisinopril in the evening instead of the morning. Keep Metformin and Atorvastatin with breakfast.\n2. **When standing up**, do it slowly — sit on the edge of the bed for 30 seconds before standing.\n3. **Get a home blood pressure monitor** — this is covered under your OTC benefit. Check your pressure in the morning before medications and in the evening.\n\nI'm going to note this in your chart so Dr. Wagle sees it before your March 4 appointment. If the dizziness gets worse or you feel faint, call our care line at 1-888-802-2738 right away.\n\nDoes this make sense? Any questions?" }
+    ]
+  },
+  {
+    id: 'thread-6',
+    title: 'Food & Home Card balance check',
+    status: 'resolved',
+    lastActivityAt: '2026-03-08T13:00:00',
+    messages: [
+      { role: 'user', text: "How much is left on my food and home card?" },
+      { role: 'ai', sender: 'MyDevoted', text: "You have **$125 remaining** this month on your Food & Home Card.\n\nYou started with $200 on March 1, and you've spent $75 so far. The balance resets to $200 on April 1 — unused funds don't roll over, so it's worth planning to use the full amount.\n\nWould you like to know where you can use it, or do you have another question?" },
+      { role: 'user', text: "No that's all, thanks!" },
+      { role: 'ai', sender: 'MyDevoted', text: "You're welcome, Rebecca! Remember, that $125 resets on April 1, so make the most of it this month." }
+    ]
+  },
+  {
+    id: 'thread-7',
+    title: 'Preparing for Dr. Wagle appointment',
+    status: 'open',
+    lastActivityAt: '2026-03-12T20:00:00',
+    messages: [
+      { role: 'user', text: "My appointment with Dr. Wagle is coming up. Can you help me prepare?" },
+      { role: 'ai', sender: 'MyDevoted', text: "Your appointment with Dr. Wagle is on **March 4 at 10:00am**. Let's make the most of it.\n\nBased on your recent labs and what we've talked about, here are some things worth bringing up:\n\n- **Your A1c improvement** (6.8%, down from 7.2%) — worth celebrating and discussing what's working\n- **Kidney function** (eGFR 58) — stable, but good to ask about monitoring frequency\n- **The dizziness you've been experiencing** — Dr. Holliday from Devoted Medical suggested splitting your Lisinopril to evenings, and Dr. Wagle should know about this\n- **Fatigue** — you mentioned feeling tired with heavy legs\n\nBut before I go further — **what feels most important to YOU going into this visit?** Sometimes the thing that's quietly nagging at you is the most valuable thing to bring up." }
+    ]
+  }
+];
 
-const THREAD_LABELS = {
-  health: 'Health',
-  wellness: 'Wellness',
-  benefits: 'Benefits',
-  'care-team': 'Care Team'
-};
+function initializeThreadsFromSeeded() {
+  conversationThreads = SEEDED_THREADS.map(t => ({
+    id: t.id,
+    title: t.title,
+    status: t.status,
+    lastActivityAt: t.lastActivityAt,
+    escalatedTo: t.escalatedTo || null,
+    messages: t.messages.map(m => ({ ...m })),
+  }));
+}
+
+// Initialize on load
+initializeThreadsFromSeeded();
 
 function createThread(options) {
   const thread = {
     id: 'thread-' + Date.now(),
     title: options.title || null,
-    category: options.category || 'health',
-    status: 'active',
-    createdAt: options.createdAt || new Date().toISOString(),
+    status: options.status || 'open',
     lastActivityAt: new Date().toISOString(),
-    participants: ['ai'],
-    messages: [],
-    initiatedBy: options.initiatedBy || 'member',
     escalatedTo: null,
+    messages: [],
   };
   conversationThreads.unshift(thread);
   return thread;
 }
 
-function generateThreadTitle(firstMessage, category) {
-  if (firstMessage.length <= 40) return firstMessage;
-  const truncated = firstMessage.substring(0, 40).replace(/\s+\S*$/, '');
+function generateThreadTitle(firstMessage) {
+  if (firstMessage.length <= 35) return firstMessage;
+  const truncated = firstMessage.substring(0, 35).replace(/\s+\S*$/, '');
   return truncated + '...';
 }
 
-function detectCategory(text) {
-  const t = text.toLowerCase();
-  if (/benefit|claim|reimburse|food.*home|otc|wellness bucks|id card|plan|copay|coverage|billing/.test(t)) return 'benefits';
-  if (/tired|energy|sleep|stress|feeling|mood|exercise|walk|motivat/.test(t)) return 'wellness';
-  if (/lab|a1c|egfr|cholesterol|blood pressure|medication|metformin|kidney|refill/.test(t)) return 'health';
-  return 'health';
+async function generateThreadTitleLive(userMessage, aiResponse) {
+  if (!apiKey || demoMode) {
+    return generateThreadTitle(userMessage);
+  }
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 30,
+        messages: [{
+          role: 'user',
+          content: 'Generate a short conversation title (under 35 characters) for this exchange. Return ONLY the title, nothing else.\n\nUser: ' + userMessage + '\nAssistant: ' + aiResponse.substring(0, 200)
+        }]
+      })
+    });
+    const data = await res.json();
+    return data.content?.[0]?.text?.trim() || generateThreadTitle(userMessage);
+  } catch {
+    return generateThreadTitle(userMessage);
+  }
 }
 
 function formatThreadDate(dateStr) {
-  if (typeof dateStr === 'string' && dateStr.match(/^(Feb|Mar|Jan)/)) return dateStr;
   const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr || '';
   const now = new Date();
   const diffMs = now - d;
   const diffMins = Math.floor(diffMs / 60000);
@@ -3818,40 +4016,36 @@ function formatThreadDate(dateStr) {
   if (diffMins < 60) return diffMins + 'm ago';
   const diffHours = Math.floor(diffMins / 60);
   if (diffHours < 24) return diffHours + 'h ago';
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return 'Yesterday';
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 function ensureActiveThread(text) {
   if (!activeThreadId) {
-    const category = detectCategory(text);
-    const thread = createThread({
-      category: category,
-      initiatedBy: 'member'
-    });
+    const thread = createThread({});
     activeThreadId = thread.id;
   }
 }
 
-function addMessageToActiveThread(role, text) {
+function addMessageToActiveThread(role, text, extra) {
   const thread = conversationThreads.find(t => t.id === activeThreadId);
   if (!thread) return;
-  thread.messages.push({
-    role: role,
-    text: text,
-    timestamp: new Date().toISOString(),
-    sender: role === 'user' ? 'member' : 'ai'
-  });
+  const msg = { role: role, text: text };
+  if (extra) Object.assign(msg, extra);
+  if (role === 'ai') msg.sender = 'MyDevoted';
+  thread.messages.push(msg);
   thread.lastActivityAt = new Date().toISOString();
 
   // Auto-title if this is the first user message and no title yet
   if (role === 'user' && !thread.title) {
-    thread.title = generateThreadTitle(text, thread.category);
-    // Update sheet subtitle
+    thread.title = generateThreadTitle(text);
     const sub = document.getElementById('conv-agent-sub');
     if (sub) sub.textContent = thread.title;
   }
 
   renderHomeConversations();
+  renderActiveThreadBanners();
 }
 
 function openThread(threadId) {
@@ -3879,26 +4073,19 @@ function openThread(threadId) {
   thread.messages.forEach(msg => {
     if (msg.role === 'user') {
       appendUserBubble(msg.text);
+    } else if (msg.role === 'human') {
+      appendHumanBubble(msg);
+    } else if (msg.role === 'system') {
+      appendSystemMessage(msg.text);
     } else {
       appendAiBubble(msg.text);
     }
   });
 
-  // If thread is waiting for care team, show banner
-  if (thread.status === 'waiting') {
-    const banner = document.createElement('div');
-    banner.style.cssText = 'text-align:center;padding:12px;font-size:13px;color:#00A0DD;font-weight:500;';
-    banner.textContent = 'Your care team will respond in this conversation';
-    msgs.appendChild(banner);
-  }
-
   scrollConvToBottom();
 
   // Set conversation history for live mode continuation
-  conversationHistory = thread.messages.map(m => ({
-    role: m.role === 'user' ? 'user' : 'assistant',
-    content: m.text
-  }));
+  conversationHistory = buildConversationHistory(thread);
 }
 
 // Profile / onboarding state
@@ -3912,82 +4099,6 @@ let greatDayDescription = null;
 // ── Escalation Regexes ──
 const EMERGENCY_REGEX = /chest pain|can't breathe|cannot breathe|heart attack|stroke|suicidal|want to die|kill myself|overdose|seizure|unconscious|choking|severe bleeding|anaphylaxis/i;
 const ESCALATE_HUMAN_REGEX = /talk to a person|talk to someone|speak to someone|live agent|real person|human agent|representative|need a person|want a person/i;
-
-// ── Past Conversations ──
-const PAST_CONVERSATIONS = [
-  {
-    id: 'past-0', agent: 'HEALTH_COACH', date: 'Feb 26', topic: 'Your A1c improved — and a check-in plan',
-    preview: 'We talked about your 6.8% result...',
-    avatarBg: '#dcfce7', avatarEmoji: '🌱',
-    turns: [
-      { role: 'ai', text: "Rebecca, I wanted to share something from your recent labs. Your HbA1c came back at 6.8% — that's down from 7.2% last time. That's a meaningful improvement.\n\nThis number reflects the last 2-3 months of your life — your meals, your movement, your daily rhythms. It doesn't change by accident.\n\nHow does it feel to hear that?" },
-      { role: 'user', text: "Honestly? A little surprised. I didn't think I was doing anything differently." },
-      { role: 'ai', text: "That's such an interesting response. Sometimes the most sustainable changes are the ones we don't even notice we're making. Maybe something shifted in how you eat, or how you move through your day, or even how you're sleeping.\n\nRather than trying to figure out what changed, what if we just paid attention together going forward? I could check in with you a couple times a week — not to give you homework, just to notice patterns together.\n\nWould that feel supportive, or would it feel like too much?" },
-      { role: 'user', text: "Supportive, I think. I'd like that." },
-      { role: 'ai', text: "I'm glad. Let's keep it light — Tuesdays and Thursdays work? Just a quick check-in, no agenda. You set the pace.\n\nAnd Rebecca — that 6.8% is yours. You earned it, even if you're not sure how. That's worth sitting with for a moment." }
-    ]
-  },
-  {
-    id: 'past-1', agent: 'HEALTH_DATA', date: 'Feb 27', topic: 'What does my eGFR result mean?',
-    preview: 'Rebecca asked about kidney function...',
-    avatarBg: 'var(--purple-light)', avatarEmoji: '🔬',
-    turns: [
-      { role: 'user', text: "I saw my eGFR was 58 on my lab results. What does that mean? Should I be worried?" },
-      { role: 'ai', text: "That's a really good question to ask, and I'm glad you're paying attention to it.\n\nYour eGFR of 58 measures how well your kidneys are filtering waste from your blood. Think of it like a performance score — at 58, your kidneys are working at roughly 60% of typical capacity.\n\nIn medical terms, this is called Stage 3a — which sounds more alarming than it usually is. It's actually quite common in people who are managing both diabetes and blood pressure, like you are.\n\nWhat's worth noticing is that your lisinopril is specifically chosen to protect kidney function. And keeping your A1c and blood pressure in good ranges — which you're doing — is the most important thing for your kidneys right now." },
-      { role: 'user', text: "I've been feeling more tired lately. I wondered if it could be connected." },
-      { role: 'ai', text: "That's a really thoughtful connection to make. For some people, reduced kidney function can contribute to feeling more tired — the kidneys do a lot of behind-the-scenes work that affects energy levels.\n\nThat said, fatigue has many possible threads — sleep quality, blood sugar patterns, even the emotional weight of managing health conditions.\n\nThis would be a great thing to bring up with Dr. Wagle on March 4. Would you like me to help you draft a question about the connection between your kidney function and fatigue? Sometimes having the words ready makes it easier to bring up." }
-    ]
-  },
-  {
-    id: 'past-2', agent: 'BENEFITS', date: 'Feb 23', topic: 'Yoga mat reimbursement',
-    preview: 'Your $45 claim was submitted...',
-    avatarBg: 'var(--red-light)', avatarEmoji: '💳',
-    turns: [
-      { role: 'user', text: "I bought a yoga mat for $45. Can I get reimbursed through my plan?" },
-      { role: 'ai', text: "Yes! A yoga mat absolutely qualifies under your **Wellness Bucks** benefit. Here's how it works:\n\nYou have a **$200 annual allowance** for wellness-related purchases. A yoga mat is an approved fitness item.\n\nTo submit your claim, you'll need your receipt showing the purchase amount and date. I can walk you through the submission process, or you can upload it through the member portal.\n\nOnce submitted, claims typically process within **5-7 business days**. After approval, your Wellness Bucks balance will update to $155 remaining.\n\nWould you like to start the submission now?" },
-      { role: 'user', text: "I also heard I have an OTC benefit. What does that cover?" },
-      { role: 'ai', text: "Great question — and yes, that's a completely separate benefit from Wellness Bucks!\n\nYour **OTC allowance is $100 per quarter**. Right now for Q1 2026, you have the full $100 available. It covers:\n\n- **Vitamins and supplements**\n- **Pain relief** (Tylenol, Advil, etc.)\n- **Bandages and first aid supplies**\n- **Digestive health** products\n- **Diabetes supplies** (glucose tablets, test strips)\n- **Cold and allergy** medications\n\nThis resets every quarter, so it's use-it-or-lose-it within each 3-month period. Your next reset is April 1.\n\nWould you like help finding where to shop with your OTC benefit?" }
-    ]
-  },
-  {
-    id: 'past-3', agent: 'HEALTH_COACH', date: 'Feb 20', topic: 'Feeling tired and unmotivated',
-    preview: 'Rebecca shared how she was feeling...',
-    avatarBg: '#dcfce7', avatarEmoji: '🌱',
-    turns: [
-      { role: 'user', text: "I've been feeling really tired and unmotivated lately. I don't know what's going on." },
-      { role: 'ai', text: "Thank you for sharing that, Rebecca. Feeling tired and unmotivated is worth paying attention to — your body and mind are trying to tell you something.\n\nBefore I jump to any connections, I want to understand what this feels like for you. When you say tired — is it more of a physical heaviness, like your body is drained? Or is it more mental — like the motivation just isn't there, even for things you usually enjoy?" },
-      { role: 'user', text: "More physical I think. My legs feel heavy, even in the morning." },
-      { role: 'ai', text: "Heavy legs, even in the morning — that's a specific kind of tired. It's not just 'didn't sleep well' tired. It sounds like something your body is carrying.\n\nI'm curious — has this been building gradually, or did you notice a shift at some point? Sometimes there's a pattern hiding in the timeline.\n\nAnd is it every day, or do some days feel lighter than others? The variation can tell us a lot." }
-    ]
-  }
-];
-
-// ── Convert past conversations to threads ──
-PAST_CONVERSATIONS.forEach(conv => {
-  const categoryMap = {
-    'HEALTH_COACH': 'wellness',
-    'HEALTH_DATA': 'health',
-    'BENEFITS': 'benefits'
-  };
-  const thread = {
-    id: conv.id,
-    title: conv.topic,
-    category: categoryMap[conv.agent] || 'health',
-    status: 'resolved',
-    createdAt: conv.date,
-    lastActivityAt: conv.date,
-    participants: ['ai'],
-    messages: conv.turns.map(t => ({
-      role: t.role === 'ai' ? 'assistant' : 'user',
-      text: t.text,
-      timestamp: conv.date,
-      sender: t.role === 'ai' ? 'ai' : 'member'
-    })),
-    initiatedBy: conv.turns[0].role === 'ai' ? 'ai' : 'member',
-    escalatedTo: null,
-  };
-  conversationThreads.push(thread);
-});
 
 // ── Utilities ──
 function escHtml(s) {
@@ -4665,28 +4776,8 @@ function resetDemo() {
   checkInBeat = 0;
   activeThreadId = null;
 
-  // Re-initialize threads from past conversations
-  conversationThreads = [];
-  PAST_CONVERSATIONS.forEach(conv => {
-    const categoryMap = { 'HEALTH_COACH': 'wellness', 'HEALTH_DATA': 'health', 'BENEFITS': 'benefits' };
-    conversationThreads.push({
-      id: conv.id,
-      title: conv.topic,
-      category: categoryMap[conv.agent] || 'health',
-      status: 'resolved',
-      createdAt: conv.date,
-      lastActivityAt: conv.date,
-      participants: ['ai'],
-      messages: conv.turns.map(t => ({
-        role: t.role === 'ai' ? 'assistant' : 'user',
-        text: t.text,
-        timestamp: conv.date,
-        sender: t.role === 'ai' ? 'ai' : 'member'
-      })),
-      initiatedBy: conv.turns[0].role === 'ai' ? 'ai' : 'member',
-      escalatedTo: null,
-    });
-  });
+  // Re-initialize threads from seeded data
+  initializeThreadsFromSeeded();
 
   currentTab = 'home';
   navItems.forEach(n => n.classList.remove('active'));
@@ -4786,6 +4877,13 @@ async function sendMessage(text) {
   }
   showConvScreen();
   showConvLiveInput();
+
+  // Build conversation history from thread if resuming
+  const activeThread = conversationThreads.find(t => t.id === activeThreadId);
+  if (activeThread && activeThread.messages.length > 0) {
+    conversationHistory = buildConversationHistory(activeThread);
+  }
+
   conversationHistory.push({ role: 'user', content: text });
   appendUserBubble(text);
   addMessageToActiveThread('user', text);
@@ -4795,6 +4893,13 @@ async function sendMessage(text) {
   // Route the message
   const agent = await routeMessage(text);
   currentAgent = agent;
+
+  // Build system prompt with thread context if resuming
+  let systemPrompt = buildSystemPrompt(agent);
+  if (activeThread && activeThread.messages.length > 1) {
+    systemPrompt += '\n\nCONVERSATION CONTEXT: This is a continued conversation. The member is returning to a previous thread. If a human team member (Devoted Guide or Devoted Medical clinician) previously responded in this thread, you can see their messages marked with [Name responded]. Reference what was discussed before naturally. Don\'t repeat information the member already received. Pick up where the conversation left off. If the member is asking about something a human clinician recommended, acknowledge the clinician\'s guidance and build on it — don\'t contradict it.';
+  }
+
   // Call the agent
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -4808,7 +4913,7 @@ async function sendMessage(text) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1024,
-        system: buildSystemPrompt(agent),
+        system: systemPrompt,
         messages: conversationHistory
       })
     });
@@ -4821,7 +4926,19 @@ async function sendMessage(text) {
     conversationHistory.push({ role: 'assistant', content: aiText });
     loadingEl.remove();
     appendAiBubble(aiText);
-    addMessageToActiveThread('assistant', aiText);
+    addMessageToActiveThread('ai', aiText);
+
+    // Generate title for new threads in live mode
+    if (activeThread && !activeThread.title && activeThread.messages.length >= 2) {
+      const firstUserMsg = activeThread.messages.find(m => m.role === 'user');
+      if (firstUserMsg) {
+        generateThreadTitleLive(firstUserMsg.text, aiText).then(title => {
+          activeThread.title = title;
+          document.getElementById('conv-agent-sub').textContent = title;
+          renderHomeConversations();
+        });
+      }
+    }
   } catch (err) {
     loadingEl.remove();
     appendError("We're having trouble connecting right now. Please try again in a moment.");
@@ -4917,7 +5034,7 @@ async function sendCheckInLiveMessage(userText) {
     conversationHistory.push({ role: 'assistant', content: aiText });
     loadingEl.remove();
     appendAiBubble(aiText);
-    addMessageToActiveThread('assistant', aiText);
+    addMessageToActiveThread('ai', aiText);
   } catch (err) {
     loadingEl.remove();
     appendError("We're having trouble connecting right now. Please try again in a moment.");
@@ -4950,8 +5067,10 @@ function showConvScreen() {
   if (activeThreadId) {
     const thread = conversationThreads.find(t => t.id === activeThreadId);
     if (thread) {
-      if (thread.status === 'waiting') {
-        contextSub.textContent = 'Waiting for your care team';
+      if (thread.status === 'waiting-guide') {
+        contextSub.textContent = 'Waiting for Devoted Guide';
+      } else if (thread.status === 'waiting-medical') {
+        contextSub.textContent = 'Waiting for Devoted Medical';
       } else if (thread.title) {
         contextSub.textContent = thread.title;
       } else {
@@ -5049,24 +5168,25 @@ function renderConvThreadList() {
     });
 
   sorted.forEach(thread => {
-    const color = THREAD_COLORS[thread.category] || '#E8E3DE';
-    const label = THREAD_LABELS[thread.category] || '';
     const lastMsg = thread.messages[thread.messages.length - 1];
     const preview = lastMsg ? lastMsg.text.substring(0, 60) + (lastMsg.text.length > 60 ? '...' : '') : '';
+    let statusHtml = '';
+    if (thread.status === 'waiting-guide') {
+      statusHtml = '<div class="thread-status-text">Waiting for Devoted Guide</div>';
+    } else if (thread.status === 'waiting-medical') {
+      statusHtml = '<div class="thread-status-text">Waiting for Devoted Medical</div>';
+    }
 
     const row = document.createElement('div');
     row.className = 'conv-thread-row';
-    row.style.borderLeftColor = color;
     row.onclick = () => openThreadFromList(thread.id);
     row.innerHTML =
       '<div style="display:flex;justify-content:space-between;align-items:baseline;">' +
         '<div style="font-size:17px;font-weight:700;color:var(--charcoal);line-height:1.3;">' + escHtml(thread.title || 'New conversation') + '</div>' +
         '<div style="font-size:13px;color:var(--gray-text);flex-shrink:0;margin-left:8px;">' + escHtml(formatThreadDate(thread.lastActivityAt)) + '</div>' +
       '</div>' +
-      '<div style="font-size:12px;font-weight:600;color:' + color + ';margin:2px 0 4px;">' + label +
-        (thread.status === 'waiting' ? ' · <span style="color:#00A0DD;">Awaiting reply</span>' : '') +
-      '</div>' +
-      '<div style="font-size:15px;color:var(--gray-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(preview) + '</div>';
+      statusHtml +
+      '<div style="font-size:15px;color:var(--gray-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px;">' + escHtml(preview) + '</div>';
     container.appendChild(row);
   });
 }
@@ -5122,27 +5242,20 @@ function openThreadInSheet(threadId) {
   thread.messages.forEach(msg => {
     if (msg.role === 'user') {
       appendUserBubble(msg.text);
+    } else if (msg.role === 'human') {
+      appendHumanBubble(msg);
+    } else if (msg.role === 'system') {
+      appendSystemMessage(msg.text);
     } else {
       appendAiBubble(msg.text);
     }
   });
 
-  // If thread is waiting for care team, show banner
-  if (thread.status === 'waiting') {
-    const banner = document.createElement('div');
-    banner.style.cssText = 'text-align:center;padding:12px;font-size:13px;color:#00A0DD;font-weight:500;';
-    banner.textContent = 'Your care team will respond in this conversation';
-    msgs.appendChild(banner);
-  }
-
   showConvLiveInput();
   scrollConvToBottom();
 
   // Set conversation history for live mode continuation
-  conversationHistory = thread.messages.map(m => ({
-    role: m.role === 'user' ? 'user' : 'assistant',
-    content: m.text
-  }));
+  conversationHistory = buildConversationHistory(thread);
 }
 
 function handleSheetClose() {
@@ -5244,6 +5357,39 @@ function appendAiBubble(text) {
       '<div class="msg-bubble">' + renderMarkdown(text) + '</div>' +
     '</div>';
   msgs.appendChild(row);
+}
+
+function appendHumanBubble(msg) {
+  const msgs = document.getElementById('conv-messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row human';
+
+  const isGuide = msg.avatar === 'guide';
+  const avatarColor = isGuide ? '#E8553D' : 'var(--purple)';
+  const initials = msg.sender ? msg.sender.split(',')[0].split(' ').map(w => w[0]).filter(c => c && c !== '.').join('').substring(0, 2) : 'DH';
+
+  row.innerHTML =
+    '<div class="msg-avatar" style="background:' + avatarColor + ';font-size:12px;font-weight:700;">' + initials + '</div>' +
+    '<div class="msg-bubble-wrap">' +
+      '<div class="msg-bubble">' + renderMarkdown(msg.text) + '</div>' +
+    '</div>';
+  msgs.appendChild(row);
+
+  // Attribution below bubble
+  if (msg.sender) {
+    const attr = document.createElement('div');
+    attr.className = 'human-attribution';
+    attr.textContent = msg.sender;
+    msgs.appendChild(attr);
+  }
+}
+
+function appendSystemMessage(text) {
+  const msgs = document.getElementById('conv-messages');
+  const divider = document.createElement('div');
+  divider.className = 'system-msg-divider';
+  divider.innerHTML = '<span>' + escHtml(text).replace(/^(.+) from (.+) has joined this conversation\.$/, '— $1 from $2 joined —') + '</span>';
+  msgs.appendChild(divider);
 }
 
 function appendLoadingBubble() {
@@ -5546,8 +5692,6 @@ function openPushConversation() {
   // Create a new thread for the check-in
   const checkInThread = createThread({
     title: 'Health Coach check-in',
-    category: 'wellness',
-    initiatedBy: 'ai'
   });
   activeThreadId = checkInThread.id;
 
@@ -5561,7 +5705,7 @@ function openPushConversation() {
   document.getElementById('conv-agent-sub').textContent = 'Health Coach check-in';
 
   appendAiBubble(openingMessage);
-  addMessageToActiveThread('assistant', openingMessage);
+  addMessageToActiveThread('ai', openingMessage);
   conversationHistory = [
     { role: 'assistant', content: openingMessage.replace(/\*\*/g, '') }
   ];
@@ -5589,7 +5733,7 @@ async function sendDemoMessage(text) {
       const reply = "Tired makes sense. And \"long week\" tells me something too.\n\nThere's a difference between tired-from-doing-too-much and tired-from-something-feeling-heavy.\n\n**Which one is it for you tonight?**\n\nI ask because both of those things actually connect to what we're watching with your blood pressure. Stress and sleep affect those numbers more than most people realize — sometimes more than what's on your plate.";
       appendAiBubble(reply);
       conversationHistory.push({ role: 'assistant', content: reply });
-      addMessageToActiveThread('assistant', reply);
+      addMessageToActiveThread('ai', reply);
       showSuggestedReplies([
         { label: "Both, honestly.", action: "message", value: "Both, honestly." }
       ]);
@@ -5599,7 +5743,7 @@ async function sendDemoMessage(text) {
       const reply = "Both. That's honest, and I appreciate it.\n\nHere's something I find worth noticing: you've been managing your blood sugar well enough that your A1c is sitting at **6.8%**. That takes consistency — even when weeks are long. Even when you're tired.\n\nThat's not nothing, Rebecca.\n\n**What does tomorrow look like for you?** Not what you think it should look like — just what it actually looks like.";
       appendAiBubble(reply);
       conversationHistory.push({ role: 'assistant', content: reply });
-      addMessageToActiveThread('assistant', reply);
+      addMessageToActiveThread('ai', reply);
       // No more chips — free text
     } else {
       // Beyond scripted beats in demo mode — use standard demo fallback
@@ -5609,7 +5753,7 @@ async function sendDemoMessage(text) {
       loadingEl.remove();
       appendAiBubble(demo.text);
       conversationHistory.push({ role: 'assistant', content: demo.text });
-      addMessageToActiveThread('assistant', demo.text);
+      addMessageToActiveThread('ai', demo.text);
       if (demo.replies && demo.replies.length) showSuggestedReplies(demo.replies);
     }
     isLoading = false;
@@ -5632,7 +5776,7 @@ async function sendDemoMessage(text) {
   await delay(800);
   loadingEl.remove();
   appendAiBubble(demo.text);
-  addMessageToActiveThread('assistant', demo.text);
+  addMessageToActiveThread('ai', demo.text);
   if (demo.replies && demo.replies.length) showSuggestedReplies(demo.replies);
   scrollConvToBottom();
   isLoading = false;
@@ -5686,39 +5830,126 @@ async function connectToHuman(teamName, teamEmoji, teamColor) {
   const card = document.getElementById('handoff-card');
   if (card) card.remove();
 
+  const isBenefits = teamName === 'Devoted Guide';
+  const status = isBenefits ? 'waiting-guide' : 'waiting-medical';
+  const humanName = isBenefits ? 'Mary Ann B.' : 'Dr. Alison Holliday';
+  const humanSender = isBenefits ? 'Mary Ann B., Devoted Guide' : 'Dr. Alison Holliday, Devoted Medical';
+  const avatarType = isBenefits ? 'guide' : 'clinical';
+
   // Update active thread status
   if (activeThreadId) {
     const thread = conversationThreads.find(t => t.id === activeThreadId);
     if (thread) {
-      thread.status = 'waiting';
-      thread.escalatedTo = teamName;
-      if (!thread.participants.includes('care-team')) {
-        thread.participants.push('care-team');
-      }
+      thread.status = status;
+      thread.escalatedTo = { name: humanName, team: teamName, role: avatarType };
     }
   }
 
-  // Update header to show message sent
-  document.getElementById('conv-agent-sub').textContent = 'Waiting for your care team';
-  document.getElementById('conv-mode-indicator').innerHTML = teamName + ' · Typically responds in a few minutes';
-
-  // Show thread-level banner
-  const msgs = document.getElementById('conv-messages');
-  const banner = document.createElement('div');
-  banner.style.cssText = 'text-align:center;padding:12px;font-size:13px;color:#00A0DD;font-weight:500;';
-  banner.textContent = 'Your care team will respond in this conversation';
-  msgs.appendChild(banner);
-
-  // Show async confirmation as AI bubble
-  const confirmMsg = "Your message has been sent to **" + teamName + "**. A member of the team will review your conversation and respond here — most replies arrive within a few minutes during business hours.";
+  // AI confirmation message
+  const confirmMsg = "Of course — I'm connecting you with someone from **" + teamName + "** who can help directly. They'll see our full conversation.";
   appendAiBubble(confirmMsg);
-  addMessageToActiveThread('assistant', confirmMsg);
-  scrollConvToBottom();
+  addMessageToActiveThread('ai', confirmMsg);
 
+  // Update header
+  document.getElementById('conv-agent-sub').textContent = 'Waiting for ' + teamName;
+  document.getElementById('conv-mode-indicator').innerHTML = humanName + ', ' + teamName + ' · Typically responds in a few minutes';
+
+  scrollConvToBottom();
   renderHomeConversations();
+  renderActiveThreadBanners();
 
   // Keep input visible so member can add more context
   document.getElementById('conv-input').placeholder = 'Add more details…';
+
+  // Simulate human joining after 3 seconds
+  setTimeout(() => {
+    const systemText = humanName + ' from ' + teamName + ' has joined this conversation.';
+    appendSystemMessage(systemText);
+    addMessageToActiveThread('system', systemText, { type: 'handoff' });
+
+    // Simulate human response after another 2 seconds
+    setTimeout(() => {
+      let humanText;
+      if (isBenefits) {
+        humanText = "Hi Rebecca — I'm Mary Ann, a Devoted Guide. I can see the conversation you've been having with MyDevoted AI. Let me look into this for you. I'll review the details and get back to you here shortly.";
+      } else {
+        humanText = "Hi Rebecca, I'm Dr. Holliday with Devoted Medical. I've read through your conversation. Let me review what you've described and I'll have some guidance for you shortly.";
+      }
+      const humanMsg = { role: 'human', sender: humanSender, avatar: avatarType, text: humanText };
+      appendHumanBubble(humanMsg);
+      addMessageToActiveThread('human', humanText, { sender: humanSender, avatar: avatarType });
+      scrollConvToBottom();
+    }, 2000);
+
+    scrollConvToBottom();
+  }, 3000);
+}
+
+// ── Build Conversation History for Live API ──
+function buildConversationHistory(thread) {
+  const history = [];
+  for (const msg of thread.messages) {
+    if (msg.role === 'user') {
+      history.push({ role: 'user', content: msg.text });
+    } else if (msg.role === 'ai') {
+      history.push({ role: 'assistant', content: msg.text });
+    } else if (msg.role === 'human') {
+      history.push({
+        role: 'assistant',
+        content: '[' + msg.sender + ' responded]: ' + msg.text
+      });
+    } else if (msg.role === 'system') {
+      history.push({
+        role: 'assistant',
+        content: '[System: ' + msg.text + ']'
+      });
+    }
+  }
+  return history;
+}
+
+// ── Active Thread Banner ──
+function renderActiveThreadBanners() {
+  const waitingThreads = conversationThreads.filter(t =>
+    t.status === 'waiting-guide' || t.status === 'waiting-medical'
+  );
+
+  // Home screen banner
+  const homeContainer = document.getElementById('home-active-banner');
+  if (homeContainer) {
+    homeContainer.innerHTML = '';
+    waitingThreads.forEach(thread => {
+      if (thread.id === activeThreadId) return; // Don't show if viewing this thread
+      const teamLabel = thread.status === 'waiting-medical' ? 'Devoted Medical' : 'Devoted Guide';
+      const banner = document.createElement('div');
+      banner.className = 'active-thread-banner';
+      banner.onclick = () => openThread(thread.id);
+      banner.innerHTML =
+        '<span>You have an active conversation with ' + teamLabel + '</span>' +
+        '<span class="banner-arrow">→</span>';
+      homeContainer.appendChild(banner);
+    });
+  }
+
+  // Conversation sheet banner (when in a different thread)
+  const convContainer = document.getElementById('conv-active-banner-area');
+  if (convContainer) {
+    convContainer.innerHTML = '';
+    waitingThreads.forEach(thread => {
+      if (thread.id === activeThreadId) return; // Don't show if viewing this thread
+      const teamLabel = thread.status === 'waiting-medical' ? 'Devoted Medical' : 'Devoted Guide';
+      const banner = document.createElement('div');
+      banner.className = 'active-thread-banner';
+      banner.onclick = () => {
+        hideConvThreadList();
+        openThreadInSheet(thread.id);
+      };
+      banner.innerHTML =
+        '<span>Active conversation with ' + teamLabel + '</span>' +
+        '<span class="banner-arrow">→</span>';
+      convContainer.appendChild(banner);
+    });
+  }
 }
 
 function keepChatting() {
@@ -5751,14 +5982,17 @@ function renderHistoryScreen() {
     });
 
   sorted.forEach(thread => {
-    const color = THREAD_COLORS[thread.category] || '#E8E3DE';
-    const label = THREAD_LABELS[thread.category] || '';
     const lastMsg = thread.messages[thread.messages.length - 1];
     const preview = lastMsg ? lastMsg.text.substring(0, 60) + (lastMsg.text.length > 60 ? '...' : '') : '';
+    let statusHtml = '';
+    if (thread.status === 'waiting-guide') {
+      statusHtml = '<div class="thread-status-text">Waiting for Devoted Guide</div>';
+    } else if (thread.status === 'waiting-medical') {
+      statusHtml = '<div class="thread-status-text">Waiting for Devoted Medical</div>';
+    }
 
     const btn = document.createElement('button');
     btn.className = 'history-list-item';
-    btn.style.borderLeft = '4px solid ' + color;
     btn.style.textAlign = 'left';
     btn.innerHTML =
       '<div class="history-list-body">' +
@@ -5766,9 +6000,7 @@ function renderHistoryScreen() {
           '<div class="history-list-topic">' + escHtml(thread.title || 'New conversation') + '</div>' +
           '<div class="history-list-date">' + escHtml(formatThreadDate(thread.lastActivityAt)) + '</div>' +
         '</div>' +
-        '<div style="font-size:12px;font-weight:600;color:' + color + ';margin:2px 0 4px;">' + label +
-          (thread.status === 'waiting' ? ' · <span style="color:#00A0DD;">Awaiting reply</span>' : '') +
-        '</div>' +
+        statusHtml +
         '<div class="history-list-preview">' + escHtml(preview) + '</div>' +
       '</div>';
     btn.onclick = () => openThread(thread.id);
@@ -5876,23 +6108,24 @@ function renderHomeConversations() {
     .slice(0, 3);
 
   recent.forEach(thread => {
-    const color = THREAD_COLORS[thread.category] || '#E8E3DE';
-    const label = THREAD_LABELS[thread.category] || '';
     const lastMsg = thread.messages[thread.messages.length - 1];
     const preview = lastMsg ? lastMsg.text.substring(0, 60) + (lastMsg.text.length > 60 ? '...' : '') : '';
+    let statusHtml = '';
+    if (thread.status === 'waiting-guide') {
+      statusHtml = '<div class="thread-status-text">Waiting for Devoted Guide</div>';
+    } else if (thread.status === 'waiting-medical') {
+      statusHtml = '<div class="thread-status-text">Waiting for Devoted Medical</div>';
+    }
 
     const row = document.createElement('div');
     row.className = 'history-row';
-    row.style.borderLeftColor = color;
     row.onclick = () => openThread(thread.id);
     row.innerHTML =
       '<div style="display:flex;justify-content:space-between;align-items:baseline;">' +
         '<div class="history-title">' + escHtml(thread.title || 'New conversation') + '</div>' +
         '<div class="history-date">' + escHtml(thread.lastActivityAt ? formatThreadDate(thread.lastActivityAt) : '') + '</div>' +
       '</div>' +
-      '<div style="font-size:12px;font-weight:600;color:' + color + ';margin:2px 0 4px;">' + label +
-        (thread.status === 'waiting' ? ' · <span style="color:#00A0DD;">Awaiting reply</span>' : '') +
-      '</div>' +
+      statusHtml +
       '<div class="history-preview">' + escHtml(preview) + '</div>';
     container.appendChild(row);
   });
@@ -6225,6 +6458,7 @@ initScrollDots('prompt-chips-scroll', 'prompt-scroll-dots', 3);
 
 // ── Init ──
 renderHomeConversations();
+renderActiveThreadBanners();
 startPushTimer();
 </script>
 </body>
