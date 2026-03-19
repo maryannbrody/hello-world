@@ -6,36 +6,41 @@
 <title>MyDevoted</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@600;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --red: #F04B24;
-  --red-dark: #D43E1A;
-  --red-light: #FBF0EB;
+  --red: #ff4713;
+  --red-dark: #cb2805;
+  --red-light: #FFF1ED;
   --purple: #592C82;
   --purple-light: #ECE4F1;
-  --blue: #00A0DD;
-  --blue-light: #D4E7F7;
+  --blue: #1A5F99;
+  --blue-light: #E8F0F8;
+  --teal: #20698d;
   --charcoal: #1D252C;
   --gray-text: #595959;
   --gray-bg: #F8F7F5;
   --bg-input: #F2EFEA;
   --gray-mid: #E0DBD5;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
   --border-warm: #E8E3DE;
   --white: #FFFFFF;
   --taupe: #f9f5f2;
   --amber: #B45309;
-  --green: #166534;
+  --green: #318503;
 }
 
 html, body {
   height: 100%;
   overflow: hidden;
-  font-family: 'Public Sans', sans-serif;
-  font-size: 17px;
-  line-height: 1.7;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
   color: var(--charcoal);
   background: var(--gray-bg);
   -webkit-tap-highlight-color: transparent;
@@ -131,10 +136,10 @@ html, body {
 .ai-bar {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 16px 10px;
+  gap: 8px;
+  padding: 8px 16px;
   background: var(--white);
-  border-top: 1px solid var(--border-warm);
+  border-top: 1px solid var(--gray-300);
   flex-shrink: 0;
 }
 .ai-bar.hidden { display: none; }
@@ -143,34 +148,35 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border-warm);
+  background: var(--white);
+  border: 1px solid var(--gray-400);
   border-radius: 9999px;
   padding: 0 16px;
   height: 48px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, outline 0.2s;
 }
 .ai-bar-pill:focus-within {
-  border-color: var(--red);
-  box-shadow: 0 0 0 3px rgba(240, 75, 36, 0.12);
+  outline: 2px solid var(--blue);
+  outline-offset: -1px;
 }
-.ai-bar-pill svg { width: 20px; height: 20px; color: #999; flex-shrink: 0; }
+.ai-bar-pill .material-icons { font-size: 20px; color: var(--gray-400); flex-shrink: 0; }
+.ai-bar-pill svg { width: 20px; height: 20px; color: var(--gray-400); flex-shrink: 0; }
 .ai-bar-pill input {
   flex: 1;
   border: none;
   outline: none;
   background: transparent;
-  font-family: 'Public Sans', sans-serif;
-  font-size: 17px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
   color: var(--charcoal);
   min-width: 0;
 }
-.ai-bar-pill input::placeholder { color: #999; }
+.ai-bar-pill input::placeholder { color: var(--gray-400); }
 .ai-bar-send {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--red);
+  background: var(--purple);
   border: none;
   display: flex;
   align-items: center;
@@ -179,7 +185,8 @@ html, body {
   flex-shrink: 0;
   transition: background 0.15s;
 }
-.ai-bar-send:active { background: var(--red-dark); }
+.ai-bar-send:active { background: #472069; }
+.ai-bar-send .material-icons { font-size: 20px; color: var(--white); }
 .ai-bar-send svg { width: 20px; height: 20px; color: var(--white); }
 
 /* ── Bottom tab bar ── */
@@ -203,8 +210,8 @@ html, body {
   border: none;
   background: transparent;
   cursor: pointer;
-  font-family: 'Public Sans', sans-serif;
-  font-size: 12px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
   font-weight: 500;
   color: #999;
   transition: color 0.15s;
@@ -217,7 +224,7 @@ html, body {
 /* ── Home tab ── */
 .home-greeting { padding: 6px 20px 24px; }
 .home-greeting h1 {
-  font-family: 'Libre Franklin', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 34px;
   font-weight: 700;
   color: var(--red);
@@ -248,34 +255,35 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border-warm);
+  background: var(--white);
+  border: 1px solid var(--gray-400);
   border-radius: 9999px;
   height: 48px;
   padding: 0 16px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, outline 0.2s;
 }
 .home-input-pill:focus-within {
-  border-color: var(--red);
-  box-shadow: 0 0 0 3px rgba(240, 75, 36, 0.12);
+  outline: 2px solid var(--blue);
+  outline-offset: -1px;
 }
-.home-input-pill svg { width: 20px; height: 20px; color: #999; flex-shrink: 0; }
+.home-input-pill .material-icons { font-size: 20px; color: var(--gray-400); flex-shrink: 0; }
+.home-input-pill svg { width: 20px; height: 20px; color: var(--gray-400); flex-shrink: 0; }
 .home-input-pill input {
   flex: 1;
   border: none;
   outline: none;
   background: transparent;
-  font-family: 'Public Sans', sans-serif;
-  font-size: 17px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
   color: var(--charcoal);
   min-width: 0;
 }
-.home-input-pill input::placeholder { color: #999; }
+.home-input-pill input::placeholder { color: var(--gray-400); }
 .home-send-btn {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--red);
+  background: var(--purple);
   border: none;
   display: flex;
   align-items: center;
@@ -284,7 +292,8 @@ html, body {
   flex-shrink: 0;
   transition: background 0.15s;
 }
-.home-send-btn:active { background: var(--red-dark); }
+.home-send-btn:active { background: #472069; }
+.home-send-btn .material-icons { font-size: 20px; color: var(--white); }
 .home-send-btn svg { width: 20px; height: 20px; color: var(--white); }
 
 /* Prompt chips */
@@ -313,7 +322,7 @@ html, body {
   border: 1.5px solid var(--border-warm);
   border-radius: 12px;
   padding: 12px 16px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 16px;
   color: var(--charcoal);
   cursor: pointer;
@@ -359,7 +368,7 @@ html, body {
 }
 .happening-badge {
   display: inline-block;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.5px;
   padding: 3px 10px;
@@ -402,7 +411,7 @@ html, body {
   background: none;
   border: none;
   cursor: pointer;
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   padding: 8px 0;
 }
 .conv-row {
@@ -438,7 +447,7 @@ html, body {
 
 /* ── Health tab ── */
 .health-header {
-  font-family: 'Libre Franklin', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 28px;
   font-weight: 700;
   color: var(--charcoal);
@@ -452,10 +461,10 @@ html, body {
   margin: 0 20px 16px;
 }
 .care-team-label {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
-  color: var(--blue);
+  color: var(--teal);
   letter-spacing: 0.5px;
   margin-bottom: 4px;
 }
@@ -481,7 +490,7 @@ html, body {
   background: transparent;
   border-radius: 9999px;
   padding: 8px 4px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -490,7 +499,7 @@ html, body {
 }
 .care-team-btn:active { background: var(--blue-light); }
 .care-team-next {
-  font-size: 13px;
+  font-size: 14px;
   font-style: italic;
   color: var(--gray-text);
 }
@@ -542,12 +551,12 @@ html, body {
   color: var(--charcoal);
 }
 .lab-header-link {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--red);
   background: none;
   border: none;
   cursor: pointer;
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   padding: 4px 0;
 }
 .lab-grid {
@@ -620,7 +629,7 @@ html, body {
 }
 .med-badge {
   display: inline-block;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--red);
   background: var(--red-light);
@@ -631,7 +640,7 @@ html, body {
 
 /* ── Benefits tab ── */
 .benefits-header {
-  font-family: 'Libre Franklin', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 28px;
   font-weight: 700;
   color: var(--charcoal);
@@ -645,7 +654,7 @@ html, body {
   margin: 0 20px 16px;
 }
 .benefit-card-label {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--blue);
@@ -716,7 +725,7 @@ html, body {
 
 /* ── Profile tab ── */
 .profile-header {
-  font-family: 'Libre Franklin', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 28px;
   font-weight: 700;
   color: var(--charcoal);
@@ -759,11 +768,11 @@ html, body {
 .sheet-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.2);
   z-index: 900;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.35s;
+  transition: opacity 0.4s;
 }
 .sheet-backdrop.open { opacity: 1; pointer-events: auto; }
 
@@ -775,27 +784,28 @@ html, body {
   height: 0;
   background: var(--white);
   border-radius: 24px 24px 0 0;
-  box-shadow: 0 -4px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
   z-index: 1000;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: height 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), height 0.4s cubic-bezier(0.32, 0.72, 0, 1);
 }
 .sheet.open { height: 85vh; }
 
 .sheet-handle {
   width: 36px;
   height: 4px;
-  background: var(--gray-mid);
-  border-radius: 2px;
-  margin: 10px auto 0;
+  background: var(--gray-300);
+  border-radius: 9999px;
+  margin: 8px auto;
   flex-shrink: 0;
 }
 .sheet-header {
   display: flex;
   align-items: center;
-  padding: 12px 16px 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--gray-300);
   flex-shrink: 0;
   min-height: 48px;
 }
@@ -814,7 +824,7 @@ html, body {
   color: var(--charcoal);
 }
 .sheet-header-subtitle {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--gray-text);
   white-space: nowrap;
   overflow: hidden;
@@ -827,8 +837,10 @@ html, body {
   justify-content: flex-end;
 }
 .sheet-btn {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
+  min-width: 48px;
+  min-height: 48px;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -838,9 +850,12 @@ html, body {
   border-radius: 50%;
   color: var(--charcoal);
   font-size: 20px;
+  transition: background 0.15s;
 }
+.sheet-btn:hover { background: var(--bg-input); }
 .sheet-btn:active { background: var(--bg-input); }
 .sheet-btn svg { width: 22px; height: 22px; }
+.sheet-btn .material-icons { font-size: 22px; }
 
 .sheet-body {
   flex: 1;
@@ -859,7 +874,7 @@ html, body {
   color: var(--white);
   border: none;
   border-radius: 9999px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -914,7 +929,7 @@ html, body {
 }
 .thread-active-badge {
   display: inline-block;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--blue);
   background: var(--blue-light);
@@ -1011,44 +1026,34 @@ html, body {
   border-radius: 6px 18px 18px 18px;
 }
 .msg-attribution {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--gray-text);
   margin-top: 4px;
   padding-left: 40px;
 }
 .msg-system-text {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--gray-text);
   text-align: center;
   padding: 8px 0;
 }
 
-/* Loading dots */
+/* Loading spinner */
 .msg-loading .msg-bubble {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
-.loading-text {
-  font-size: 15px;
-  color: var(--gray-text);
-}
-.loading-dots {
-  display: flex;
-  gap: 4px;
-}
-.loading-dots span {
-  width: 6px;
-  height: 6px;
-  background: var(--red);
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid var(--gray-300);
+  border-top-color: var(--gray-500);
   border-radius: 50%;
-  animation: bounce-dot 1.4s infinite;
+  animation: spin 0.8s linear infinite;
 }
-.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes bounce-dot {
-  0%, 80%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-6px); }
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* Conversation input */
@@ -1068,33 +1073,33 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border-warm);
+  background: var(--white);
+  border: 1px solid var(--gray-400);
   border-radius: 9999px;
   padding: 0 16px;
   height: 48px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, outline 0.2s;
 }
 .conv-input-pill:focus-within {
-  border-color: var(--red);
-  box-shadow: 0 0 0 3px rgba(240, 75, 36, 0.12);
+  outline: 2px solid var(--blue);
+  outline-offset: -1px;
 }
 .conv-input-pill input {
   flex: 1;
   border: none;
   outline: none;
   background: transparent;
-  font-family: 'Public Sans', sans-serif;
-  font-size: 17px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
   color: var(--charcoal);
   min-width: 0;
 }
-.conv-input-pill input::placeholder { color: #999; }
+.conv-input-pill input::placeholder { color: var(--gray-400); }
 .conv-send-btn {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--red);
+  background: var(--purple);
   border: none;
   display: flex;
   align-items: center;
@@ -1103,7 +1108,8 @@ html, body {
   flex-shrink: 0;
   transition: background 0.15s;
 }
-.conv-send-btn:active { background: var(--red-dark); }
+.conv-send-btn:active { background: #472069; }
+.conv-send-btn .material-icons { font-size: 20px; color: var(--white); }
 .conv-send-btn svg { width: 20px; height: 20px; color: var(--white); }
 .conv-footer-link {
   display: block;
@@ -1114,7 +1120,7 @@ html, body {
   cursor: pointer;
   background: none;
   border: none;
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   width: 100%;
   min-height: 48px;
 }
@@ -1188,7 +1194,7 @@ html, body {
   color: var(--white);
   border: none;
   border-radius: 9999px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -1205,7 +1211,7 @@ html, body {
   color: var(--charcoal);
   border: 2px solid var(--border-warm);
   border-radius: 9999px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -1291,7 +1297,7 @@ html, body {
       </svg>
       <!-- Wordmark -->
       <svg height="20" viewBox="0 0 330 60" fill="none">
-        <text x="0" y="46" font-family="Libre Franklin, sans-serif" font-weight="700" font-size="48" fill="#1D252C">Devoted</text>
+        <text x="0" y="46" font-family="Inter, sans-serif" font-weight="700" font-size="48" fill="#1D252C">Devoted</text>
       </svg>
     </div>
     <button class="profile-btn" aria-label="Profile" onclick="switchTab('profile')">
@@ -1313,11 +1319,11 @@ html, body {
       <!-- Hero input -->
       <div class="home-input-wrap">
         <div class="home-input-pill">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.49"/></svg>
+          <span class="material-icons">attach_file</span>
           <input type="text" id="homeInput" placeholder="What's on your mind?" onkeydown="if(event.key==='Enter')handleHomeSend()">
         </div>
         <button class="home-send-btn" aria-label="Send" onclick="handleHomeSend()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <span class="material-icons">send</span>
         </button>
       </div>
 
@@ -1593,11 +1599,11 @@ html, body {
   <!-- AI bar -->
   <div class="ai-bar" id="aiBar">
     <div class="ai-bar-pill">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.49"/></svg>
+      <span class="material-icons">attach_file</span>
       <input type="text" id="aiBarInput" placeholder="">
     </div>
     <button class="ai-bar-send" aria-label="Send" onclick="handleAiBarSend()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      <span class="material-icons">send</span>
     </button>
   </div>
 
@@ -1626,7 +1632,7 @@ html, body {
             <input type="text" id="convInput" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter')handleConvSend()">
           </div>
           <button class="conv-send-btn" aria-label="Send" onclick="handleConvSend()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <span class="material-icons">send</span>
           </button>
         </div>
         <div id="convFooter"></div>
@@ -1856,7 +1862,7 @@ function renderSheetHeader() {
       </div>
       <div class="sheet-header-right">
         <button class="sheet-btn" onclick="closeSheet()" aria-label="Close">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span class="material-icons">close</span>
         </button>
       </div>`;
   } else {
@@ -1865,16 +1871,16 @@ function renderSheetHeader() {
     header.innerHTML = `
       <div class="sheet-header-left">
         <button class="sheet-btn" onclick="showThreadList()" aria-label="Back">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <span class="material-icons">arrow_back</span>
         </button>
       </div>
       <div class="sheet-header-center">
-        <div class="sheet-header-title">MyDevoted AI</div>
+        <div class="sheet-header-title">MyDevoted</div>
         <div class="sheet-header-subtitle">${subtitle}</div>
       </div>
       <div class="sheet-header-right">
         <button class="sheet-btn" onclick="closeSheet()" aria-label="Close">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span class="material-icons">close</span>
         </button>
       </div>`;
   }
@@ -2149,8 +2155,7 @@ function showLoading() {
   const div = document.createElement('div');
   div.className = 'msg msg-ai msg-loading';
   div.innerHTML = `<div class="msg-avatar msg-avatar-ai">♥</div>
-    <div class="msg-bubble"><span class="loading-text">Thinking...</span>
-    <div class="loading-dots"><span></span><span></span><span></span></div></div>`;
+    <div class="msg-bubble"><div class="loading-spinner"></div></div>`;
   container.appendChild(div);
   requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
   return div;
@@ -2167,7 +2172,7 @@ function showEmergencyCard(thread) {
       <p><strong>If this is an emergency, call 911 now.</strong></p>
       <p>If you need urgent care advice, call the Devoted Care OnDemand line:</p>
       <p><a href="tel:18888022738" style="color:var(--red);font-weight:700;font-size:17px;">1-888-802-2738</a></p>
-      <p style="margin-top:8px;"><button onclick="dismissEmergencyCard(this)" style="background:none;border:none;color:var(--gray-text);font-size:14px;cursor:pointer;font-family:Public Sans,sans-serif;text-decoration:underline;">This isn't an emergency</button></p>
+      <p style="margin-top:8px;"><button onclick="dismissEmergencyCard(this)" style="background:none;border:none;color:var(--gray-text);font-size:14px;cursor:pointer;font-family:Inter,sans-serif;text-decoration:underline;">This isn't an emergency</button></p>
     </div>`;
   container.appendChild(div);
   thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: '🚨 If this is an emergency, call 911 now. Care OnDemand: 1-888-802-2738' });
