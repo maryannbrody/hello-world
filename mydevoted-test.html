@@ -628,6 +628,132 @@ html, body {
   border-radius: 4px;
   margin-top: 4px;
 }
+
+/* ── Benefits tab ── */
+.benefits-header {
+  font-family: 'Libre Franklin', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--charcoal);
+  padding: 16px 20px 8px;
+}
+.benefit-card {
+  background: var(--white);
+  border: 1px solid var(--border-warm);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 20px 16px;
+}
+.benefit-card-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--blue);
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.benefit-card-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+.benefit-card-amount {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin: 4px 0;
+}
+.benefit-card-sub {
+  font-size: 15px;
+  color: var(--gray-text);
+  margin-bottom: 10px;
+}
+.benefit-progress-track {
+  height: 8px;
+  background: var(--bg-input);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.benefit-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--green);
+}
+.benefit-progress-fill.amber { background: var(--amber); }
+.benefit-card-link {
+  font-size: 14px;
+  color: var(--red);
+  cursor: pointer;
+}
+.benefit-pending {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--amber);
+  background: #FEF3C7;
+  padding: 2px 10px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+.plan-highlight {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+}
+.plan-highlight-check {
+  color: var(--green);
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.plan-highlight-text {
+  font-size: 16px;
+  color: var(--charcoal);
+  line-height: 1.5;
+}
+
+/* ── Profile tab ── */
+.profile-header {
+  font-family: 'Libre Franklin', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--charcoal);
+  padding: 16px 20px 8px;
+}
+.member-card {
+  background: var(--charcoal);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 0 20px 16px;
+  color: var(--white);
+}
+.member-card-name {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.member-card-plan {
+  font-size: 15px;
+  color: #B0B8BF;
+  margin-bottom: 12px;
+}
+.member-card-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 4px 0;
+}
+.member-card-row-label { color: #8A929A; }
+.member-card-row-value { color: var(--white); font-weight: 600; }
+.profile-section-label {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--charcoal);
+  padding: 0 20px;
+  margin-bottom: 8px;
+}
 </style>
 </head>
 <body>
@@ -847,8 +973,117 @@ html, body {
         </div>
       </div>
     </div>
-    <div id="tab-benefits" class="tab-view"></div>
-    <div id="tab-profile" class="tab-view"></div>
+    <div id="tab-benefits" class="tab-view">
+      <div class="benefits-header">Your Benefits</div>
+
+      <!-- Food & Home Card -->
+      <div class="benefit-card">
+        <div class="benefit-card-label">FOOD &amp; HOME CARD</div>
+        <div class="benefit-card-amount">$125 <span style="font-size:15px;font-weight:400;color:var(--gray-text)">remaining</span></div>
+        <div class="benefit-card-sub">of $300 quarterly allowance</div>
+        <div class="benefit-progress-track">
+          <div class="benefit-progress-fill" style="width:42%"></div>
+        </div>
+        <div class="benefit-card-link" onclick="sendPrompt('Tell me about my Food and Home Card balance and how to use it')">See details →</div>
+      </div>
+
+      <!-- Wellness Bucks -->
+      <div class="benefit-card">
+        <div class="benefit-card-label">WELLNESS BUCKS</div>
+        <div class="benefit-card-amount">$155 <span style="font-size:15px;font-weight:400;color:var(--gray-text)">remaining</span></div>
+        <div class="benefit-card-sub">of $500 annual allowance</div>
+        <div class="benefit-progress-track">
+          <div class="benefit-progress-fill amber" style="width:31%"></div>
+        </div>
+        <div class="benefit-pending">Pending: Yoga Mat $45</div>
+      </div>
+
+      <!-- OTC Allowance -->
+      <div class="benefit-card">
+        <div class="benefit-card-label">OTC ALLOWANCE</div>
+        <div class="benefit-card-amount">$100 <span style="font-size:15px;font-weight:400;color:var(--gray-text)">/quarter</span></div>
+        <div class="benefit-card-sub">Use at participating pharmacies for health essentials</div>
+        <div class="benefit-card-link" onclick="sendPrompt('How do I use my OTC allowance?')">Learn more →</div>
+      </div>
+
+      <!-- ID Card -->
+      <div class="benefit-card" style="cursor:pointer" onclick="sendPrompt('Show me my member ID card')">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--charcoal)">ID Card</div>
+            <div style="font-size:15px;color:var(--gray-text)">View or share your member card</div>
+          </div>
+          <span style="font-size:18px;color:var(--gray-mid)">›</span>
+        </div>
+      </div>
+
+      <!-- Plan Highlights -->
+      <div class="health-section-label">Plan Highlights</div>
+      <div class="benefit-card">
+        <div class="plan-highlight">
+          <span class="plan-highlight-check">✓</span>
+          <span class="plan-highlight-text">$0 primary care visits</span>
+        </div>
+        <div class="plan-highlight">
+          <span class="plan-highlight-check">✓</span>
+          <span class="plan-highlight-text">$0 Tier 1 prescriptions</span>
+        </div>
+        <div class="plan-highlight">
+          <span class="plan-highlight-check">✓</span>
+          <span class="plan-highlight-text">Dental, vision &amp; hearing included</span>
+        </div>
+        <div class="plan-highlight">
+          <span class="plan-highlight-check">✓</span>
+          <span class="plan-highlight-text">24/7 nurse line access</span>
+        </div>
+        <div class="plan-highlight">
+          <span class="plan-highlight-check">✓</span>
+          <span class="plan-highlight-text">Transportation to appointments</span>
+        </div>
+      </div>
+    </div>
+    <div id="tab-profile" class="tab-view">
+      <div class="profile-header">Your Profile</div>
+
+      <!-- Member card -->
+      <div class="member-card">
+        <div class="member-card-name">Laura Ingalls Wilder</div>
+        <div class="member-card-plan">Devoted Health MA (HMO)</div>
+        <div class="member-card-row">
+          <span class="member-card-row-label">Member ID</span>
+          <span class="member-card-row-value">DVH-2024-78432</span>
+        </div>
+        <div class="member-card-row">
+          <span class="member-card-row-label">PCP</span>
+          <span class="member-card-row-value">Dr. Sarah Wagle</span>
+        </div>
+        <div class="member-card-row">
+          <span class="member-card-row-label">Next visit</span>
+          <span class="member-card-row-value">March 4, 10:00am</span>
+        </div>
+      </div>
+
+      <!-- Preferences -->
+      <div class="profile-section-label">Preferences</div>
+      <div class="nav-card-group">
+        <div class="nav-card-row" onclick="sendPrompt('Show me my mail from Devoted')">
+          <span class="nav-card-row-label">Mail from Devoted</span>
+          <span class="nav-card-row-arrow">›</span>
+        </div>
+        <div class="nav-card-row" onclick="sendPrompt('Help me manage my information sharing settings')">
+          <span class="nav-card-row-label">Share My Information</span>
+          <span class="nav-card-row-arrow">›</span>
+        </div>
+        <div class="nav-card-row" onclick="sendPrompt('Help me go paperless')">
+          <span class="nav-card-row-label">Go Paperless</span>
+          <span class="nav-card-row-arrow">›</span>
+        </div>
+        <div class="nav-card-row" onclick="sendPrompt('Help me change my language preference')">
+          <span class="nav-card-row-label">Language</span>
+          <span style="font-size:16px;color:var(--gray-text)">English ›</span>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- AI bar -->
