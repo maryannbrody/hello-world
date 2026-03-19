@@ -213,6 +213,228 @@ html, body {
 .tab-bar-item.active { color: var(--red); }
 .tab-bar-item svg { width: 26px; height: 26px; }
 .tab-bar-item span { font-size: 14px; }
+
+/* ── Home tab ── */
+.home-greeting { padding: 6px 20px 24px; }
+.home-greeting h1 {
+  font-family: 'Libre Franklin', sans-serif;
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--red);
+  line-height: 1.2;
+  margin: 0;
+}
+.home-greeting .subtitle {
+  font-size: 20px;
+  color: var(--gray-text);
+  margin-top: 4px;
+}
+.home-greeting .member-id {
+  font-size: 14px;
+  color: #999;
+  margin-top: 2px;
+}
+
+/* Hero input */
+.home-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px;
+  margin-bottom: 16px;
+}
+.home-input-pill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border-warm);
+  border-radius: 9999px;
+  height: 48px;
+  padding: 0 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.home-input-pill:focus-within {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(240, 75, 36, 0.12);
+}
+.home-input-pill svg { width: 20px; height: 20px; color: #999; flex-shrink: 0; }
+.home-input-pill input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 17px;
+  color: var(--charcoal);
+  min-width: 0;
+}
+.home-input-pill input::placeholder { color: #999; }
+.home-send-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--red);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.home-send-btn:active { background: var(--red-dark); }
+.home-send-btn svg { width: 20px; height: 20px; color: var(--white); }
+
+/* Prompt chips */
+.chips-label {
+  font-size: 20px;
+  color: var(--gray-text);
+  padding: 0 20px;
+  margin-bottom: 12px;
+}
+.chips-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-left: 20px;
+  padding-right: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x mandatory;
+}
+.chips-scroll::-webkit-scrollbar { display: none; }
+.chip-card {
+  flex-shrink: 0;
+  width: 140px;
+  min-height: 64px;
+  background: var(--white);
+  border: 1.5px solid var(--border-warm);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 16px;
+  color: var(--charcoal);
+  cursor: pointer;
+  text-align: left;
+  line-height: 1.35;
+  scroll-snap-align: start;
+  transition: border-color 0.15s;
+}
+.chip-card:active { border-color: var(--red); background: var(--red-light); }
+.scroll-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 0 24px;
+}
+.scroll-dots .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  opacity: 0.3;
+  transition: all 0.2s;
+}
+.scroll-dots .dot.active {
+  width: 20px;
+  border-radius: 4px;
+  opacity: 1;
+}
+
+/* What's Happening */
+.section-header {
+  font-size: 20px;
+  color: var(--gray-text);
+  padding: 0 20px;
+  margin-bottom: 12px;
+}
+.happening-card {
+  background: var(--taupe);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin: 0 20px 12px;
+}
+.happening-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.badge-purple { background: var(--purple-light); color: var(--purple); }
+.badge-amber { background: #FEF3C7; color: var(--amber); }
+.badge-blue { background: var(--blue-light); color: var(--blue); }
+.happening-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--charcoal);
+  line-height: 1.3;
+}
+.happening-subtitle {
+  font-size: 15px;
+  color: var(--gray-text);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* Conversations */
+.conv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  margin: 24px 0 12px;
+}
+.conv-header-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+.conv-header-link {
+  font-size: 14px;
+  color: var(--red);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Public Sans', sans-serif;
+  padding: 8px 0;
+}
+.conv-row {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-warm);
+  cursor: pointer;
+}
+.conv-row:active { background: var(--bg-input); }
+.conv-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.conv-row-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+.conv-row-date {
+  font-size: 14px;
+  color: #999;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+.conv-row-preview {
+  font-size: 15px;
+  color: var(--gray-text);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 </style>
 </head>
 <body>
@@ -257,7 +479,84 @@ html, body {
 
   <!-- Content area -->
   <main class="content-area">
-    <div id="tab-home" class="tab-view active"></div>
+    <div id="tab-home" class="tab-view active">
+      <!-- Greeting -->
+      <div class="home-greeting">
+        <h1>Hello, Laura!</h1>
+        <div class="subtitle">How can we help you today?</div>
+        <div class="member-id">Member ID DVH-2024-78432</div>
+      </div>
+
+      <!-- Hero input -->
+      <div class="home-input-wrap">
+        <div class="home-input-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.49"/></svg>
+          <input type="text" id="homeInput" placeholder="What's on your mind?" onkeydown="if(event.key==='Enter')handleHomeSend()">
+        </div>
+        <button class="home-send-btn" aria-label="Send" onclick="handleHomeSend()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+
+      <!-- Suggested prompt chips -->
+      <div class="chips-label">You could ask</div>
+      <div class="chips-scroll" id="chipsScroll">
+        <button class="chip-card" onclick="sendPrompt('How can I have more energy?')">How can I have more energy?</button>
+        <button class="chip-card" onclick="sendPrompt('Food & Home Card balance')">Food &amp; Home Card balance</button>
+        <button class="chip-card" onclick="sendPrompt('What do my labs mean?')">What do my labs mean?</button>
+        <button class="chip-card" onclick="sendPrompt('Prepare for my visit')">Prepare for my visit</button>
+      </div>
+      <div class="scroll-dots" id="scrollDots">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+
+      <!-- What's Happening -->
+      <div class="section-header">What's happening</div>
+      <div class="happening-card">
+        <div class="happening-badge badge-purple">NOT STARTED</div>
+        <div class="happening-title">Health Connections Checklist</div>
+        <div class="happening-subtitle">Personalize your experience. Takes about 2 minutes.</div>
+      </div>
+      <div class="happening-card">
+        <div class="happening-badge badge-amber">IN PROGRESS</div>
+        <div class="happening-title">Yoga Mat Reimbursement</div>
+        <div class="happening-subtitle">Received February 20 · $45</div>
+      </div>
+      <div class="happening-card">
+        <div class="happening-badge badge-blue">UPCOMING</div>
+        <div class="happening-title">Complete visit intake</div>
+        <div class="happening-subtitle">March 4, 10am · Dr. Wagle · Primary Care</div>
+      </div>
+
+      <!-- Conversations -->
+      <div class="conv-header">
+        <div class="conv-header-title">Conversations</div>
+        <button class="conv-header-link" onclick="openThreadList()">See all →</button>
+      </div>
+      <div class="conv-row" onclick="openConvSheet('Your A1c improved to 6.8%')">
+        <div class="conv-row-top">
+          <div class="conv-row-title">Your A1c improved to 6.8%</div>
+          <div class="conv-row-date">Feb 26</div>
+        </div>
+        <div class="conv-row-preview">Great news — your latest HbA1c result shows improvement from your previous reading...</div>
+      </div>
+      <div class="conv-row" onclick="openConvSheet('What does my eGFR mean?')">
+        <div class="conv-row-top">
+          <div class="conv-row-title">What does my eGFR mean?</div>
+          <div class="conv-row-date">Feb 27</div>
+        </div>
+        <div class="conv-row-preview">Your eGFR of 58 indicates mild kidney function change. Here's what that means...</div>
+      </div>
+      <div class="conv-row" onclick="openConvSheet('Yoga mat reimbursement')">
+        <div class="conv-row-top">
+          <div class="conv-row-title">Yoga mat reimbursement</div>
+          <div class="conv-row-date">Feb 23</div>
+        </div>
+        <div class="conv-row-preview">Your Wellness Bucks claim for $45 was received and is currently being processed...</div>
+      </div>
+    </div>
     <div id="tab-health" class="tab-view"></div>
     <div id="tab-benefits" class="tab-view"></div>
     <div id="tab-profile" class="tab-view"></div>
@@ -353,6 +652,34 @@ function handleAiBarSend() {
     input.value = '';
   }
 }
+
+// ── Home hero input ──
+function handleHomeSend() {
+  const input = document.getElementById('homeInput');
+  const text = input.value.trim();
+  if (text) {
+    sendPrompt(text);
+    input.value = '';
+  }
+}
+
+function sendPrompt(text) {
+  console.log('send:', text);
+  openConvSheet(text);
+}
+
+// ── Scroll dots for chips ──
+(function() {
+  const scroll = document.getElementById('chipsScroll');
+  const dots = document.querySelectorAll('#scrollDots .dot');
+  if (scroll && dots.length) {
+    scroll.addEventListener('scroll', function() {
+      const pct = scroll.scrollLeft / (scroll.scrollWidth - scroll.clientWidth);
+      const idx = Math.round(pct * (dots.length - 1));
+      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    });
+  }
+})();
 
 // ── Stubs for Prompt 2 ──
 function openConvSheet(prefill) { console.log('open sheet:', prefill); }
