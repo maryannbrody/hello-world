@@ -1,0 +1,2504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MyDevoted</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@600;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #F04B24;
+  --red-dark: #D43E1A;
+  --red-light: #FBF0EB;
+  --purple: #592C82;
+  --purple-light: #ECE4F1;
+  --blue: #00A0DD;
+  --blue-light: #D4E7F7;
+  --charcoal: #1D252C;
+  --gray-text: #595959;
+  --gray-bg: #F8F7F5;
+  --bg-input: #F2EFEA;
+  --gray-mid: #E0DBD5;
+  --border-warm: #E8E3DE;
+  --white: #FFFFFF;
+  --taupe: #f9f5f2;
+  --amber: #B45309;
+  --green: #166534;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--charcoal);
+  background: var(--gray-bg);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Gate screen ── */
+#gate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 24px;
+  text-align: center;
+  font-size: 17px;
+  color: var(--gray-text);
+}
+
+/* ── App shell ── */
+#app {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+}
+#app.active { display: flex; }
+
+/* ── Status bar (mobile only) ── */
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 54px;
+  padding: 0 24px;
+  background: var(--gray-bg);
+  font-size: 15px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.status-bar-left { font-variant-numeric: tabular-nums; }
+.status-bar-right { display: flex; align-items: center; gap: 6px; }
+.status-bar-right svg { width: 18px; height: 18px; }
+
+@media (min-width: 768px) {
+  .status-bar { display: none; }
+}
+
+/* ── App header ── */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 56px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border-warm);
+  flex-shrink: 0;
+  padding: 0 16px;
+}
+.app-header .logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.app-header .logo-wrap svg { height: 28px; width: auto; }
+.app-header .profile-btn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 50%;
+}
+.app-header .profile-btn:active { background: var(--bg-input); }
+.app-header .profile-btn svg { width: 28px; height: 28px; color: var(--charcoal); }
+
+/* ── Content area ── */
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.tab-view { display: none; padding: 24px 20px 24px; min-height: 100%; }
+.tab-view.active { display: block; }
+
+/* ── AI bar ── */
+.ai-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px 10px;
+  background: var(--white);
+  border-top: 1px solid var(--border-warm);
+  flex-shrink: 0;
+}
+.ai-bar.hidden { display: none; }
+.ai-bar-pill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border-warm);
+  border-radius: 9999px;
+  padding: 0 16px;
+  height: 48px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.ai-bar-pill:focus-within {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(240, 75, 36, 0.12);
+}
+.ai-bar-pill svg { width: 20px; height: 20px; color: #999; flex-shrink: 0; }
+.ai-bar-pill input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 17px;
+  color: var(--charcoal);
+  min-width: 0;
+}
+.ai-bar-pill input::placeholder { color: #999; }
+.ai-bar-send {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--red);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.ai-bar-send:active { background: var(--red-dark); }
+.ai-bar-send svg { width: 20px; height: 20px; color: var(--white); }
+
+/* ── Bottom tab bar ── */
+.tab-bar {
+  display: flex;
+  align-items: stretch;
+  background: var(--white);
+  border-top: 1px solid var(--border-warm);
+  flex-shrink: 0;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.tab-bar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 0 8px;
+  min-height: 56px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #999;
+  transition: color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.tab-bar-item.active { color: var(--red); }
+.tab-bar-item svg { width: 26px; height: 26px; }
+.tab-bar-item span { font-size: 14px; }
+
+/* ── Home tab ── */
+.home-greeting { padding: 6px 20px 24px; }
+.home-greeting h1 {
+  font-family: 'Libre Franklin', sans-serif;
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--red);
+  line-height: 1.2;
+  margin: 0;
+}
+.home-greeting .subtitle {
+  font-size: 20px;
+  color: var(--gray-text);
+  margin-top: 4px;
+}
+.home-greeting .member-id {
+  font-size: 14px;
+  color: #999;
+  margin-top: 2px;
+}
+
+/* Hero input */
+.home-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px;
+  margin-bottom: 16px;
+}
+.home-input-pill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border-warm);
+  border-radius: 9999px;
+  height: 48px;
+  padding: 0 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.home-input-pill:focus-within {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(240, 75, 36, 0.12);
+}
+.home-input-pill svg { width: 20px; height: 20px; color: #999; flex-shrink: 0; }
+.home-input-pill input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 17px;
+  color: var(--charcoal);
+  min-width: 0;
+}
+.home-input-pill input::placeholder { color: #999; }
+.home-send-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--red);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.home-send-btn:active { background: var(--red-dark); }
+.home-send-btn svg { width: 20px; height: 20px; color: var(--white); }
+
+/* Prompt chips */
+.chips-label {
+  font-size: 20px;
+  color: var(--gray-text);
+  padding: 0 20px;
+  margin-bottom: 12px;
+}
+.chips-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-left: 20px;
+  padding-right: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x mandatory;
+}
+.chips-scroll::-webkit-scrollbar { display: none; }
+.chip-card {
+  flex-shrink: 0;
+  width: 140px;
+  min-height: 64px;
+  background: var(--white);
+  border: 1.5px solid var(--border-warm);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 16px;
+  color: var(--charcoal);
+  cursor: pointer;
+  text-align: left;
+  line-height: 1.35;
+  scroll-snap-align: start;
+  transition: border-color 0.15s;
+}
+.chip-card:active { border-color: var(--red); background: var(--red-light); }
+.scroll-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 0 24px;
+}
+.scroll-dots .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  opacity: 0.3;
+  transition: all 0.2s;
+}
+.scroll-dots .dot.active {
+  width: 20px;
+  border-radius: 4px;
+  opacity: 1;
+}
+
+/* What's Happening */
+.section-header {
+  font-size: 20px;
+  color: var(--gray-text);
+  padding: 0 20px;
+  margin-bottom: 12px;
+}
+.happening-card {
+  background: var(--taupe);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin: 0 20px 12px;
+}
+.happening-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.badge-purple { background: var(--purple-light); color: var(--purple); }
+.badge-amber { background: #FEF3C7; color: var(--amber); }
+.badge-blue { background: var(--blue-light); color: var(--blue); }
+.happening-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--charcoal);
+  line-height: 1.3;
+}
+.happening-subtitle {
+  font-size: 15px;
+  color: var(--gray-text);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* Conversations */
+.conv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  margin: 24px 0 12px;
+}
+.conv-header-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+.conv-header-link {
+  font-size: 14px;
+  color: var(--red);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Public Sans', sans-serif;
+  padding: 8px 0;
+}
+.conv-row {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-warm);
+  cursor: pointer;
+}
+.conv-row:active { background: var(--bg-input); }
+.conv-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.conv-row-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+.conv-row-date {
+  font-size: 14px;
+  color: #999;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+.conv-row-preview {
+  font-size: 15px;
+  color: var(--gray-text);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Health tab ── */
+.health-header {
+  font-family: 'Libre Franklin', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--charcoal);
+  padding: 16px 20px 8px;
+}
+.care-team-card {
+  background: var(--white);
+  border: 1px solid var(--border-warm);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 20px 16px;
+}
+.care-team-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--blue);
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.care-team-name {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+.care-team-detail {
+  font-size: 15px;
+  color: var(--gray-text);
+  margin-bottom: 12px;
+}
+.care-team-btns {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.care-team-btn {
+  flex: 1;
+  border: 2px solid var(--blue);
+  color: var(--blue);
+  background: transparent;
+  border-radius: 9999px;
+  padding: 8px 4px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 48px;
+  transition: background 0.15s;
+}
+.care-team-btn:active { background: var(--blue-light); }
+.care-team-next {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--gray-text);
+}
+.health-section-label {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--charcoal);
+  padding: 0 20px;
+  margin-bottom: 8px;
+}
+.nav-card-group {
+  background: var(--white);
+  border: 1px solid var(--border-warm);
+  border-radius: 8px;
+  margin: 0 20px 16px;
+  overflow: hidden;
+}
+.nav-card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--bg-input);
+  min-height: 48px;
+  transition: background 0.1s;
+}
+.nav-card-row:last-child { border-bottom: none; }
+.nav-card-row:active { background: var(--bg-input); }
+.nav-card-row-label {
+  font-size: 16px;
+  color: var(--charcoal);
+}
+.nav-card-row-arrow {
+  font-size: 18px;
+  color: var(--gray-mid);
+  flex-shrink: 0;
+}
+.lab-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0 20px;
+  margin-bottom: 8px;
+}
+.lab-header-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--charcoal);
+}
+.lab-header-link {
+  font-size: 13px;
+  color: var(--red);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Public Sans', sans-serif;
+  padding: 4px 0;
+}
+.lab-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 0 20px;
+  margin-bottom: 16px;
+}
+.lab-card {
+  background: var(--white);
+  border: 1px solid var(--border-warm);
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.lab-card:active { border-color: var(--red); }
+.lab-card-label {
+  font-size: 14px;
+  color: var(--gray-text);
+  margin-bottom: 2px;
+}
+.lab-card-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--charcoal);
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.lab-card-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.lab-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.lab-dot-green { background: var(--green); }
+.lab-dot-amber { background: var(--amber); }
+.lab-card-cta {
+  font-size: 14px;
+  color: var(--red);
+}
+.med-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--white);
+  border: 1px solid var(--border-warm);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 20px 12px;
+}
+.med-icon { font-size: 28px; flex-shrink: 0; }
+.med-info { flex: 1; min-width: 0; }
+.med-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+.med-detail {
+  font-size: 15px;
+  color: var(--gray-text);
+}
+.med-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--red);
+  background: var(--red-light);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+/* ── Benefits tab ── */
+.benefits-header {
+  font-family: 'Libre Franklin', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--charcoal);
+  padding: 16px 20px 8px;
+}
+.benefit-card {
+  background: var(--white);
+  border: 1px solid var(--border-warm);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 20px 16px;
+}
+.benefit-card-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--blue);
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.benefit-card-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+.benefit-card-amount {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin: 4px 0;
+}
+.benefit-card-sub {
+  font-size: 15px;
+  color: var(--gray-text);
+  margin-bottom: 10px;
+}
+.benefit-progress-track {
+  height: 8px;
+  background: var(--bg-input);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.benefit-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--green);
+}
+.benefit-progress-fill.amber { background: var(--amber); }
+.benefit-card-link {
+  font-size: 14px;
+  color: var(--red);
+  cursor: pointer;
+}
+.benefit-pending {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--amber);
+  background: #FEF3C7;
+  padding: 2px 10px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+.plan-highlight {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+}
+.plan-highlight-check {
+  color: var(--green);
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.plan-highlight-text {
+  font-size: 16px;
+  color: var(--charcoal);
+  line-height: 1.5;
+}
+
+/* ── Profile tab ── */
+.profile-header {
+  font-family: 'Libre Franklin', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--charcoal);
+  padding: 16px 20px 8px;
+}
+.member-card {
+  background: var(--charcoal);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 0 20px 16px;
+  color: var(--white);
+}
+.member-card-name {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.member-card-plan {
+  font-size: 15px;
+  color: #B0B8BF;
+  margin-bottom: 12px;
+}
+.member-card-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 4px 0;
+}
+.member-card-row-label { color: #8A929A; }
+.member-card-row-value { color: var(--white); font-weight: 600; }
+.profile-section-label {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--charcoal);
+  padding: 0 20px;
+  margin-bottom: 8px;
+}
+
+/* ── Companion sheet ── */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 900;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s;
+}
+.sheet-backdrop.open { opacity: 1; pointer-events: auto; }
+
+.sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  background: var(--white);
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -4px 40px rgba(0,0,0,0.15);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: height 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.sheet.open { height: 85vh; }
+
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--gray-mid);
+  border-radius: 2px;
+  margin: 10px auto 0;
+  flex-shrink: 0;
+}
+.sheet-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px 8px;
+  flex-shrink: 0;
+  min-height: 48px;
+}
+.sheet-header-left {
+  width: 48px;
+  flex-shrink: 0;
+}
+.sheet-header-center {
+  flex: 1;
+  text-align: center;
+  min-width: 0;
+}
+.sheet-header-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+.sheet-header-subtitle {
+  font-size: 13px;
+  color: var(--gray-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sheet-header-right {
+  width: 48px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+}
+.sheet-btn {
+  width: 48px;
+  height: 48px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--charcoal);
+  font-size: 20px;
+}
+.sheet-btn:active { background: var(--bg-input); }
+.sheet-btn svg { width: 22px; height: 22px; }
+
+.sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Thread list */
+.thread-list-view { display: none; }
+.thread-list-view.active { display: flex; flex-direction: column; height: 100%; }
+.thread-new-btn {
+  display: block;
+  margin: 8px 20px 12px;
+  padding: 12px 0;
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 9999px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  min-height: 48px;
+  transition: background 0.15s;
+}
+.thread-new-btn:active { background: var(--red-dark); }
+.thread-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-warm);
+  cursor: pointer;
+  min-height: 48px;
+  transition: background 0.1s;
+}
+.thread-row:active { background: var(--bg-input); }
+.thread-row-content { flex: 1; min-width: 0; }
+.thread-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.thread-row-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--charcoal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.thread-row-date {
+  font-size: 14px;
+  color: #999;
+  flex-shrink: 0;
+}
+.thread-row-bottom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+.thread-row-preview {
+  font-size: 15px;
+  color: var(--gray-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+.thread-active-badge {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue);
+  background: var(--blue-light);
+  padding: 1px 8px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+/* Conversation view */
+.conv-view { display: none; }
+.conv-view.active { display: flex; flex-direction: column; height: 100%; }
+.conv-messages {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* First-chat card */
+.first-chat-card {
+  background: var(--taupe);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 15px;
+  color: var(--gray-text);
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Emergency footer */
+.emergency-footer {
+  text-align: center;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #999;
+  line-height: 1.6;
+}
+.emergency-footer a {
+  color: #999;
+  text-decoration: underline;
+}
+
+/* Message bubbles */
+.msg { display: flex; gap: 8px; max-width: 88%; }
+.msg-user { align-self: flex-end; }
+.msg-ai { align-self: flex-start; }
+.msg-human { align-self: flex-start; }
+.msg-system { align-self: center; max-width: 100%; }
+
+.msg-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: var(--white);
+  margin-top: 4px;
+}
+.msg-avatar-ai { background: var(--red); }
+.msg-avatar-guide { background: var(--red); }
+.msg-avatar-medical { background: var(--purple); }
+
+.msg-bubble {
+  padding: 12px 16px;
+  font-size: 16px;
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+.msg-bubble p { margin: 0 0 8px; }
+.msg-bubble p:last-child { margin-bottom: 0; }
+.msg-bubble strong { font-weight: 700; }
+
+.msg-user .msg-bubble {
+  background: var(--charcoal);
+  color: var(--white);
+  border-radius: 18px 18px 6px 18px;
+}
+.msg-ai .msg-bubble {
+  background: var(--white);
+  border: 1px solid var(--border-warm);
+  color: var(--charcoal);
+  border-radius: 6px 18px 18px 18px;
+}
+.msg-human .msg-bubble {
+  background: var(--white);
+  border: 1px solid var(--border-warm);
+  color: var(--charcoal);
+  border-radius: 6px 18px 18px 18px;
+}
+.msg-attribution {
+  font-size: 13px;
+  color: var(--gray-text);
+  margin-top: 4px;
+  padding-left: 40px;
+}
+.msg-system-text {
+  font-size: 13px;
+  color: var(--gray-text);
+  text-align: center;
+  padding: 8px 0;
+}
+
+/* Loading dots */
+.msg-loading .msg-bubble {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.loading-text {
+  font-size: 15px;
+  color: var(--gray-text);
+}
+.loading-dots {
+  display: flex;
+  gap: 4px;
+}
+.loading-dots span {
+  width: 6px;
+  height: 6px;
+  background: var(--red);
+  border-radius: 50%;
+  animation: bounce-dot 1.4s infinite;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce-dot {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-6px); }
+}
+
+/* Conversation input */
+.conv-input-area {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border-warm);
+  background: var(--white);
+}
+.conv-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.conv-input-pill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border-warm);
+  border-radius: 9999px;
+  padding: 0 16px;
+  height: 48px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.conv-input-pill:focus-within {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(240, 75, 36, 0.12);
+}
+.conv-input-pill input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 17px;
+  color: var(--charcoal);
+  min-width: 0;
+}
+.conv-input-pill input::placeholder { color: #999; }
+.conv-send-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--red);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.conv-send-btn:active { background: var(--red-dark); }
+.conv-send-btn svg { width: 20px; height: 20px; color: var(--white); }
+.conv-footer-link {
+  display: block;
+  text-align: center;
+  font-size: 14px;
+  color: var(--gray-text);
+  padding: 8px 0 4px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'Public Sans', sans-serif;
+  width: 100%;
+  min-height: 48px;
+}
+.conv-footer-status {
+  display: block;
+  text-align: center;
+  font-size: 14px;
+  color: var(--blue);
+  font-weight: 600;
+  padding: 8px 0 4px;
+}
+
+/* Turnaround time */
+.conv-turnaround {
+  text-align: center;
+  font-size: 14px;
+  color: var(--blue);
+  padding: 6px 0 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.conv-turnaround svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+/* Active thread banner */
+.active-thread-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--blue-light);
+  border: 1px solid #B0D4EF;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin: 0 0 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--blue);
+  transition: background 0.15s;
+  min-height: 48px;
+}
+.active-thread-banner:active { background: #C4DFF5; }
+
+/* Escalation card */
+.escalation-card {
+  padding: 16px;
+  text-align: center;
+}
+.escalation-card-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+.escalation-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 6px;
+}
+.escalation-card-desc {
+  font-size: 15px;
+  color: var(--gray-text);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.escalation-btn-primary {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: var(--charcoal);
+  color: var(--white);
+  border: none;
+  border-radius: 9999px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 48px;
+  margin-bottom: 10px;
+  transition: background 0.15s;
+}
+.escalation-btn-primary:active { background: #333; }
+.escalation-btn-secondary {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: var(--charcoal);
+  border: 2px solid var(--border-warm);
+  border-radius: 9999px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 48px;
+  transition: background 0.15s, border-color 0.15s;
+}
+.escalation-btn-secondary:active { background: var(--bg-input); border-color: var(--gray-mid); }
+
+/* Message fade-in animation */
+@keyframes msg-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.msg { animation: msg-fade-in 0.3s ease-out; }
+
+/* Hidden scrollbars everywhere */
+.content-area::-webkit-scrollbar,
+.conv-messages::-webkit-scrollbar,
+.sheet-body::-webkit-scrollbar,
+.thread-list-view::-webkit-scrollbar { display: none; }
+.content-area, .conv-messages, .sheet-body, .thread-list-view {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Markdown rendering in bubbles */
+.msg-bubble ul, .msg-bubble ol {
+  margin: 6px 0;
+  padding-left: 20px;
+}
+.msg-bubble li {
+  margin-bottom: 4px;
+  line-height: 1.5;
+}
+.msg-bubble em { font-style: italic; }
+.msg-bubble h1, .msg-bubble h2, .msg-bubble h3 {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 8px 0 4px;
+  line-height: 1.3;
+}
+.msg-bubble hr {
+  border: none;
+  border-top: 1px solid var(--border-warm);
+  margin: 10px 0;
+}
+.msg-bubble code {
+  font-size: 14px;
+  background: var(--bg-input);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+</style>
+</head>
+<body>
+
+<!-- Gate: no API key -->
+<div id="gate">Please use the link provided to access MyDevoted.</div>
+
+<!-- App shell -->
+<div id="app">
+  <!-- Status bar -->
+  <div class="status-bar">
+    <div class="status-bar-left">9:41</div>
+    <div class="status-bar-right">
+      <!-- Signal -->
+      <svg viewBox="0 0 18 14" fill="none"><rect x="0" y="10" width="3" height="4" rx="0.5" fill="currentColor"/><rect x="5" y="7" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="10" y="3.5" width="3" height="10.5" rx="0.5" fill="currentColor"/><rect x="15" y="0" width="3" height="14" rx="0.5" fill="currentColor"/></svg>
+      <!-- WiFi -->
+      <svg viewBox="0 0 18 18" fill="none"><path d="M9 14a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm-4.24-3.18a6.5 6.5 0 018.48 0l-1.06 1.06a5 5 0 00-6.36 0l-1.06-1.06zm-2.83-2.83a10 10 0 0114.14 0l-1.06 1.06a8.5 8.5 0 00-12.02 0L1.93 7.99z" fill="currentColor"/></svg>
+      <!-- Battery -->
+      <svg viewBox="0 0 28 14" fill="none"><rect x="0.5" y="0.5" width="23" height="13" rx="2" stroke="currentColor" fill="none"/><rect x="2" y="2" width="20" height="10" rx="1" fill="currentColor"/><path d="M25 4.5v5a2 2 0 000-5z" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <!-- App header -->
+  <header class="app-header">
+    <div class="logo-wrap">
+      <!-- Devoted Health logo mark -->
+      <svg width="32" height="32" viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="35" r="18" fill="#F04B24"/>
+        <circle cx="34" cy="60" r="16" fill="#592C82"/>
+        <circle cx="66" cy="60" r="16" fill="#00A0DD"/>
+      </svg>
+      <!-- Wordmark -->
+      <svg height="20" viewBox="0 0 330 60" fill="none">
+        <text x="0" y="46" font-family="Libre Franklin, sans-serif" font-weight="700" font-size="48" fill="#1D252C">Devoted</text>
+      </svg>
+    </div>
+    <button class="profile-btn" aria-label="Profile" onclick="switchTab('profile')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg>
+    </button>
+  </header>
+
+  <!-- Content area -->
+  <main class="content-area">
+    <div id="tab-home" class="tab-view active">
+      <!-- Greeting -->
+      <div class="home-greeting">
+        <h1>Hello, Laura!</h1>
+        <div class="subtitle">How can we help you today?</div>
+        <div class="member-id">Member ID DVH-2024-78432</div>
+      </div>
+
+      <!-- Hero input -->
+      <div class="home-input-wrap">
+        <div class="home-input-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.49"/></svg>
+          <input type="text" id="homeInput" placeholder="What's on your mind?" onkeydown="if(event.key==='Enter')handleHomeSend()">
+        </div>
+        <button class="home-send-btn" aria-label="Send" onclick="handleHomeSend()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+
+      <!-- Suggested prompt chips -->
+      <div class="chips-label">You could ask</div>
+      <div class="chips-scroll" id="chipsScroll">
+        <button class="chip-card" onclick="sendPrompt('How can I have more energy?')">How can I have more energy?</button>
+        <button class="chip-card" onclick="sendPrompt('Food & Home Card balance')">Food &amp; Home Card balance</button>
+        <button class="chip-card" onclick="sendPrompt('What do my labs mean?')">What do my labs mean?</button>
+        <button class="chip-card" onclick="sendPrompt('Prepare for my visit')">Prepare for my visit</button>
+      </div>
+      <div class="scroll-dots" id="scrollDots">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+
+      <!-- What's Happening -->
+      <div class="section-header">What's happening</div>
+      <div class="happening-card">
+        <div class="happening-badge badge-purple">NOT STARTED</div>
+        <div class="happening-title">Health Connections Checklist</div>
+        <div class="happening-subtitle">Personalize your experience. Takes about 2 minutes.</div>
+      </div>
+      <div class="happening-card">
+        <div class="happening-badge badge-amber">IN PROGRESS</div>
+        <div class="happening-title">Yoga Mat Reimbursement</div>
+        <div class="happening-subtitle">Received February 20 · $45</div>
+      </div>
+      <div class="happening-card">
+        <div class="happening-badge badge-blue">UPCOMING</div>
+        <div class="happening-title">Complete visit intake</div>
+        <div class="happening-subtitle">March 4, 10am · Dr. Wagle · Primary Care</div>
+      </div>
+
+      <!-- Conversations -->
+      <div class="conv-header">
+        <div class="conv-header-title">Conversations</div>
+        <button class="conv-header-link" onclick="openThreadList()">See all →</button>
+      </div>
+      <div class="conv-row" onclick="openConvSheet('Your A1c improved to 6.8%')">
+        <div class="conv-row-top">
+          <div class="conv-row-title">Your A1c improved to 6.8%</div>
+          <div class="conv-row-date">Feb 26</div>
+        </div>
+        <div class="conv-row-preview">Great news — your latest HbA1c result shows improvement from your previous reading...</div>
+      </div>
+      <div class="conv-row" onclick="openConvSheet('What does my eGFR mean?')">
+        <div class="conv-row-top">
+          <div class="conv-row-title">What does my eGFR mean?</div>
+          <div class="conv-row-date">Feb 27</div>
+        </div>
+        <div class="conv-row-preview">Your eGFR of 58 indicates mild kidney function change. Here's what that means...</div>
+      </div>
+      <div class="conv-row" onclick="openConvSheet('Yoga mat reimbursement')">
+        <div class="conv-row-top">
+          <div class="conv-row-title">Yoga mat reimbursement</div>
+          <div class="conv-row-date">Feb 23</div>
+        </div>
+        <div class="conv-row-preview">Your Wellness Bucks claim for $45 was received and is currently being processed...</div>
+      </div>
+    </div>
+    <div id="tab-health" class="tab-view">
+      <div class="health-header">Your Health</div>
+
+      <!-- Care Team -->
+      <div class="care-team-card">
+        <div class="care-team-label">YOUR CARE TEAM</div>
+        <div class="care-team-name">Dr. Sarah Wagle</div>
+        <div class="care-team-detail">Primary Care · Devoted Medical Group</div>
+        <div class="care-team-btns">
+          <button class="care-team-btn" onclick="sendPrompt('I want to message my care team')">Message your team</button>
+          <button class="care-team-btn" onclick="sendPrompt('Help me prepare for my visit with Dr. Wagle')">Prepare for visit</button>
+        </div>
+        <div class="care-team-next">Next visit: March 4, 10:00am</div>
+      </div>
+
+      <!-- Manage My Care -->
+      <div class="health-section-label">Manage My Care</div>
+      <div class="nav-card-group">
+        <div class="nav-card-row" onclick="sendPrompt('Show me my messages')">
+          <span class="nav-card-row-label">Messages</span>
+          <span class="nav-card-row-arrow">›</span>
+        </div>
+        <div class="nav-card-row" onclick="sendPrompt('Show me my test results')">
+          <span class="nav-card-row-label">Test Results</span>
+          <span class="nav-card-row-arrow">›</span>
+        </div>
+        <div class="nav-card-row" onclick="sendPrompt('Show me my appointments')">
+          <span class="nav-card-row-label">Appointments</span>
+          <span class="nav-card-row-arrow">›</span>
+        </div>
+        <div class="nav-card-row" onclick="sendPrompt('Tell me about my referrals and authorizations')">
+          <span class="nav-card-row-label">Referrals &amp; Authorizations</span>
+          <span class="nav-card-row-arrow">›</span>
+        </div>
+        <div class="nav-card-row" onclick="sendPrompt('Help me manage my PHI sharing settings')">
+          <span class="nav-card-row-label">PHI Sharing</span>
+          <span class="nav-card-row-arrow">›</span>
+        </div>
+      </div>
+
+      <!-- Lab Highlights -->
+      <div class="lab-header-row">
+        <span class="lab-header-title">Lab Highlights · Feb 10, 2026</span>
+        <button class="lab-header-link">View all results →</button>
+      </div>
+      <div class="lab-grid">
+        <div class="lab-card" onclick="sendPrompt('What does my HbA1c of 6.8% mean?')">
+          <div class="lab-card-label">HbA1c</div>
+          <div class="lab-card-value">6.8%</div>
+          <div class="lab-card-status"><span class="lab-dot lab-dot-green"></span> <span style="color:var(--green)">Improved</span></div>
+          <div class="lab-card-cta">Tap to understand →</div>
+        </div>
+        <div class="lab-card" onclick="sendPrompt('What does my eGFR of 58 mean?')">
+          <div class="lab-card-label">eGFR</div>
+          <div class="lab-card-value">58 <span style="font-size:14px;font-weight:400;color:var(--gray-text)">mL/min</span></div>
+          <div class="lab-card-status"><span class="lab-dot lab-dot-amber"></span> <span style="color:var(--amber)">Needs attention</span></div>
+          <div class="lab-card-cta">Tap to understand →</div>
+        </div>
+        <div class="lab-card" onclick="sendPrompt('What does my LDL cholesterol of 112 mean?')">
+          <div class="lab-card-label">LDL</div>
+          <div class="lab-card-value">112 <span style="font-size:14px;font-weight:400;color:var(--gray-text)">mg/dL</span></div>
+          <div class="lab-card-status"><span class="lab-dot lab-dot-amber"></span> <span style="color:var(--amber)">Borderline high</span></div>
+          <div class="lab-card-cta">Tap to understand →</div>
+        </div>
+        <div class="lab-card" onclick="sendPrompt('What does my blood pressure of 138/84 mean?')">
+          <div class="lab-card-label">BP</div>
+          <div class="lab-card-value">138/84</div>
+          <div class="lab-card-status"><span class="lab-dot lab-dot-amber"></span> <span style="color:var(--amber)">Elevated</span></div>
+          <div class="lab-card-cta">Tap to understand →</div>
+        </div>
+      </div>
+
+      <!-- Medications -->
+      <div class="health-section-label">Medications</div>
+      <div class="med-card">
+        <div class="med-icon">💊</div>
+        <div class="med-info">
+          <div class="med-name">Metformin 500mg</div>
+          <div class="med-detail">Twice daily · Last filled Jan 15</div>
+          <div class="med-badge">Refill soon</div>
+        </div>
+      </div>
+      <div class="med-card">
+        <div class="med-icon">💊</div>
+        <div class="med-info">
+          <div class="med-name">Lisinopril 10mg</div>
+          <div class="med-detail">Once daily</div>
+        </div>
+      </div>
+      <div class="med-card">
+        <div class="med-icon">💊</div>
+        <div class="med-info">
+          <div class="med-name">Atorvastatin 20mg</div>
+          <div class="med-detail">Once daily</div>
+        </div>
+      </div>
+    </div>
+    <div id="tab-benefits" class="tab-view">
+      <div class="benefits-header">Your Benefits</div>
+
+      <!-- Food & Home Card -->
+      <div class="benefit-card">
+        <div class="benefit-card-label">FOOD &amp; HOME CARD</div>
+        <div class="benefit-card-amount">$125 <span style="font-size:15px;font-weight:400;color:var(--gray-text)">remaining</span></div>
+        <div class="benefit-card-sub">of $300 quarterly allowance</div>
+        <div class="benefit-progress-track">
+          <div class="benefit-progress-fill" style="width:42%"></div>
+        </div>
+        <div class="benefit-card-link" onclick="sendPrompt('Tell me about my Food and Home Card balance and how to use it')">See details →</div>
+      </div>
+
+      <!-- Wellness Bucks -->
+      <div class="benefit-card">
+        <div class="benefit-card-label">WELLNESS BUCKS</div>
+        <div class="benefit-card-amount">$155 <span style="font-size:15px;font-weight:400;color:var(--gray-text)">remaining</span></div>
+        <div class="benefit-card-sub">of $500 annual allowance</div>
+        <div class="benefit-progress-track">
+          <div class="benefit-progress-fill amber" style="width:31%"></div>
+        </div>
+        <div class="benefit-pending">Pending: Yoga Mat $45</div>
+      </div>
+
+      <!-- OTC Allowance -->
+      <div class="benefit-card">
+        <div class="benefit-card-label">OTC ALLOWANCE</div>
+        <div class="benefit-card-amount">$100 <span style="font-size:15px;font-weight:400;color:var(--gray-text)">/quarter</span></div>
+        <div class="benefit-card-sub">Use at participating pharmacies for health essentials</div>
+        <div class="benefit-card-link" onclick="sendPrompt('How do I use my OTC allowance?')">Learn more →</div>
+      </div>
+
+      <!-- ID Card -->
+      <div class="benefit-card" style="cursor:pointer" onclick="sendPrompt('Show me my member ID card')">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--charcoal)">ID Card</div>
+            <div style="font-size:15px;color:var(--gray-text)">View or share your member card</div>
+          </div>
+          <span style="font-size:18px;color:var(--gray-mid)">›</span>
+        </div>
+      </div>
+
+      <!-- Plan Highlights -->
+      <div class="health-section-label">Plan Highlights</div>
+      <div class="benefit-card">
+        <div class="plan-highlight">
+          <span class="plan-highlight-check">✓</span>
+          <span class="plan-highlight-text">$0 primary care visits</span>
+        </div>
+        <div class="plan-highlight">
+          <span class="plan-highlight-check">✓</span>
+          <span class="plan-highlight-text">$0 Tier 1 prescriptions</span>
+        </div>
+        <div class="plan-highlight">
+          <span class="plan-highlight-check">✓</span>
+          <span class="plan-highlight-text">Dental, vision &amp; hearing included</span>
+        </div>
+        <div class="plan-highlight">
+          <span class="plan-highlight-check">✓</span>
+          <span class="plan-highlight-text">24/7 nurse line access</span>
+        </div>
+        <div class="plan-highlight">
+          <span class="plan-highlight-check">✓</span>
+          <span class="plan-highlight-text">Transportation to appointments</span>
+        </div>
+      </div>
+    </div>
+    <div id="tab-profile" class="tab-view">
+      <div class="profile-header">Your Profile</div>
+
+      <!-- Member card -->
+      <div class="member-card">
+        <div class="member-card-name">Laura Ingalls Wilder</div>
+        <div class="member-card-plan">Devoted Health MA (HMO)</div>
+        <div class="member-card-row">
+          <span class="member-card-row-label">Member ID</span>
+          <span class="member-card-row-value">DVH-2024-78432</span>
+        </div>
+        <div class="member-card-row">
+          <span class="member-card-row-label">PCP</span>
+          <span class="member-card-row-value">Dr. Sarah Wagle</span>
+        </div>
+        <div class="member-card-row">
+          <span class="member-card-row-label">Next visit</span>
+          <span class="member-card-row-value">March 4, 10:00am</span>
+        </div>
+      </div>
+
+      <!-- Preferences -->
+      <div class="profile-section-label">Preferences</div>
+      <div class="nav-card-group">
+        <div class="nav-card-row" onclick="sendPrompt('Show me my mail from Devoted')">
+          <span class="nav-card-row-label">Mail from Devoted</span>
+          <span class="nav-card-row-arrow">›</span>
+        </div>
+        <div class="nav-card-row" onclick="sendPrompt('Help me manage my information sharing settings')">
+          <span class="nav-card-row-label">Share My Information</span>
+          <span class="nav-card-row-arrow">›</span>
+        </div>
+        <div class="nav-card-row" onclick="sendPrompt('Help me go paperless')">
+          <span class="nav-card-row-label">Go Paperless</span>
+          <span class="nav-card-row-arrow">›</span>
+        </div>
+        <div class="nav-card-row" onclick="sendPrompt('Help me change my language preference')">
+          <span class="nav-card-row-label">Language</span>
+          <span style="font-size:16px;color:var(--gray-text)">English ›</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- AI bar -->
+  <div class="ai-bar" id="aiBar">
+    <div class="ai-bar-pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.49"/></svg>
+      <input type="text" id="aiBarInput" placeholder="">
+    </div>
+    <button class="ai-bar-send" aria-label="Send" onclick="handleAiBarSend()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+
+  <!-- Companion sheet backdrop -->
+  <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeSheet()"></div>
+
+  <!-- Companion sheet -->
+  <div class="sheet" id="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header" id="sheetHeader"></div>
+
+    <!-- Thread list view -->
+    <div class="thread-list-view" id="threadListView">
+      <div class="sheet-body">
+        <button class="thread-new-btn" onclick="startNewConversation()">New conversation</button>
+        <div id="threadListRows"></div>
+      </div>
+    </div>
+
+    <!-- Conversation view -->
+    <div class="conv-view" id="convView">
+      <div class="conv-messages" id="convMessages"></div>
+      <div class="conv-input-area">
+        <div class="conv-input-row">
+          <div class="conv-input-pill">
+            <input type="text" id="convInput" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter')handleConvSend()">
+          </div>
+          <button class="conv-send-btn" aria-label="Send" onclick="handleConvSend()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+        <div id="convFooter"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom tab bar -->
+  <nav class="tab-bar">
+    <button class="tab-bar-item active" data-tab="home" onclick="switchTab('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="tab-bar-item" data-tab="health" onclick="switchTab('health')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>
+      <span>Health</span>
+    </button>
+    <button class="tab-bar-item" data-tab="benefits" onclick="switchTab('benefits')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      <span>Benefits</span>
+    </button>
+    <button class="tab-bar-item" data-tab="chat" onclick="openChatTab()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <span>Chat</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+// ── API key gate ──
+const apiKey = new URLSearchParams(window.location.search).get('k');
+if (apiKey) {
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').classList.add('active');
+}
+
+// ── Tab switching ──
+let currentTab = 'home';
+
+const aiBarPlaceholders = {
+  home: '',
+  health: 'Ask about your health...',
+  benefits: 'Ask about your benefits...',
+  profile: 'Help me to...'
+};
+
+function switchTab(tab) {
+  currentTab = tab;
+
+  // Update tab views
+  document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+  const target = document.getElementById('tab-' + tab);
+  if (target) target.classList.add('active');
+
+  // Update tab bar active state
+  document.querySelectorAll('.tab-bar-item').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tab);
+  });
+
+  // AI bar visibility & placeholder
+  const aiBar = document.getElementById('aiBar');
+  const aiInput = document.getElementById('aiBarInput');
+  if (tab === 'home') {
+    aiBar.classList.add('hidden');
+  } else {
+    aiBar.classList.remove('hidden');
+    aiInput.placeholder = aiBarPlaceholders[tab] || '';
+  }
+}
+
+function openChatTab() {
+  // Highlight chat tab
+  document.querySelectorAll('.tab-bar-item').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === 'chat');
+  });
+  openThreadList();
+}
+
+function handleAiBarSend() {
+  const input = document.getElementById('aiBarInput');
+  const text = input.value.trim();
+  if (text) {
+    openConvSheet(text);
+    input.value = '';
+  }
+}
+
+// ── Home hero input ──
+function handleHomeSend() {
+  const input = document.getElementById('homeInput');
+  const text = input.value.trim();
+  if (text) {
+    sendPrompt(text);
+    input.value = '';
+  }
+}
+
+function sendPrompt(text) {
+  console.log('send:', text);
+  openConvSheet(text);
+}
+
+// ── Scroll dots for chips ──
+(function() {
+  const scroll = document.getElementById('chipsScroll');
+  const dots = document.querySelectorAll('#scrollDots .dot');
+  if (scroll && dots.length) {
+    scroll.addEventListener('scroll', function() {
+      const pct = scroll.scrollLeft / (scroll.scrollWidth - scroll.clientWidth);
+      const idx = Math.round(pct * (dots.length - 1));
+      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    });
+  }
+})();
+
+// ── Seeded threads ──
+const SEEDED_THREADS = [
+  {
+    id: 'thread-1',
+    title: 'Your A1c improved to 6.8%',
+    status: 'resolved',
+    lastActivityAt: '2026-02-26',
+    messages: [
+      { role: 'ai', sender: 'MyDevoted', text: "Laura, I wanted to share something from your recent labs. Your HbA1c came back at 6.8% — that's down from 7.2% last time. That's a meaningful improvement.\n\nThis number reflects the last 2-3 months of your life — your meals, your movement, your daily rhythms.\n\nHow does it feel to hear that?" },
+      { role: 'user', text: "Honestly? A little surprised. I didn't think I was doing anything differently." },
+      { role: 'ai', sender: 'MyDevoted', text: "That's such an interesting response. Sometimes the most sustainable changes are the ones we don't even notice.\n\nWould you like me to check in with you a couple times a week? Not homework — just noticing patterns together." },
+      { role: 'user', text: "Supportive, I think. I'd like that." },
+      { role: 'ai', sender: 'MyDevoted', text: "Let's keep it light — Tuesdays and Thursdays. You set the pace.\n\nAnd Laura — that 6.8% is yours. You earned it." }
+    ]
+  },
+  {
+    id: 'thread-2',
+    title: 'What does my eGFR of 58 mean?',
+    status: 'resolved',
+    lastActivityAt: '2026-02-27',
+    messages: [
+      { role: 'user', text: "I saw my eGFR was 58. What does that mean?" },
+      { role: 'ai', sender: 'MyDevoted', text: "Your eGFR of 58 measures how well your kidneys are filtering. At 58, they're working at roughly 60% capacity.\n\nThis is called Stage 3a — which sounds more alarming than it usually is. It's quite common alongside diabetes and blood pressure management.\n\nYour lisinopril is specifically chosen to protect kidney function." },
+      { role: 'user', text: "I've been feeling more tired lately. Could it be connected?" },
+      { role: 'ai', sender: 'MyDevoted', text: "That's a thoughtful connection. For some people, reduced kidney function can contribute to tiredness.\n\nThis would be a great thing to bring up with Dr. Wagle on March 4. Would you like me to help you draft a question?" }
+    ]
+  },
+  {
+    id: 'thread-3',
+    title: 'Yoga mat reimbursement',
+    status: 'resolved',
+    lastActivityAt: '2026-02-23',
+    messages: [
+      { role: 'user', text: "I bought a yoga mat for $45. Can I get reimbursed?" },
+      { role: 'ai', sender: 'MyDevoted', text: "Yes! A yoga mat qualifies under your **Wellness Bucks** benefit. You have a **$200 annual allowance**.\n\nOnce submitted, claims typically process within **5-7 business days**. Your remaining balance will be **$155**.\n\nWould you like to start the submission?" }
+    ]
+  },
+  {
+    id: 'thread-4',
+    title: 'Billing question about specialist',
+    status: 'waiting-guide',
+    lastActivityAt: '2026-03-10',
+    escalatedTo: { name: 'Mary Ann B.', team: 'Devoted Guide' },
+    messages: [
+      { role: 'user', text: "I got a bill for $150 from a specialist. I thought my plan covered this?" },
+      { role: 'ai', sender: 'MyDevoted', text: "With a PCP referral, in-network dermatology visits should have a **$30 copay**. A $150 bill sounds like it may have been processed incorrectly.\n\nWould you like me to connect you with a Devoted Guide who can look into the claim details?" },
+      { role: 'user', text: "Yes please." },
+      { role: 'system', text: 'Mary Ann B. from Devoted Guide has joined this conversation.' },
+      { role: 'human', sender: 'Mary Ann B., Devoted Guide', team: 'guide', text: "Hi Laura — I'm Mary Ann, a Devoted Guide. I can see you're asking about a $150 bill from a dermatology visit. I'm pulling up your claim details now. I'll get back to you here shortly." }
+    ]
+  },
+  {
+    id: 'thread-5',
+    title: 'Preparing for Dr. Wagle appointment',
+    status: 'open',
+    lastActivityAt: '2026-03-12',
+    messages: [
+      { role: 'user', text: "My appointment with Dr. Wagle is coming up. Can you help me prepare?" },
+      { role: 'ai', sender: 'MyDevoted', text: "Your appointment is on **March 4 at 10:00am**. Based on your recent labs:\n\n- **A1c improvement** (6.8%) — worth celebrating\n- **Kidney function** (eGFR 58) — stable, ask about monitoring\n- **Fatigue** — you mentioned feeling tired\n\n**What feels most important to YOU going into this visit?**" }
+    ]
+  }
+];
+
+let threads = SEEDED_THREADS.map(t => ({ ...t, messages: [...t.messages] }));
+let activeThreadId = null;
+let sheetOpen = false;
+let sheetView = 'thread-list';
+
+// ── Date formatting ──
+function formatThreadDate(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00');
+  const now = new Date();
+  const diffMs = now - d;
+  const diffDays = Math.floor(diffMs / 86400000);
+  if (diffDays < 1) return 'Just now';
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return diffDays + 'd ago';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+// ── Sheet control ──
+function openSheet() {
+  sheetOpen = true;
+  document.getElementById('sheet').classList.add('open');
+  document.getElementById('sheetBackdrop').classList.add('open');
+  document.getElementById('aiBar').classList.add('hidden');
+}
+
+function closeSheet() {
+  sheetOpen = false;
+  activeThreadId = null;
+  document.getElementById('sheet').classList.remove('open');
+  document.getElementById('sheetBackdrop').classList.remove('open');
+  // Restore AI bar based on current tab
+  if (currentTab !== 'home') {
+    document.getElementById('aiBar').classList.remove('hidden');
+  }
+  // Reset chat tab highlight
+  document.querySelectorAll('.tab-bar-item').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === currentTab);
+  });
+}
+
+// ── Render sheet header ──
+function renderSheetHeader() {
+  const header = document.getElementById('sheetHeader');
+  if (sheetView === 'thread-list') {
+    header.innerHTML = `
+      <div class="sheet-header-left"></div>
+      <div class="sheet-header-center">
+        <div class="sheet-header-title">Conversations</div>
+      </div>
+      <div class="sheet-header-right">
+        <button class="sheet-btn" onclick="closeSheet()" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>`;
+  } else {
+    const thread = threads.find(t => t.id === activeThreadId);
+    const subtitle = thread ? thread.title : '';
+    header.innerHTML = `
+      <div class="sheet-header-left">
+        <button class="sheet-btn" onclick="showThreadList()" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+      </div>
+      <div class="sheet-header-center">
+        <div class="sheet-header-title">MyDevoted AI</div>
+        <div class="sheet-header-subtitle">${subtitle}</div>
+      </div>
+      <div class="sheet-header-right">
+        <button class="sheet-btn" onclick="closeSheet()" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>`;
+  }
+}
+
+// ── Thread list ──
+function renderThreadList() {
+  const container = document.getElementById('threadListRows');
+  const sorted = [...threads].sort((a, b) => new Date(b.lastActivityAt) - new Date(a.lastActivityAt));
+  container.innerHTML = sorted.map(t => {
+    const lastMsg = t.messages[t.messages.length - 1];
+    let preview = lastMsg ? lastMsg.text.replace(/\*\*/g, '').replace(/\n/g, ' ') : '';
+    if (preview.length > 60) preview = preview.substring(0, 60) + '...';
+    const isActive = t.status === 'waiting-guide' || t.status === 'waiting-medical';
+    const badge = isActive ? '<span class="thread-active-badge">Active</span>' : '';
+    return `<div class="thread-row" onclick="openThread('${t.id}')">
+      <div class="thread-row-content">
+        <div class="thread-row-top">
+          <span class="thread-row-title">${t.title}</span>
+          <span class="thread-row-date">${formatThreadDate(t.lastActivityAt)}</span>
+        </div>
+        <div class="thread-row-bottom">
+          <span class="thread-row-preview">${preview}</span>
+          ${badge}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showThreadList() {
+  sheetView = 'thread-list';
+  activeThreadId = null;
+  renderSheetHeader();
+  renderThreadList();
+  document.getElementById('threadListView').classList.add('active');
+  document.getElementById('convView').classList.remove('active');
+}
+
+// ── Markdown renderer ──
+function formatMessageText(text) {
+  let html = text;
+  // Horizontal rules
+  html = html.replace(/^---$/gm, '<hr>');
+  // Headers
+  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  // Bold **text**
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // Italic *text*
+  html = html.replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, '<em>$1</em>');
+  // Unordered lists: consecutive lines starting with - or *
+  html = html.replace(/(^|\n)((?:[-*] .+\n?)+)/g, function(match, pre, list) {
+    const items = list.trim().split('\n').map(l => '<li>' + l.replace(/^[-*] /, '') + '</li>').join('');
+    return pre + '<ul>' + items + '</ul>';
+  });
+  // Ordered lists: consecutive lines starting with number.
+  html = html.replace(/(^|\n)((?:\d+\. .+\n?)+)/g, function(match, pre, list) {
+    const items = list.trim().split('\n').map(l => '<li>' + l.replace(/^\d+\. /, '') + '</li>').join('');
+    return pre + '<ol>' + items + '</ol>';
+  });
+  // Paragraphs
+  const paras = html.split('\n\n');
+  if (paras.length > 1) {
+    html = paras.map(p => {
+      p = p.trim();
+      if (p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('<ol') || p.startsWith('<hr')) return p;
+      return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+    }).join('');
+  } else {
+    html = html.replace(/\n/g, '<br>');
+  }
+  return html;
+}
+
+// ── Determine if thread has waiting status ──
+function isThreadEscalated(thread) {
+  return thread.status === 'waiting-guide' || thread.status === 'waiting-medical';
+}
+
+// ── Find any active escalated thread ──
+function findActiveEscalatedThread() {
+  return threads.find(t => isThreadEscalated(t));
+}
+
+function renderConversation() {
+  const thread = threads.find(t => t.id === activeThreadId);
+  const container = document.getElementById('convMessages');
+  const footer = document.getElementById('convFooter');
+  const input = document.getElementById('convInput');
+
+  if (!thread) return;
+
+  let html = '';
+
+  // Active thread banner if there's an escalated thread AND we're not viewing it
+  const escalatedThread = findActiveEscalatedThread();
+  if (escalatedThread && escalatedThread.id !== activeThreadId) {
+    html += `<div class="active-thread-banner" onclick="openThread('${escalatedThread.id}')">
+      <span>You have an active conversation</span>
+      <span>→</span>
+    </div>`;
+  }
+
+  // First-chat card if no history and it's a brand new thread
+  if (thread.messages.length === 0) {
+    html += '<div class="first-chat-card">You\'re chatting with MyDevoted AI. You can ask to speak with a real person at any time.</div>';
+    html += '<div class="emergency-footer">Emergency? <a href="tel:911">Call 911</a> · Care OnDemand <a href="tel:18888022738">1-888-802-2738</a></div>';
+  }
+
+  thread.messages.forEach(msg => {
+    if (msg.role === 'user') {
+      html += `<div class="msg msg-user"><div class="msg-bubble">${formatMessageText(msg.text)}</div></div>`;
+    } else if (msg.role === 'ai') {
+      html += `<div class="msg msg-ai">
+        <div class="msg-avatar msg-avatar-ai">♥</div>
+        <div class="msg-bubble">${formatMessageText(msg.text)}</div>
+      </div>`;
+    } else if (msg.role === 'system') {
+      html += `<div class="msg msg-system"><div class="msg-system-text">— ${msg.text} —</div></div>`;
+    } else if (msg.role === 'human') {
+      const avatarClass = msg.team === 'medical' ? 'msg-avatar-medical' : 'msg-avatar-guide';
+      const initials = msg.sender.split(' ').map(w => w[0]).join('').substring(0, 2);
+      html += `<div class="msg msg-human">
+        <div class="msg-avatar ${avatarClass}">${initials}</div>
+        <div><div class="msg-bubble">${formatMessageText(msg.text)}</div>
+        <div class="msg-attribution">${msg.sender}</div></div>
+      </div>`;
+    }
+  });
+
+  container.innerHTML = html;
+
+  // Footer: escalated vs normal
+  const escalated = isThreadEscalated(thread);
+  if (escalated) {
+    input.placeholder = 'Add more details...';
+    footer.innerHTML = `<div class="conv-turnaround">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Your care team typically responds in 5–10 minutes
+    </div>`;
+  } else {
+    input.placeholder = 'Ask me anything...';
+    if (thread.messages.length > 0) {
+      footer.innerHTML = '<button class="conv-footer-link" onclick="handleTalkToPerson()">Talk to a person</button>';
+    } else {
+      footer.innerHTML = '<button class="conv-footer-link" onclick="handleTalkToPerson()">Talk to a person</button>';
+    }
+  }
+
+  // Scroll to bottom
+  requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+}
+
+// ── Handle "Talk to a person" link tap ──
+function handleTalkToPerson() {
+  if (!activeThreadId) return;
+  showEscalationCard();
+}
+
+function openThread(threadId) {
+  activeThreadId = threadId;
+  sheetView = 'conversation';
+  renderSheetHeader();
+  renderConversation();
+  document.getElementById('threadListView').classList.remove('active');
+  document.getElementById('convView').classList.add('active');
+  if (!sheetOpen) openSheet();
+}
+
+// ── API config ──
+const API_URL = 'https://api.anthropic.com/v1/messages';
+const MODEL = 'claude-sonnet-4-20250514';
+const HEADERS = {
+  'Content-Type': 'application/json',
+  'x-api-key': apiKey,
+  'anthropic-version': '2023-06-01',
+  'anthropic-dangerous-direct-browser-access': 'true'
+};
+
+const MEMBER_CONTEXT = `MEMBER CONTEXT:
+Laura Ingalls Wilder, age 71
+Plan: Devoted Health Medicare Advantage (HMO)
+Member ID: DVH-2024-78432
+PCP: Dr. Sarah Wagle, Devoted Medical Group
+Next appointment: March 4, 2026 at 10:00am
+
+Recent labs (Feb 10, 2026):
+- HbA1c: 6.8% (improved from 7.2%)
+- eGFR: 58 mL/min (mildly reduced kidney function)
+- LDL: 112 mg/dL (borderline high)
+- Blood pressure: 138/84 (elevated)
+
+Medications: Metformin 500mg twice daily, Lisinopril 10mg daily, Atorvastatin 20mg daily
+
+Benefits:
+- Food & Home Card: $125 remaining of $200/month
+- Wellness Bucks: $155 remaining of $200/year ($45 yoga mat claim in progress)
+- OTC: $100/quarter, Q1 untouched`;
+
+const FORMATTING_RULES = `FORMATTING:
+- Use **bold** for key terms and numbers
+- Bullet lists for multiple items
+- Keep paragraphs to 1-2 sentences
+- Never write more than 2 sentences without a visual break`;
+
+const AGENT_PROMPTS = {
+  BENEFITS: 'You are MyDevoted, answering a benefits question. Be friendly, precise, confident. Give exact dollar amounts, statuses, timelines. Proactively mention related benefits. Under 150 words. End with one next step.',
+  HEALTH: 'You are MyDevoted, helping a member understand health data. Use plain language (5th grade level). Define jargon immediately. Use "for many people...", "something worth noticing...". Never diagnose, prescribe, or suggest medication changes. Offer to help draft questions for their doctor. Under 200 words. End with a curious question.',
+  COACH: 'You are MyDevoted, supporting wellness and motivation. Ask one genuinely curious question per response. Validate before offering perspective. Never give to-do lists or say "you should." Never lecture. Under 180 words. End with an open question.',
+  NAVIGATE: 'You are MyDevoted, helping navigate the app. Provide the relevant page name and briefly describe what they\'ll find. If ambiguous, offer 2-3 options. Under 80 words.'
+};
+
+const ROUTER_PROMPT = `You are a triage router. Classify this message as exactly one word:
+BENEFITS — claims, coverage, Food & Home Card, Wellness Bucks, OTC, billing, ID card, copay
+HEALTH — labs, medications, vitals, conditions, kidneys, blood sugar, cholesterol, blood pressure
+COACH — feelings, energy, tired, sleep, stress, motivation, appointment prep, wellness
+NAVIGATE — "where do I find", "take me to", "show me", single-word queries like "claims"
+
+Default: HEALTH`;
+
+const EMERGENCY_REGEX = /chest pain|can't breathe|cannot breathe|heart attack|stroke|suicidal|want to die|kill myself|overdose|seizure|unconscious|choking|severe bleeding|anaphylaxis/i;
+const ESCALATION_REGEX = /talk to a person|talk to someone|speak to someone|live agent|real person|human agent|representative|need a person|want a person|need to talk|can I speak/i;
+
+// ── Route message ──
+async function routeMessage(text) {
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: HEADERS,
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 10,
+        system: ROUTER_PROMPT,
+        messages: [{ role: 'user', content: `Member message: "${text}"` }]
+      })
+    });
+    const data = await res.json();
+    const word = (data.content?.[0]?.text || 'HEALTH').trim().toUpperCase();
+    if (AGENT_PROMPTS[word]) return word;
+    return 'HEALTH';
+  } catch (e) {
+    return 'HEALTH';
+  }
+}
+
+// ── Build API messages from thread history ──
+function buildApiMessages(thread) {
+  const messages = [];
+  for (const msg of thread.messages) {
+    if (msg.role === 'user') {
+      messages.push({ role: 'user', content: msg.text });
+    } else if (msg.role === 'ai') {
+      messages.push({ role: 'assistant', content: msg.text });
+    } else if (msg.role === 'human') {
+      messages.push({ role: 'assistant', content: `[${msg.sender} responded]: ${msg.text}` });
+    }
+  }
+  return messages;
+}
+
+// ── Render home conversations section ──
+function renderHomeConversations() {
+  const convRows = document.querySelectorAll('#tab-home .conv-row');
+  // Home page shows static seeded rows — no dynamic update needed for prototype
+}
+
+// ── Loading indicator ──
+function showLoading() {
+  const container = document.getElementById('convMessages');
+  const div = document.createElement('div');
+  div.className = 'msg msg-ai msg-loading';
+  div.innerHTML = `<div class="msg-avatar msg-avatar-ai">♥</div>
+    <div class="msg-bubble"><span class="loading-text">Thinking...</span>
+    <div class="loading-dots"><span></span><span></span><span></span></div></div>`;
+  container.appendChild(div);
+  requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+  return div;
+}
+
+// ── Emergency card ──
+function showEmergencyCard(thread) {
+  const container = document.getElementById('convMessages');
+  const div = document.createElement('div');
+  div.className = 'msg msg-ai';
+  div.innerHTML = `<div class="msg-avatar msg-avatar-ai">♥</div>
+    <div class="msg-bubble" style="background:var(--red-light);border-color:var(--red);">
+      <p style="font-size:20px;text-align:center;">🚨</p>
+      <p><strong>If this is an emergency, call 911 now.</strong></p>
+      <p>If you need urgent care advice, call the Devoted Care OnDemand line:</p>
+      <p><a href="tel:18888022738" style="color:var(--red);font-weight:700;font-size:17px;">1-888-802-2738</a></p>
+      <p style="margin-top:8px;"><button onclick="dismissEmergencyCard(this)" style="background:none;border:none;color:var(--gray-text);font-size:14px;cursor:pointer;font-family:Public Sans,sans-serif;text-decoration:underline;">This isn't an emergency</button></p>
+    </div>`;
+  container.appendChild(div);
+  thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: '🚨 If this is an emergency, call 911 now. Care OnDemand: 1-888-802-2738' });
+  requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+}
+
+function dismissEmergencyCard(btn) {
+  const bubble = btn.closest('.msg');
+  if (bubble) bubble.remove();
+}
+
+// ── Escalation card (inline) ──
+let escalationCardEl = null;
+
+function showEscalationCard() {
+  const container = document.getElementById('convMessages');
+  const div = document.createElement('div');
+  div.className = 'msg msg-ai';
+  escalationCardEl = div;
+  div.innerHTML = `<div class="msg-avatar msg-avatar-ai">♥</div>
+    <div class="msg-bubble escalation-card">
+      <div class="escalation-card-icon">👤</div>
+      <div class="escalation-card-title">Would you like to talk to someone?</div>
+      <div class="escalation-card-desc">A member of our team will respond in this conversation.</div>
+      <button class="escalation-btn-primary" onclick="confirmEscalation()">Send to care team</button>
+      <button class="escalation-btn-secondary" onclick="dismissEscalation()">Continue with AI</button>
+    </div>`;
+  container.appendChild(div);
+  requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+}
+
+function dismissEscalation() {
+  if (escalationCardEl) {
+    escalationCardEl.remove();
+    escalationCardEl = null;
+  }
+}
+
+// ── Determine escalation team from conversation content ──
+const BENEFITS_KEYWORDS = /benefit|claim|coverage|food.*card|home.*card|wellness.*buck|otc|billing|copay|deductible|id card|reimburse|allowance/i;
+
+function determineEscalationTeam(thread) {
+  const allText = thread.messages.map(m => m.text).join(' ');
+  if (BENEFITS_KEYWORDS.test(allText)) return 'guide';
+  return 'medical';
+}
+
+const HUMAN_PROMPTS = {
+  guide: {
+    name: 'Mary Ann B.',
+    title: 'Mary Ann B., Devoted Guide',
+    team: 'Devoted Guide',
+    status: 'waiting-guide',
+    systemPrompt: `You are Mary Ann B., a Devoted Guide at Devoted Health. You are a real person responding to a member about their benefits or billing question. You've just joined the conversation and can see everything that was discussed with the AI.
+
+Be warm, specific, professional. Use first person. Introduce yourself briefly. Reference what was already discussed. Provide a concrete next step. Sign your message with "— Mary Ann B., Devoted Guide"
+
+Keep under 100 words.`
+  },
+  medical: {
+    name: 'Dr. Alison Holliday',
+    title: 'Dr. Alison Holliday, Devoted Medical',
+    team: 'Devoted Medical',
+    status: 'waiting-medical',
+    systemPrompt: `You are Dr. Alison Holliday, a clinician at Devoted Medical. You are a real doctor responding to a member about a health concern. You've just joined the conversation and can see everything that was discussed with the AI.
+
+Be warm, specific, clinically precise. Use first person. Introduce yourself briefly. Reference what was already discussed. Provide clinical guidance. If recommending medication changes, be specific. Sign your message with "— Dr. Alison Holliday, Devoted Medical"
+
+Keep under 150 words.`
+  }
+};
+
+async function confirmEscalation() {
+  const thread = threads.find(t => t.id === activeThreadId);
+  if (!thread) return;
+
+  // Remove the escalation card
+  dismissEscalation();
+
+  // AI transition message
+  thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: "Of course — I'm connecting you with our care team. They'll see our full conversation." });
+  renderConversation();
+
+  // Determine team
+  const teamKey = determineEscalationTeam(thread);
+  const persona = HUMAN_PROMPTS[teamKey];
+
+  // Update thread status
+  thread.status = persona.status;
+  thread.escalatedTo = { name: persona.name, team: persona.team };
+
+  // System message
+  thread.messages.push({ role: 'system', text: `${persona.name} from ${persona.team} has joined this conversation.` });
+  renderConversation();
+
+  // Show loading, wait ~3s, then call API for human response
+  const loader = showLoading();
+
+  try {
+    // Delay to simulate human joining
+    await new Promise(r => setTimeout(r, 3000));
+
+    const apiMessages = buildApiMessages(thread);
+    const systemPrompt = MEMBER_CONTEXT + '\n\n' + persona.systemPrompt + '\n\n' + FORMATTING_RULES;
+
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: HEADERS,
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 512,
+        system: systemPrompt,
+        messages: apiMessages
+      })
+    });
+
+    loader.remove();
+
+    const data = await response.json();
+    const humanText = data.content?.[0]?.text || `Hi Laura — I'm ${persona.name}. I've reviewed this conversation and I'm here to help. Let me look into this for you.\n\n— ${persona.name}`;
+
+    thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: humanText });
+    thread.lastActivityAt = new Date().toISOString().split('T')[0];
+    renderConversation();
+    renderSheetHeader();
+  } catch (err) {
+    loader.remove();
+    thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: `Hi Laura — I'm ${persona.name}. I've reviewed this conversation and I'm here to help. Let me look into this for you.\n\n— ${persona.name}` });
+    renderConversation();
+  }
+}
+
+// ── Send message (main flow) ──
+let isSending = false;
+
+async function sendMessage(text) {
+  if (isSending || !activeThreadId) return;
+  const thread = threads.find(t => t.id === activeThreadId);
+  if (!thread) return;
+
+  // 1. Check emergency
+  if (EMERGENCY_REGEX.test(text)) {
+    thread.messages.push({ role: 'user', text: text });
+    thread.lastActivityAt = new Date().toISOString().split('T')[0];
+    renderConversation();
+    showEmergencyCard(thread);
+    return;
+  }
+
+  // 2. Check escalation
+  if (ESCALATION_REGEX.test(text)) {
+    thread.messages.push({ role: 'user', text: text });
+    thread.lastActivityAt = new Date().toISOString().split('T')[0];
+    renderConversation();
+    showEscalationCard();
+    return;
+  }
+
+  // 3. Add user message
+  thread.messages.push({ role: 'user', text: text });
+  thread.lastActivityAt = new Date().toISOString().split('T')[0];
+
+  // Update title if first message
+  if (thread.messages.length === 1 || (thread.messages.length <= 2 && !thread.titleGenerated)) {
+    const firstUserMsg = thread.messages.find(m => m.role === 'user');
+    if (firstUserMsg) {
+      thread.title = firstUserMsg.text.length > 40 ? firstUserMsg.text.substring(0, 40) + '...' : firstUserMsg.text;
+      thread.titleGenerated = true;
+    }
+  }
+
+  renderConversation();
+  renderSheetHeader();
+
+  // 4. Show loading
+  isSending = true;
+  const loader = showLoading();
+
+  try {
+    // Check if thread is escalated — use human persona
+    const escalated = isThreadEscalated(thread);
+
+    if (escalated) {
+      // Use human persona for responses after escalation
+      const teamKey = thread.status === 'waiting-medical' ? 'medical' : 'guide';
+      const persona = HUMAN_PROMPTS[teamKey];
+      const apiMessages = buildApiMessages(thread);
+      const systemPrompt = MEMBER_CONTEXT + '\n\n' + persona.systemPrompt + '\n\n' + FORMATTING_RULES + '\n\nCONVERSATION CONTEXT: This is a continued conversation. The member has sent a follow-up message. Respond as yourself, staying in character.';
+
+      // Simulate slight delay for human feel
+      await new Promise(r => setTimeout(r, 2000));
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: HEADERS,
+        body: JSON.stringify({
+          model: MODEL,
+          max_tokens: 512,
+          system: systemPrompt,
+          messages: apiMessages
+        })
+      });
+
+      loader.remove();
+      const data = await response.json();
+      const humanText = data.content?.[0]?.text || "Thank you for the additional details. I'm looking into this now.";
+      thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: humanText });
+      thread.lastActivityAt = new Date().toISOString().split('T')[0];
+      renderConversation();
+    } else {
+      // 5. Route
+      const agent = await routeMessage(text);
+
+      // 6. Build messages
+      const apiMessages = buildApiMessages(thread);
+
+      // 7. Build system prompt
+      let systemPrompt = MEMBER_CONTEXT + '\n\n' + AGENT_PROMPTS[agent] + '\n\n' + FORMATTING_RULES;
+      if (thread.messages.filter(m => m.role === 'user').length > 1) {
+        systemPrompt += '\n\nCONVERSATION CONTEXT: This is a continued conversation. Reference what was discussed. Don\'t repeat information.';
+      }
+
+      // 8. Call API
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: HEADERS,
+        body: JSON.stringify({
+          model: MODEL,
+          max_tokens: 1024,
+          system: systemPrompt,
+          messages: apiMessages
+        })
+      });
+
+      loader.remove();
+
+      const data = await response.json();
+      const aiText = data.content?.[0]?.text || "I'm having trouble right now. Please try again.";
+      thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: aiText });
+      thread.lastActivityAt = new Date().toISOString().split('T')[0];
+      renderConversation();
+    }
+  } catch (err) {
+    loader.remove();
+    thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: "We're having trouble connecting. Please try again." });
+    renderConversation();
+  } finally {
+    isSending = false;
+  }
+}
+
+// ── Create new thread ──
+let threadCounter = 100;
+function createThread(firstMessage) {
+  threadCounter++;
+  const title = firstMessage.length > 40 ? firstMessage.substring(0, 40) + '...' : firstMessage;
+  const today = new Date().toISOString().split('T')[0];
+  const thread = {
+    id: 'thread-' + threadCounter,
+    title: title,
+    titleGenerated: true,
+    status: 'open',
+    lastActivityAt: today,
+    messages: []
+  };
+  threads.unshift(thread);
+  return thread;
+}
+
+function startNewConversation() {
+  threadCounter++;
+  const today = new Date().toISOString().split('T')[0];
+  const thread = {
+    id: 'thread-' + threadCounter,
+    title: 'New conversation',
+    status: 'open',
+    lastActivityAt: today,
+    messages: []
+  };
+  threads.unshift(thread);
+  openThread(thread.id);
+}
+
+// ── Public API: open sheet ──
+function openConvSheet(prefill) {
+  // Check if prefill matches a seeded thread title
+  const existing = threads.find(t => t.title === prefill);
+  if (existing) {
+    openThread(existing.id);
+    openSheet();
+    return;
+  }
+  // Create new thread and send first message
+  const thread = createThread(prefill);
+  openThread(thread.id);
+  openSheet();
+  // Send the first message through the AI pipeline
+  sendMessage(prefill);
+}
+
+function openThreadList() {
+  showThreadList();
+  openSheet();
+}
+
+// ── Conversation input ──
+function handleConvSend() {
+  const input = document.getElementById('convInput');
+  const text = input.value.trim();
+  if (!text || !activeThreadId) return;
+  input.value = '';
+
+  const thread = threads.find(t => t.id === activeThreadId);
+  if (!thread) return;
+
+  // If this is the first message in an empty thread, update title
+  if (thread.messages.length === 0) {
+    thread.title = text.length > 40 ? text.substring(0, 40) + '...' : text;
+    thread.titleGenerated = true;
+  }
+
+  sendMessage(text);
+}
+
+// ── AI bar send (with enter key) ──
+document.getElementById('aiBarInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') handleAiBarSend();
+});
+
+// Initialize
+switchTab('home');
+</script>
+</body>
+</html>
