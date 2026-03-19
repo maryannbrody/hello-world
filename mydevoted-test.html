@@ -435,6 +435,199 @@ html, body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ── Health tab ── */
+.health-header {
+  font-family: 'Libre Franklin', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--charcoal);
+  padding: 16px 20px 8px;
+}
+.care-team-card {
+  background: var(--white);
+  border: 1px solid var(--border-warm);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 20px 16px;
+}
+.care-team-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--blue);
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.care-team-name {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+.care-team-detail {
+  font-size: 15px;
+  color: var(--gray-text);
+  margin-bottom: 12px;
+}
+.care-team-btns {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.care-team-btn {
+  flex: 1;
+  border: 2px solid var(--blue);
+  color: var(--blue);
+  background: transparent;
+  border-radius: 9999px;
+  padding: 8px 4px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 48px;
+  transition: background 0.15s;
+}
+.care-team-btn:active { background: var(--blue-light); }
+.care-team-next {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--gray-text);
+}
+.health-section-label {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--charcoal);
+  padding: 0 20px;
+  margin-bottom: 8px;
+}
+.nav-card-group {
+  background: var(--white);
+  border: 1px solid var(--border-warm);
+  border-radius: 8px;
+  margin: 0 20px 16px;
+  overflow: hidden;
+}
+.nav-card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--bg-input);
+  min-height: 48px;
+  transition: background 0.1s;
+}
+.nav-card-row:last-child { border-bottom: none; }
+.nav-card-row:active { background: var(--bg-input); }
+.nav-card-row-label {
+  font-size: 16px;
+  color: var(--charcoal);
+}
+.nav-card-row-arrow {
+  font-size: 18px;
+  color: var(--gray-mid);
+  flex-shrink: 0;
+}
+.lab-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0 20px;
+  margin-bottom: 8px;
+}
+.lab-header-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--charcoal);
+}
+.lab-header-link {
+  font-size: 13px;
+  color: var(--red);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Public Sans', sans-serif;
+  padding: 4px 0;
+}
+.lab-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 0 20px;
+  margin-bottom: 16px;
+}
+.lab-card {
+  background: var(--white);
+  border: 1px solid var(--border-warm);
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.lab-card:active { border-color: var(--red); }
+.lab-card-label {
+  font-size: 14px;
+  color: var(--gray-text);
+  margin-bottom: 2px;
+}
+.lab-card-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--charcoal);
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.lab-card-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.lab-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.lab-dot-green { background: var(--green); }
+.lab-dot-amber { background: var(--amber); }
+.lab-card-cta {
+  font-size: 14px;
+  color: var(--red);
+}
+.med-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--white);
+  border: 1px solid var(--border-warm);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 20px 12px;
+}
+.med-icon { font-size: 28px; flex-shrink: 0; }
+.med-info { flex: 1; min-width: 0; }
+.med-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+.med-detail {
+  font-size: 15px;
+  color: var(--gray-text);
+}
+.med-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--red);
+  background: var(--red-light);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
 </style>
 </head>
 <body>
@@ -557,7 +750,103 @@ html, body {
         <div class="conv-row-preview">Your Wellness Bucks claim for $45 was received and is currently being processed...</div>
       </div>
     </div>
-    <div id="tab-health" class="tab-view"></div>
+    <div id="tab-health" class="tab-view">
+      <div class="health-header">Your Health</div>
+
+      <!-- Care Team -->
+      <div class="care-team-card">
+        <div class="care-team-label">YOUR CARE TEAM</div>
+        <div class="care-team-name">Dr. Sarah Wagle</div>
+        <div class="care-team-detail">Primary Care · Devoted Medical Group</div>
+        <div class="care-team-btns">
+          <button class="care-team-btn" onclick="sendPrompt('I want to message my care team')">Message your team</button>
+          <button class="care-team-btn" onclick="sendPrompt('Help me prepare for my visit with Dr. Wagle')">Prepare for visit</button>
+        </div>
+        <div class="care-team-next">Next visit: March 4, 10:00am</div>
+      </div>
+
+      <!-- Manage My Care -->
+      <div class="health-section-label">Manage My Care</div>
+      <div class="nav-card-group">
+        <div class="nav-card-row" onclick="sendPrompt('Show me my messages')">
+          <span class="nav-card-row-label">Messages</span>
+          <span class="nav-card-row-arrow">›</span>
+        </div>
+        <div class="nav-card-row" onclick="sendPrompt('Show me my test results')">
+          <span class="nav-card-row-label">Test Results</span>
+          <span class="nav-card-row-arrow">›</span>
+        </div>
+        <div class="nav-card-row" onclick="sendPrompt('Show me my appointments')">
+          <span class="nav-card-row-label">Appointments</span>
+          <span class="nav-card-row-arrow">›</span>
+        </div>
+        <div class="nav-card-row" onclick="sendPrompt('Tell me about my referrals and authorizations')">
+          <span class="nav-card-row-label">Referrals &amp; Authorizations</span>
+          <span class="nav-card-row-arrow">›</span>
+        </div>
+        <div class="nav-card-row" onclick="sendPrompt('Help me manage my PHI sharing settings')">
+          <span class="nav-card-row-label">PHI Sharing</span>
+          <span class="nav-card-row-arrow">›</span>
+        </div>
+      </div>
+
+      <!-- Lab Highlights -->
+      <div class="lab-header-row">
+        <span class="lab-header-title">Lab Highlights · Feb 10, 2026</span>
+        <button class="lab-header-link">View all results →</button>
+      </div>
+      <div class="lab-grid">
+        <div class="lab-card" onclick="sendPrompt('What does my HbA1c of 6.8% mean?')">
+          <div class="lab-card-label">HbA1c</div>
+          <div class="lab-card-value">6.8%</div>
+          <div class="lab-card-status"><span class="lab-dot lab-dot-green"></span> <span style="color:var(--green)">Improved</span></div>
+          <div class="lab-card-cta">Tap to understand →</div>
+        </div>
+        <div class="lab-card" onclick="sendPrompt('What does my eGFR of 58 mean?')">
+          <div class="lab-card-label">eGFR</div>
+          <div class="lab-card-value">58 <span style="font-size:14px;font-weight:400;color:var(--gray-text)">mL/min</span></div>
+          <div class="lab-card-status"><span class="lab-dot lab-dot-amber"></span> <span style="color:var(--amber)">Needs attention</span></div>
+          <div class="lab-card-cta">Tap to understand →</div>
+        </div>
+        <div class="lab-card" onclick="sendPrompt('What does my LDL cholesterol of 112 mean?')">
+          <div class="lab-card-label">LDL</div>
+          <div class="lab-card-value">112 <span style="font-size:14px;font-weight:400;color:var(--gray-text)">mg/dL</span></div>
+          <div class="lab-card-status"><span class="lab-dot lab-dot-amber"></span> <span style="color:var(--amber)">Borderline high</span></div>
+          <div class="lab-card-cta">Tap to understand →</div>
+        </div>
+        <div class="lab-card" onclick="sendPrompt('What does my blood pressure of 138/84 mean?')">
+          <div class="lab-card-label">BP</div>
+          <div class="lab-card-value">138/84</div>
+          <div class="lab-card-status"><span class="lab-dot lab-dot-amber"></span> <span style="color:var(--amber)">Elevated</span></div>
+          <div class="lab-card-cta">Tap to understand →</div>
+        </div>
+      </div>
+
+      <!-- Medications -->
+      <div class="health-section-label">Medications</div>
+      <div class="med-card">
+        <div class="med-icon">💊</div>
+        <div class="med-info">
+          <div class="med-name">Metformin 500mg</div>
+          <div class="med-detail">Twice daily · Last filled Jan 15</div>
+          <div class="med-badge">Refill soon</div>
+        </div>
+      </div>
+      <div class="med-card">
+        <div class="med-icon">💊</div>
+        <div class="med-info">
+          <div class="med-name">Lisinopril 10mg</div>
+          <div class="med-detail">Once daily</div>
+        </div>
+      </div>
+      <div class="med-card">
+        <div class="med-icon">💊</div>
+        <div class="med-info">
+          <div class="med-name">Atorvastatin 20mg</div>
+          <div class="med-detail">Once daily</div>
+        </div>
+      </div>
+    </div>
     <div id="tab-benefits" class="tab-view"></div>
     <div id="tab-profile" class="tab-view"></div>
   </main>
