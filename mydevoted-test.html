@@ -1116,6 +1116,7 @@ html, body {
   border: none;
   font-family: 'Public Sans', sans-serif;
   width: 100%;
+  min-height: 48px;
 }
 .conv-footer-status {
   display: block;
@@ -1124,6 +1125,138 @@ html, body {
   color: var(--blue);
   font-weight: 600;
   padding: 8px 0 4px;
+}
+
+/* Turnaround time */
+.conv-turnaround {
+  text-align: center;
+  font-size: 14px;
+  color: var(--blue);
+  padding: 6px 0 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.conv-turnaround svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+/* Active thread banner */
+.active-thread-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--blue-light);
+  border: 1px solid #B0D4EF;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin: 0 0 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--blue);
+  transition: background 0.15s;
+  min-height: 48px;
+}
+.active-thread-banner:active { background: #C4DFF5; }
+
+/* Escalation card */
+.escalation-card {
+  padding: 16px;
+  text-align: center;
+}
+.escalation-card-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+.escalation-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 6px;
+}
+.escalation-card-desc {
+  font-size: 15px;
+  color: var(--gray-text);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.escalation-btn-primary {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: var(--charcoal);
+  color: var(--white);
+  border: none;
+  border-radius: 9999px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 48px;
+  margin-bottom: 10px;
+  transition: background 0.15s;
+}
+.escalation-btn-primary:active { background: #333; }
+.escalation-btn-secondary {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: var(--charcoal);
+  border: 2px solid var(--border-warm);
+  border-radius: 9999px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 48px;
+  transition: background 0.15s, border-color 0.15s;
+}
+.escalation-btn-secondary:active { background: var(--bg-input); border-color: var(--gray-mid); }
+
+/* Message fade-in animation */
+@keyframes msg-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.msg { animation: msg-fade-in 0.3s ease-out; }
+
+/* Hidden scrollbars everywhere */
+.content-area::-webkit-scrollbar,
+.conv-messages::-webkit-scrollbar,
+.sheet-body::-webkit-scrollbar,
+.thread-list-view::-webkit-scrollbar { display: none; }
+.content-area, .conv-messages, .sheet-body, .thread-list-view {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Markdown rendering in bubbles */
+.msg-bubble ul, .msg-bubble ol {
+  margin: 6px 0;
+  padding-left: 20px;
+}
+.msg-bubble li {
+  margin-bottom: 4px;
+  line-height: 1.5;
+}
+.msg-bubble em { font-style: italic; }
+.msg-bubble h1, .msg-bubble h2, .msg-bubble h3 {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 8px 0 4px;
+  line-height: 1.3;
+}
+.msg-bubble hr {
+  border: none;
+  border-top: 1px solid var(--border-warm);
+  margin: 10px 0;
+}
+.msg-bubble code {
+  font-size: 14px;
+  background: var(--bg-input);
+  padding: 1px 4px;
+  border-radius: 3px;
 }
 </style>
 </head>
@@ -1755,7 +1888,7 @@ function renderThreadList() {
     const lastMsg = t.messages[t.messages.length - 1];
     let preview = lastMsg ? lastMsg.text.replace(/\*\*/g, '').replace(/\n/g, ' ') : '';
     if (preview.length > 60) preview = preview.substring(0, 60) + '...';
-    const isActive = t.status === 'waiting-guide';
+    const isActive = t.status === 'waiting-guide' || t.status === 'waiting-medical';
     const badge = isActive ? '<span class="thread-active-badge">Active</span>' : '';
     return `<div class="thread-row" onclick="openThread('${t.id}')">
       <div class="thread-row-content">
@@ -1781,18 +1914,51 @@ function showThreadList() {
   document.getElementById('convView').classList.remove('active');
 }
 
-// ── Conversation view ──
+// ── Markdown renderer ──
 function formatMessageText(text) {
+  let html = text;
+  // Horizontal rules
+  html = html.replace(/^---$/gm, '<hr>');
+  // Headers
+  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
   // Bold **text**
-  let html = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  // Convert newlines to paragraphs
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // Italic *text*
+  html = html.replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, '<em>$1</em>');
+  // Unordered lists: consecutive lines starting with - or *
+  html = html.replace(/(^|\n)((?:[-*] .+\n?)+)/g, function(match, pre, list) {
+    const items = list.trim().split('\n').map(l => '<li>' + l.replace(/^[-*] /, '') + '</li>').join('');
+    return pre + '<ul>' + items + '</ul>';
+  });
+  // Ordered lists: consecutive lines starting with number.
+  html = html.replace(/(^|\n)((?:\d+\. .+\n?)+)/g, function(match, pre, list) {
+    const items = list.trim().split('\n').map(l => '<li>' + l.replace(/^\d+\. /, '') + '</li>').join('');
+    return pre + '<ol>' + items + '</ol>';
+  });
+  // Paragraphs
   const paras = html.split('\n\n');
   if (paras.length > 1) {
-    html = paras.map(p => '<p>' + p.replace(/\n/g, '<br>') + '</p>').join('');
+    html = paras.map(p => {
+      p = p.trim();
+      if (p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('<ol') || p.startsWith('<hr')) return p;
+      return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+    }).join('');
   } else {
     html = html.replace(/\n/g, '<br>');
   }
   return html;
+}
+
+// ── Determine if thread has waiting status ──
+function isThreadEscalated(thread) {
+  return thread.status === 'waiting-guide' || thread.status === 'waiting-medical';
+}
+
+// ── Find any active escalated thread ──
+function findActiveEscalatedThread() {
+  return threads.find(t => isThreadEscalated(t));
 }
 
 function renderConversation() {
@@ -1804,6 +1970,15 @@ function renderConversation() {
   if (!thread) return;
 
   let html = '';
+
+  // Active thread banner if there's an escalated thread AND we're not viewing it
+  const escalatedThread = findActiveEscalatedThread();
+  if (escalatedThread && escalatedThread.id !== activeThreadId) {
+    html += `<div class="active-thread-banner" onclick="openThread('${escalatedThread.id}')">
+      <span>You have an active conversation</span>
+      <span>→</span>
+    </div>`;
+  }
 
   // First-chat card if no history and it's a brand new thread
   if (thread.messages.length === 0) {
@@ -1835,21 +2010,30 @@ function renderConversation() {
   container.innerHTML = html;
 
   // Footer: escalated vs normal
-  const isEscalated = thread.status === 'waiting-guide';
-  if (isEscalated) {
+  const escalated = isThreadEscalated(thread);
+  if (escalated) {
     input.placeholder = 'Add more details...';
-    footer.innerHTML = '<div class="conv-footer-status">Your care team will respond here</div>';
+    footer.innerHTML = `<div class="conv-turnaround">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Your care team typically responds in 5–10 minutes
+    </div>`;
   } else {
     input.placeholder = 'Ask me anything...';
     if (thread.messages.length > 0) {
-      footer.innerHTML = '<button class="conv-footer-link" onclick="sendPrompt(\'I\'d like to talk to a person\')">Talk to a person</button>';
+      footer.innerHTML = '<button class="conv-footer-link" onclick="handleTalkToPerson()">Talk to a person</button>';
     } else {
-      footer.innerHTML = '<button class="conv-footer-link" onclick="sendPrompt(\'I\'d like to talk to a person\')">Talk to a person</button>';
+      footer.innerHTML = '<button class="conv-footer-link" onclick="handleTalkToPerson()">Talk to a person</button>';
     }
   }
 
   // Scroll to bottom
   requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+}
+
+// ── Handle "Talk to a person" link tap ──
+function handleTalkToPerson() {
+  if (!activeThreadId) return;
+  showEscalationCard();
 }
 
 function openThread(threadId) {
@@ -1995,29 +2179,125 @@ function dismissEmergencyCard(btn) {
   if (bubble) bubble.remove();
 }
 
-// ── Escalation card ──
-function showEscalationCard(thread) {
+// ── Escalation card (inline) ──
+let escalationCardEl = null;
+
+function showEscalationCard() {
   const container = document.getElementById('convMessages');
   const div = document.createElement('div');
   div.className = 'msg msg-ai';
+  escalationCardEl = div;
   div.innerHTML = `<div class="msg-avatar msg-avatar-ai">♥</div>
-    <div class="msg-bubble">
-      <p>I'd be happy to connect you with someone from our team.</p>
-      <p><strong>Mary Ann B.</strong> from Devoted Guide is available now.</p>
-      <p><button onclick="confirmEscalation()" style="display:block;width:100%;margin-top:8px;padding:12px;background:var(--red);color:white;border:none;border-radius:9999px;font-family:Public Sans,sans-serif;font-size:16px;font-weight:600;cursor:pointer;min-height:48px;">Connect me now</button></p>
+    <div class="msg-bubble escalation-card">
+      <div class="escalation-card-icon">👤</div>
+      <div class="escalation-card-title">Would you like to talk to someone?</div>
+      <div class="escalation-card-desc">A member of our team will respond in this conversation.</div>
+      <button class="escalation-btn-primary" onclick="confirmEscalation()">Send to care team</button>
+      <button class="escalation-btn-secondary" onclick="dismissEscalation()">Continue with AI</button>
     </div>`;
   container.appendChild(div);
   requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
 }
 
-function confirmEscalation() {
+function dismissEscalation() {
+  if (escalationCardEl) {
+    escalationCardEl.remove();
+    escalationCardEl = null;
+  }
+}
+
+// ── Determine escalation team from conversation content ──
+const BENEFITS_KEYWORDS = /benefit|claim|coverage|food.*card|home.*card|wellness.*buck|otc|billing|copay|deductible|id card|reimburse|allowance/i;
+
+function determineEscalationTeam(thread) {
+  const allText = thread.messages.map(m => m.text).join(' ');
+  if (BENEFITS_KEYWORDS.test(allText)) return 'guide';
+  return 'medical';
+}
+
+const HUMAN_PROMPTS = {
+  guide: {
+    name: 'Mary Ann B.',
+    title: 'Mary Ann B., Devoted Guide',
+    team: 'Devoted Guide',
+    status: 'waiting-guide',
+    systemPrompt: `You are Mary Ann B., a Devoted Guide at Devoted Health. You are a real person responding to a member about their benefits or billing question. You've just joined the conversation and can see everything that was discussed with the AI.
+
+Be warm, specific, professional. Use first person. Introduce yourself briefly. Reference what was already discussed. Provide a concrete next step. Sign your message with "— Mary Ann B., Devoted Guide"
+
+Keep under 100 words.`
+  },
+  medical: {
+    name: 'Dr. Alison Holliday',
+    title: 'Dr. Alison Holliday, Devoted Medical',
+    team: 'Devoted Medical',
+    status: 'waiting-medical',
+    systemPrompt: `You are Dr. Alison Holliday, a clinician at Devoted Medical. You are a real doctor responding to a member about a health concern. You've just joined the conversation and can see everything that was discussed with the AI.
+
+Be warm, specific, clinically precise. Use first person. Introduce yourself briefly. Reference what was already discussed. Provide clinical guidance. If recommending medication changes, be specific. Sign your message with "— Dr. Alison Holliday, Devoted Medical"
+
+Keep under 150 words.`
+  }
+};
+
+async function confirmEscalation() {
   const thread = threads.find(t => t.id === activeThreadId);
   if (!thread) return;
-  thread.status = 'waiting-guide';
-  thread.escalatedTo = { name: 'Mary Ann B.', team: 'Devoted Guide' };
-  thread.messages.push({ role: 'system', text: 'Mary Ann B. from Devoted Guide has joined this conversation.' });
-  thread.messages.push({ role: 'human', sender: 'Mary Ann B., Devoted Guide', team: 'guide', text: "Hi Laura — I'm Mary Ann, a Devoted Guide. I've reviewed this conversation and I'm here to help. Let me look into this for you." });
+
+  // Remove the escalation card
+  dismissEscalation();
+
+  // AI transition message
+  thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: "Of course — I'm connecting you with our care team. They'll see our full conversation." });
   renderConversation();
+
+  // Determine team
+  const teamKey = determineEscalationTeam(thread);
+  const persona = HUMAN_PROMPTS[teamKey];
+
+  // Update thread status
+  thread.status = persona.status;
+  thread.escalatedTo = { name: persona.name, team: persona.team };
+
+  // System message
+  thread.messages.push({ role: 'system', text: `${persona.name} from ${persona.team} has joined this conversation.` });
+  renderConversation();
+
+  // Show loading, wait ~3s, then call API for human response
+  const loader = showLoading();
+
+  try {
+    // Delay to simulate human joining
+    await new Promise(r => setTimeout(r, 3000));
+
+    const apiMessages = buildApiMessages(thread);
+    const systemPrompt = MEMBER_CONTEXT + '\n\n' + persona.systemPrompt + '\n\n' + FORMATTING_RULES;
+
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: HEADERS,
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 512,
+        system: systemPrompt,
+        messages: apiMessages
+      })
+    });
+
+    loader.remove();
+
+    const data = await response.json();
+    const humanText = data.content?.[0]?.text || `Hi Laura — I'm ${persona.name}. I've reviewed this conversation and I'm here to help. Let me look into this for you.\n\n— ${persona.name}`;
+
+    thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: humanText });
+    thread.lastActivityAt = new Date().toISOString().split('T')[0];
+    renderConversation();
+    renderSheetHeader();
+  } catch (err) {
+    loader.remove();
+    thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: `Hi Laura — I'm ${persona.name}. I've reviewed this conversation and I'm here to help. Let me look into this for you.\n\n— ${persona.name}` });
+    renderConversation();
+  }
 }
 
 // ── Send message (main flow) ──
@@ -2042,7 +2322,7 @@ async function sendMessage(text) {
     thread.messages.push({ role: 'user', text: text });
     thread.lastActivityAt = new Date().toISOString().split('T')[0];
     renderConversation();
-    showEscalationCard(thread);
+    showEscalationCard();
     return;
   }
 
@@ -2067,40 +2347,72 @@ async function sendMessage(text) {
   const loader = showLoading();
 
   try {
-    // 5. Route
-    const agent = await routeMessage(text);
+    // Check if thread is escalated — use human persona
+    const escalated = isThreadEscalated(thread);
 
-    // 6. Build messages
-    const apiMessages = buildApiMessages(thread);
+    if (escalated) {
+      // Use human persona for responses after escalation
+      const teamKey = thread.status === 'waiting-medical' ? 'medical' : 'guide';
+      const persona = HUMAN_PROMPTS[teamKey];
+      const apiMessages = buildApiMessages(thread);
+      const systemPrompt = MEMBER_CONTEXT + '\n\n' + persona.systemPrompt + '\n\n' + FORMATTING_RULES + '\n\nCONVERSATION CONTEXT: This is a continued conversation. The member has sent a follow-up message. Respond as yourself, staying in character.';
 
-    // 7. Build system prompt
-    let systemPrompt = MEMBER_CONTEXT + '\n\n' + AGENT_PROMPTS[agent] + '\n\n' + FORMATTING_RULES;
-    if (thread.messages.filter(m => m.role === 'user').length > 1) {
-      systemPrompt += '\n\nCONVERSATION CONTEXT: This is a continued conversation. Reference what was discussed. Don\'t repeat information.';
+      // Simulate slight delay for human feel
+      await new Promise(r => setTimeout(r, 2000));
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: HEADERS,
+        body: JSON.stringify({
+          model: MODEL,
+          max_tokens: 512,
+          system: systemPrompt,
+          messages: apiMessages
+        })
+      });
+
+      loader.remove();
+      const data = await response.json();
+      const humanText = data.content?.[0]?.text || "Thank you for the additional details. I'm looking into this now.";
+      thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: humanText });
+      thread.lastActivityAt = new Date().toISOString().split('T')[0];
+      renderConversation();
+    } else {
+      // 5. Route
+      const agent = await routeMessage(text);
+
+      // 6. Build messages
+      const apiMessages = buildApiMessages(thread);
+
+      // 7. Build system prompt
+      let systemPrompt = MEMBER_CONTEXT + '\n\n' + AGENT_PROMPTS[agent] + '\n\n' + FORMATTING_RULES;
+      if (thread.messages.filter(m => m.role === 'user').length > 1) {
+        systemPrompt += '\n\nCONVERSATION CONTEXT: This is a continued conversation. Reference what was discussed. Don\'t repeat information.';
+      }
+
+      // 8. Call API
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: HEADERS,
+        body: JSON.stringify({
+          model: MODEL,
+          max_tokens: 1024,
+          system: systemPrompt,
+          messages: apiMessages
+        })
+      });
+
+      loader.remove();
+
+      const data = await response.json();
+      const aiText = data.content?.[0]?.text || "I'm having trouble right now. Please try again.";
+      thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: aiText });
+      thread.lastActivityAt = new Date().toISOString().split('T')[0];
+      renderConversation();
     }
-
-    // 8. Call API
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: HEADERS,
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 1024,
-        system: systemPrompt,
-        messages: apiMessages
-      })
-    });
-
-    loader.remove();
-
-    const data = await response.json();
-    const aiText = data.content?.[0]?.text || "I'm having trouble right now. Please try again.";
-    thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: aiText });
-    thread.lastActivityAt = new Date().toISOString().split('T')[0];
-    renderConversation();
   } catch (err) {
     loader.remove();
-    thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: "I'm having trouble connecting right now. Please try again in a moment." });
+    thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: "We're having trouble connecting. Please try again." });
     renderConversation();
   } finally {
     isSending = false;
