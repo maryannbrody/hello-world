@@ -67,26 +67,6 @@ html, body {
 }
 #app.active { display: flex; }
 
-/* ── Status bar (mobile only) ── */
-.status-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 54px;
-  padding: 0 24px;
-  background: var(--gray-bg);
-  font-size: 15px;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-.status-bar-left { font-variant-numeric: tabular-nums; }
-.status-bar-right { display: flex; align-items: center; gap: 6px; }
-.status-bar-right svg { width: 18px; height: 18px; }
-
-@media (min-width: 768px) {
-  .status-bar { display: none; }
-}
-
 /* ── App header ── */
 .app-header {
   display: flex;
@@ -96,7 +76,6 @@ html, body {
   height: 56px;
   background: var(--white);
   border-bottom: 1px solid var(--border-warm);
-  flex-shrink: 0;
   padding: 0 16px;
 }
 .app-header .logo-wrap {
@@ -1273,41 +1252,28 @@ html, body {
 
 <!-- App shell -->
 <div id="app">
-  <!-- Status bar -->
-  <div class="status-bar">
-    <div class="status-bar-left">9:41</div>
-    <div class="status-bar-right">
-      <!-- Signal -->
-      <svg viewBox="0 0 18 14" fill="none"><rect x="0" y="10" width="3" height="4" rx="0.5" fill="currentColor"/><rect x="5" y="7" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="10" y="3.5" width="3" height="10.5" rx="0.5" fill="currentColor"/><rect x="15" y="0" width="3" height="14" rx="0.5" fill="currentColor"/></svg>
-      <!-- WiFi -->
-      <svg viewBox="0 0 18 18" fill="none"><path d="M9 14a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm-4.24-3.18a6.5 6.5 0 018.48 0l-1.06 1.06a5 5 0 00-6.36 0l-1.06-1.06zm-2.83-2.83a10 10 0 0114.14 0l-1.06 1.06a8.5 8.5 0 00-12.02 0L1.93 7.99z" fill="currentColor"/></svg>
-      <!-- Battery -->
-      <svg viewBox="0 0 28 14" fill="none"><rect x="0.5" y="0.5" width="23" height="13" rx="2" stroke="currentColor" fill="none"/><rect x="2" y="2" width="20" height="10" rx="1" fill="currentColor"/><path d="M25 4.5v5a2 2 0 000-5z" fill="currentColor"/></svg>
-    </div>
-  </div>
-
-  <!-- App header -->
-  <header class="app-header">
-    <div class="logo-wrap">
-      <!-- Devoted Health logo mark -->
-      <svg width="32" height="32" viewBox="0 0 100 100" fill="none">
-        <circle cx="50" cy="35" r="18" fill="#F04B24"/>
-        <circle cx="34" cy="60" r="16" fill="#592C82"/>
-        <circle cx="66" cy="60" r="16" fill="#00A0DD"/>
-      </svg>
-      <!-- Wordmark -->
-      <svg height="20" viewBox="0 0 330 60" fill="none">
-        <text x="0" y="46" font-family="Inter, sans-serif" font-weight="700" font-size="48" fill="#1D252C">Devoted</text>
-      </svg>
-    </div>
-    <button class="profile-btn" aria-label="Profile" onclick="switchTab('profile')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg>
-    </button>
-  </header>
 
   <!-- Content area -->
   <main class="content-area">
+    <!-- App header (scrolls with content) -->
+    <header class="app-header">
+      <div class="logo-wrap">
+        <!-- Devoted Health logo mark -->
+        <svg width="32" height="32" viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="35" r="18" fill="#F04B24"/>
+          <circle cx="34" cy="60" r="16" fill="#592C82"/>
+          <circle cx="66" cy="60" r="16" fill="#00A0DD"/>
+        </svg>
+        <!-- Wordmark -->
+        <svg height="20" viewBox="0 0 330 60" fill="none">
+          <text x="0" y="46" font-family="Inter, sans-serif" font-weight="700" font-size="48" fill="#1D252C">Devoted</text>
+        </svg>
+      </div>
+      <button class="profile-btn" aria-label="Profile" onclick="switchTab('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg>
+      </button>
+    </header>
     <div id="tab-home" class="tab-view active">
       <!-- Greeting -->
       <div class="home-greeting">
