@@ -2,42 +2,63 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>MyDevoted</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@600;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --red: #F04B24;
-  --red-dark: #D43E1A;
-  --red-light: #FBF0EB;
+  /* Production brand colors */
+  --red: #ff4713;
+  --red-dark: #cb2805;
+  --red-light: #fff8f3;
+  --red-light-border: #f7e4d7;
   --purple: #592C82;
-  --purple-light: #ECE4F1;
-  --blue: #00A0DD;
-  --blue-light: #D4E7F7;
+  --purple-light: #f3e8ff;
+  --blue: #1A5F99;
+  --blue-light: #e6f7ff;
+  --teal: #20698d;
+  --dark-blue: #004876;
   --charcoal: #1D252C;
-  --gray-text: #595959;
-  --gray-bg: #F8F7F5;
-  --bg-input: #F2EFEA;
-  --gray-mid: #E0DBD5;
-  --border-warm: #E8E3DE;
+  /* Production grays */
+  --gray-text: #767676;
+  --gray-bg: #ffffff;
+  --bg-input: #f0f0f0;
+  --gray-mid: #dddddd;
+  --gray-100: #f0f0f0;
+  --gray-200: #e8e8e8;
+  --gray-300: #d9d9d9;
+  --gray-400: #bfbfbf;
+  --gray-500: #6b7280;
+  --gray-600: #767676;
+  --border: #dddddd;
+  --border-warm: #dddddd;
   --white: #FFFFFF;
   --taupe: #f9f5f2;
   --amber: #B45309;
-  --green: #166534;
+  --green: #318503;
+  --green-bg: #f6ffed;
+  /* Production layout */
+  --button-radius: 3.124rem;
+  --padding: 1rem;
+  /* Logo colors (different from brand) */
+  --logo-red: #f04b24;
+  --logo-purple: #592d82;
+  --logo-blue: #00a0dd;
 }
 
 html, body {
   height: 100%;
   overflow: hidden;
-  font-family: 'Public Sans', sans-serif;
-  font-size: 17px;
-  line-height: 1.7;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
   color: var(--charcoal);
-  background: var(--gray-bg);
+  background: var(--white);
   -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
 }
@@ -62,26 +83,6 @@ html, body {
 }
 #app.active { display: flex; }
 
-/* ── Status bar (mobile only) ── */
-.status-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 54px;
-  padding: 0 24px;
-  background: var(--gray-bg);
-  font-size: 15px;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-.status-bar-left { font-variant-numeric: tabular-nums; }
-.status-bar-right { display: flex; align-items: center; gap: 6px; }
-.status-bar-right svg { width: 18px; height: 18px; }
-
-@media (min-width: 768px) {
-  .status-bar { display: none; }
-}
-
 /* ── App header ── */
 .app-header {
   display: flex;
@@ -91,7 +92,6 @@ html, body {
   height: 56px;
   background: var(--white);
   border-bottom: 1px solid var(--border-warm);
-  flex-shrink: 0;
   padding: 0 16px;
 }
 .app-header .logo-wrap {
@@ -131,10 +131,10 @@ html, body {
 .ai-bar {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 16px 10px;
+  gap: 8px;
+  padding: 8px 16px;
   background: var(--white);
-  border-top: 1px solid var(--border-warm);
+  border-top: 1px solid var(--gray-300);
   flex-shrink: 0;
 }
 .ai-bar.hidden { display: none; }
@@ -143,34 +143,35 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border-warm);
+  background: var(--white);
+  border: 1px solid var(--gray-400);
   border-radius: 9999px;
   padding: 0 16px;
   height: 48px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, outline 0.2s;
 }
 .ai-bar-pill:focus-within {
-  border-color: var(--red);
-  box-shadow: 0 0 0 3px rgba(240, 75, 36, 0.12);
+  outline: 2px solid var(--blue);
+  outline-offset: -1px;
 }
-.ai-bar-pill svg { width: 20px; height: 20px; color: #999; flex-shrink: 0; }
+.ai-bar-pill .material-icons { font-size: 20px; color: var(--gray-400); flex-shrink: 0; }
+.ai-bar-pill svg { width: 20px; height: 20px; color: var(--gray-400); flex-shrink: 0; }
 .ai-bar-pill input {
   flex: 1;
   border: none;
   outline: none;
   background: transparent;
-  font-family: 'Public Sans', sans-serif;
-  font-size: 17px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
   color: var(--charcoal);
   min-width: 0;
 }
-.ai-bar-pill input::placeholder { color: #999; }
+.ai-bar-pill input::placeholder { color: var(--gray-400); }
 .ai-bar-send {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--red);
+  background: var(--purple);
   border: none;
   display: flex;
   align-items: center;
@@ -179,7 +180,8 @@ html, body {
   flex-shrink: 0;
   transition: background 0.15s;
 }
-.ai-bar-send:active { background: var(--red-dark); }
+.ai-bar-send:active { background: #472069; }
+.ai-bar-send .material-icons { font-size: 20px; color: var(--white); }
 .ai-bar-send svg { width: 20px; height: 20px; color: var(--white); }
 
 /* ── Bottom tab bar ── */
@@ -203,10 +205,10 @@ html, body {
   border: none;
   background: transparent;
   cursor: pointer;
-  font-family: 'Public Sans', sans-serif;
-  font-size: 12px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
   font-weight: 500;
-  color: #999;
+  color: var(--gray-600);
   transition: color 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
@@ -215,24 +217,66 @@ html, body {
 .tab-bar-item span { font-size: 14px; }
 
 /* ── Home tab ── */
-.home-greeting { padding: 6px 20px 24px; }
+.home-greeting {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 6px 20px 16px;
+  border: none;
+}
 .home-greeting h1 {
-  font-family: 'Libre Franklin', sans-serif;
-  font-size: 34px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 2.25rem;
   font-weight: 700;
   color: var(--red);
   line-height: 1.2;
   margin: 0;
 }
-.home-greeting .subtitle {
-  font-size: 20px;
-  color: var(--gray-text);
-  margin-top: 4px;
-}
 .home-greeting .member-id {
   font-size: 14px;
-  color: #999;
+  color: #222222;
   margin-top: 2px;
+}
+/* ── Home CTA card ── */
+.home-cta {
+  margin: 0 20px 16px;
+  padding: 20px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.home-cta-icon {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+}
+.home-cta-body h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--charcoal);
+}
+.home-cta-body p {
+  font-size: 15px;
+  color: #222222;
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+.home-cta-btn {
+  display: inline-block;
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: var(--button-radius);
+  padding: 0.5em 1.25em;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
 }
 
 /* Hero input */
@@ -248,34 +292,35 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border-warm);
+  background: var(--white);
+  border: 1px solid var(--gray-400);
   border-radius: 9999px;
   height: 48px;
   padding: 0 16px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, outline 0.2s;
 }
 .home-input-pill:focus-within {
-  border-color: var(--red);
-  box-shadow: 0 0 0 3px rgba(240, 75, 36, 0.12);
+  outline: 2px solid var(--blue);
+  outline-offset: -1px;
 }
-.home-input-pill svg { width: 20px; height: 20px; color: #999; flex-shrink: 0; }
+.home-input-pill .material-icons { font-size: 20px; color: var(--gray-400); flex-shrink: 0; }
+.home-input-pill svg { width: 20px; height: 20px; color: var(--gray-400); flex-shrink: 0; }
 .home-input-pill input {
   flex: 1;
   border: none;
   outline: none;
   background: transparent;
-  font-family: 'Public Sans', sans-serif;
-  font-size: 17px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
   color: var(--charcoal);
   min-width: 0;
 }
-.home-input-pill input::placeholder { color: #999; }
+.home-input-pill input::placeholder { color: var(--gray-400); }
 .home-send-btn {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--red);
+  background: var(--purple);
   border: none;
   display: flex;
   align-items: center;
@@ -284,7 +329,8 @@ html, body {
   flex-shrink: 0;
   transition: background 0.15s;
 }
-.home-send-btn:active { background: var(--red-dark); }
+.home-send-btn:active { background: #472069; }
+.home-send-btn .material-icons { font-size: 20px; color: var(--white); }
 .home-send-btn svg { width: 20px; height: 20px; color: var(--white); }
 
 /* Prompt chips */
@@ -313,7 +359,7 @@ html, body {
   border: 1.5px solid var(--border-warm);
   border-radius: 12px;
   padding: 12px 16px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 16px;
   color: var(--charcoal);
   cursor: pointer;
@@ -359,7 +405,7 @@ html, body {
 }
 .happening-badge {
   display: inline-block;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.5px;
   padding: 3px 10px;
@@ -402,7 +448,7 @@ html, body {
   background: none;
   border: none;
   cursor: pointer;
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   padding: 8px 0;
 }
 .conv-row {
@@ -423,7 +469,7 @@ html, body {
 }
 .conv-row-date {
   font-size: 14px;
-  color: #999;
+  color: var(--gray-400);
   flex-shrink: 0;
   margin-left: 12px;
 }
@@ -438,7 +484,7 @@ html, body {
 
 /* ── Health tab ── */
 .health-header {
-  font-family: 'Libre Franklin', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 28px;
   font-weight: 700;
   color: var(--charcoal);
@@ -452,10 +498,10 @@ html, body {
   margin: 0 20px 16px;
 }
 .care-team-label {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
-  color: var(--blue);
+  color: var(--teal);
   letter-spacing: 0.5px;
   margin-bottom: 4px;
 }
@@ -481,7 +527,7 @@ html, body {
   background: transparent;
   border-radius: 9999px;
   padding: 8px 4px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -490,7 +536,7 @@ html, body {
 }
 .care-team-btn:active { background: var(--blue-light); }
 .care-team-next {
-  font-size: 13px;
+  font-size: 14px;
   font-style: italic;
   color: var(--gray-text);
 }
@@ -542,12 +588,12 @@ html, body {
   color: var(--charcoal);
 }
 .lab-header-link {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--red);
   background: none;
   border: none;
   cursor: pointer;
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   padding: 4px 0;
 }
 .lab-grid {
@@ -620,7 +666,7 @@ html, body {
 }
 .med-badge {
   display: inline-block;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--red);
   background: var(--red-light);
@@ -631,7 +677,7 @@ html, body {
 
 /* ── Benefits tab ── */
 .benefits-header {
-  font-family: 'Libre Franklin', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 28px;
   font-weight: 700;
   color: var(--charcoal);
@@ -645,7 +691,7 @@ html, body {
   margin: 0 20px 16px;
 }
 .benefit-card-label {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--blue);
@@ -716,7 +762,7 @@ html, body {
 
 /* ── Profile tab ── */
 .profile-header {
-  font-family: 'Libre Franklin', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 28px;
   font-weight: 700;
   color: var(--charcoal);
@@ -759,11 +805,11 @@ html, body {
 .sheet-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.2);
   z-index: 900;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.35s;
+  transition: opacity 0.4s;
 }
 .sheet-backdrop.open { opacity: 1; pointer-events: auto; }
 
@@ -775,27 +821,28 @@ html, body {
   height: 0;
   background: var(--white);
   border-radius: 24px 24px 0 0;
-  box-shadow: 0 -4px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
   z-index: 1000;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: height 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), height 0.4s cubic-bezier(0.32, 0.72, 0, 1);
 }
 .sheet.open { height: 85vh; }
 
 .sheet-handle {
   width: 36px;
   height: 4px;
-  background: var(--gray-mid);
-  border-radius: 2px;
-  margin: 10px auto 0;
+  background: var(--gray-300);
+  border-radius: 9999px;
+  margin: 8px auto;
   flex-shrink: 0;
 }
 .sheet-header {
   display: flex;
   align-items: center;
-  padding: 12px 16px 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--gray-300);
   flex-shrink: 0;
   min-height: 48px;
 }
@@ -814,7 +861,7 @@ html, body {
   color: var(--charcoal);
 }
 .sheet-header-subtitle {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--gray-text);
   white-space: nowrap;
   overflow: hidden;
@@ -827,8 +874,10 @@ html, body {
   justify-content: flex-end;
 }
 .sheet-btn {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
+  min-width: 48px;
+  min-height: 48px;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -838,9 +887,12 @@ html, body {
   border-radius: 50%;
   color: var(--charcoal);
   font-size: 20px;
+  transition: background 0.15s;
 }
+.sheet-btn:hover { background: var(--bg-input); }
 .sheet-btn:active { background: var(--bg-input); }
 .sheet-btn svg { width: 22px; height: 22px; }
+.sheet-btn .material-icons { font-size: 22px; }
 
 .sheet-body {
   flex: 1;
@@ -859,7 +911,7 @@ html, body {
   color: var(--white);
   border: none;
   border-radius: 9999px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -895,7 +947,7 @@ html, body {
 }
 .thread-row-date {
   font-size: 14px;
-  color: #999;
+  color: var(--gray-400);
   flex-shrink: 0;
 }
 .thread-row-bottom {
@@ -914,7 +966,7 @@ html, body {
 }
 .thread-active-badge {
   display: inline-block;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--blue);
   background: var(--blue-light);
@@ -952,11 +1004,11 @@ html, body {
   text-align: center;
   padding: 8px 16px;
   font-size: 14px;
-  color: #999;
+  color: var(--gray-400);
   line-height: 1.6;
 }
 .emergency-footer a {
-  color: #999;
+  color: var(--gray-400);
   text-decoration: underline;
 }
 
@@ -1011,50 +1063,79 @@ html, body {
   border-radius: 6px 18px 18px 18px;
 }
 .msg-attribution {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--gray-text);
   margin-top: 4px;
   padding-left: 40px;
 }
 .msg-system-text {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--gray-text);
   text-align: center;
   padding: 8px 0;
 }
 
-/* Loading dots */
+/* Loading spinner */
 .msg-loading .msg-bubble {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
-.loading-text {
-  font-size: 15px;
-  color: var(--gray-text);
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid var(--gray-300);
+  border-top-color: var(--gray-500);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
-.loading-dots {
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Connecting animation for human handoff */
+.connecting-msg {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--gray-100);
+  border-radius: 12px;
+  margin: 8px 0;
+  animation: connecting-pulse 1.5s ease-in-out infinite;
+}
+.connecting-msg .connecting-dots {
   display: flex;
   gap: 4px;
 }
-.loading-dots span {
+.connecting-msg .connecting-dots span {
   width: 6px;
   height: 6px;
-  background: var(--red);
+  background: var(--gray-600);
   border-radius: 50%;
-  animation: bounce-dot 1.4s infinite;
+  animation: connecting-bounce 1.2s ease-in-out infinite;
 }
-.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes bounce-dot {
-  0%, 80%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-6px); }
+.connecting-msg .connecting-dots span:nth-child(2) { animation-delay: 0.15s; }
+.connecting-msg .connecting-dots span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes connecting-bounce {
+  0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1.1); }
+}
+@keyframes connecting-pulse {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+.connecting-msg .connecting-text {
+  font-size: 14px;
+  color: var(--gray-600);
+  font-style: italic;
 }
 
 /* Conversation input */
 .conv-input-area {
   flex-shrink: 0;
   padding: 10px 16px;
+  padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--border-warm);
   background: var(--white);
 }
@@ -1068,33 +1149,33 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border-warm);
+  background: var(--white);
+  border: 1px solid var(--gray-400);
   border-radius: 9999px;
   padding: 0 16px;
   height: 48px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, outline 0.2s;
 }
 .conv-input-pill:focus-within {
-  border-color: var(--red);
-  box-shadow: 0 0 0 3px rgba(240, 75, 36, 0.12);
+  outline: 2px solid var(--blue);
+  outline-offset: -1px;
 }
 .conv-input-pill input {
   flex: 1;
   border: none;
   outline: none;
   background: transparent;
-  font-family: 'Public Sans', sans-serif;
-  font-size: 17px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
   color: var(--charcoal);
   min-width: 0;
 }
-.conv-input-pill input::placeholder { color: #999; }
+.conv-input-pill input::placeholder { color: var(--gray-400); }
 .conv-send-btn {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--red);
+  background: var(--purple);
   border: none;
   display: flex;
   align-items: center;
@@ -1103,7 +1184,8 @@ html, body {
   flex-shrink: 0;
   transition: background 0.15s;
 }
-.conv-send-btn:active { background: var(--red-dark); }
+.conv-send-btn:active { background: #472069; }
+.conv-send-btn .material-icons { font-size: 20px; color: var(--white); }
 .conv-send-btn svg { width: 20px; height: 20px; color: var(--white); }
 .conv-footer-link {
   display: block;
@@ -1114,7 +1196,7 @@ html, body {
   cursor: pointer;
   background: none;
   border: none;
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   width: 100%;
   min-height: 48px;
 }
@@ -1188,7 +1270,7 @@ html, body {
   color: var(--white);
   border: none;
   border-radius: 9999px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -1205,7 +1287,7 @@ html, body {
   color: var(--charcoal);
   border: 2px solid var(--border-warm);
   border-radius: 9999px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -1254,7 +1336,7 @@ html, body {
 }
 .msg-bubble code {
   font-size: 14px;
-  background: var(--bg-input);
+  background: var(--gray-100);
   padding: 1px 4px;
   border-radius: 3px;
 }
@@ -1267,57 +1349,55 @@ html, body {
 
 <!-- App shell -->
 <div id="app">
-  <!-- Status bar -->
-  <div class="status-bar">
-    <div class="status-bar-left">9:41</div>
-    <div class="status-bar-right">
-      <!-- Signal -->
-      <svg viewBox="0 0 18 14" fill="none"><rect x="0" y="10" width="3" height="4" rx="0.5" fill="currentColor"/><rect x="5" y="7" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="10" y="3.5" width="3" height="10.5" rx="0.5" fill="currentColor"/><rect x="15" y="0" width="3" height="14" rx="0.5" fill="currentColor"/></svg>
-      <!-- WiFi -->
-      <svg viewBox="0 0 18 18" fill="none"><path d="M9 14a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm-4.24-3.18a6.5 6.5 0 018.48 0l-1.06 1.06a5 5 0 00-6.36 0l-1.06-1.06zm-2.83-2.83a10 10 0 0114.14 0l-1.06 1.06a8.5 8.5 0 00-12.02 0L1.93 7.99z" fill="currentColor"/></svg>
-      <!-- Battery -->
-      <svg viewBox="0 0 28 14" fill="none"><rect x="0.5" y="0.5" width="23" height="13" rx="2" stroke="currentColor" fill="none"/><rect x="2" y="2" width="20" height="10" rx="1" fill="currentColor"/><path d="M25 4.5v5a2 2 0 000-5z" fill="currentColor"/></svg>
-    </div>
-  </div>
-
-  <!-- App header -->
-  <header class="app-header">
-    <div class="logo-wrap">
-      <!-- Devoted Health logo mark -->
-      <svg width="32" height="32" viewBox="0 0 100 100" fill="none">
-        <circle cx="50" cy="35" r="18" fill="#F04B24"/>
-        <circle cx="34" cy="60" r="16" fill="#592C82"/>
-        <circle cx="66" cy="60" r="16" fill="#00A0DD"/>
-      </svg>
-      <!-- Wordmark -->
-      <svg height="20" viewBox="0 0 330 60" fill="none">
-        <text x="0" y="46" font-family="Libre Franklin, sans-serif" font-weight="700" font-size="48" fill="#1D252C">Devoted</text>
-      </svg>
-    </div>
-    <button class="profile-btn" aria-label="Profile" onclick="switchTab('profile')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg>
-    </button>
-  </header>
 
   <!-- Content area -->
   <main class="content-area">
+    <!-- App header (scrolls with content) -->
+    <header class="app-header">
+      <div class="logo-wrap">
+        <!-- Devoted Health logo mark -->
+        <svg width="32" height="32" viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="35" r="18" fill="#F04B24"/>
+          <circle cx="34" cy="60" r="16" fill="#592C82"/>
+          <circle cx="66" cy="60" r="16" fill="#00A0DD"/>
+        </svg>
+        <!-- Wordmark -->
+        <svg height="20" viewBox="0 0 330 60" fill="none">
+          <text x="0" y="46" font-family="Inter, sans-serif" font-weight="700" font-size="48" fill="#1D252C">Devoted</text>
+        </svg>
+      </div>
+      <button class="profile-btn" aria-label="Profile" onclick="switchTab('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg>
+      </button>
+    </header>
     <div id="tab-home" class="tab-view active">
-      <!-- Greeting -->
+      <!-- Greeting (matches production Greeting component) -->
       <div class="home-greeting">
-        <h1>Hello, Laura!</h1>
-        <div class="subtitle">How can we help you today?</div>
-        <div class="member-id">Member ID DVH-2024-78432</div>
+        <div>
+          <h1>Hello, Laura!</h1>
+          <div class="member-id">Member ID DVH-2024-78432</div>
+        </div>
+      </div>
+
+      <!-- CTA card (matches production CallToAction / HealthConnectionsChecklistCTA) -->
+      <div class="home-cta">
+        <img class="home-cta-icon" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='35' r='18' fill='%23F04B24'/%3E%3Ccircle cx='34' cy='60' r='16' fill='%23592C82'/%3E%3Ccircle cx='66' cy='60' r='16' fill='%2300A0DD'/%3E%3C/svg%3E" alt="">
+        <div class="home-cta-body">
+          <h3>Complete your health checklist</h3>
+          <p>Answer a few questions to help your care team support you better.</p>
+          <button class="home-cta-btn" onclick="switchTab('messages')">Get started</button>
+        </div>
       </div>
 
       <!-- Hero input -->
       <div class="home-input-wrap">
         <div class="home-input-pill">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.49"/></svg>
+          <span class="material-icons">attach_file</span>
           <input type="text" id="homeInput" placeholder="What's on your mind?" onkeydown="if(event.key==='Enter')handleHomeSend()">
         </div>
         <button class="home-send-btn" aria-label="Send" onclick="handleHomeSend()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <span class="material-icons">send</span>
         </button>
       </div>
 
@@ -1593,11 +1673,11 @@ html, body {
   <!-- AI bar -->
   <div class="ai-bar" id="aiBar">
     <div class="ai-bar-pill">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.49"/></svg>
+      <span class="material-icons">attach_file</span>
       <input type="text" id="aiBarInput" placeholder="">
     </div>
     <button class="ai-bar-send" aria-label="Send" onclick="handleAiBarSend()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      <span class="material-icons">send</span>
     </button>
   </div>
 
@@ -1626,7 +1706,7 @@ html, body {
             <input type="text" id="convInput" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter')handleConvSend()">
           </div>
           <button class="conv-send-btn" aria-label="Send" onclick="handleConvSend()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <span class="material-icons">send</span>
           </button>
         </div>
         <div id="convFooter"></div>
@@ -1782,21 +1862,21 @@ const SEEDED_THREADS = [
   {
     id: 'thread-4',
     title: 'Billing question about specialist',
-    status: 'waiting-guide',
+    status: 'resolved',
     lastActivityAt: '2026-03-10',
-    escalatedTo: { name: 'Mary Ann B.', team: 'Devoted Guide' },
     messages: [
       { role: 'user', text: "I got a bill for $150 from a specialist. I thought my plan covered this?" },
       { role: 'ai', sender: 'MyDevoted', text: "With a PCP referral, in-network dermatology visits should have a **$30 copay**. A $150 bill sounds like it may have been processed incorrectly.\n\nWould you like me to connect you with a Devoted Guide who can look into the claim details?" },
       { role: 'user', text: "Yes please." },
       { role: 'system', text: 'Mary Ann B. from Devoted Guide has joined this conversation.' },
-      { role: 'human', sender: 'Mary Ann B., Devoted Guide', team: 'guide', text: "Hi Laura — I'm Mary Ann, a Devoted Guide. I can see you're asking about a $150 bill from a dermatology visit. I'm pulling up your claim details now. I'll get back to you here shortly." }
+      { role: 'human', sender: 'Mary Ann B., Devoted Guide', team: 'guide', text: "Hi Laura — I'm Mary Ann, a Devoted Guide. I can see you're asking about a $150 bill from a dermatology visit. I'm pulling up your claim details now. I'll get back to you here shortly." },
+      { role: 'human', sender: 'Mary Ann B., Devoted Guide', team: 'guide', text: "Good news, Laura — I reviewed the claim. It was processed as out-of-network by mistake. I've submitted a correction. You should see the adjusted amount ($30 copay) within 7-10 business days. Let me know if you have any other questions!\n\n— Mary Ann B., Devoted Guide" }
     ]
   },
   {
     id: 'thread-5',
     title: 'Preparing for Dr. Wagle appointment',
-    status: 'open',
+    status: 'resolved',
     lastActivityAt: '2026-03-12',
     messages: [
       { role: 'user', text: "My appointment with Dr. Wagle is coming up. Can you help me prepare?" },
@@ -1856,25 +1936,27 @@ function renderSheetHeader() {
       </div>
       <div class="sheet-header-right">
         <button class="sheet-btn" onclick="closeSheet()" aria-label="Close">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span class="material-icons">close</span>
         </button>
       </div>`;
   } else {
     const thread = threads.find(t => t.id === activeThreadId);
-    const subtitle = thread ? thread.title : '';
+    const escalated = thread && isThreadEscalated(thread);
+    const title = escalated && thread.escalatedTo ? thread.escalatedTo.name : 'MyDevoted AI';
+    const subtitle = escalated && thread.escalatedTo ? thread.escalatedTo.team : (thread ? thread.title : '');
     header.innerHTML = `
       <div class="sheet-header-left">
         <button class="sheet-btn" onclick="showThreadList()" aria-label="Back">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <span class="material-icons">arrow_back</span>
         </button>
       </div>
       <div class="sheet-header-center">
-        <div class="sheet-header-title">MyDevoted AI</div>
+        <div class="sheet-header-title">${title}</div>
         <div class="sheet-header-subtitle">${subtitle}</div>
       </div>
       <div class="sheet-header-right">
         <button class="sheet-btn" onclick="closeSheet()" aria-label="Close">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span class="material-icons">close</span>
         </button>
       </div>`;
   }
@@ -2149,8 +2231,7 @@ function showLoading() {
   const div = document.createElement('div');
   div.className = 'msg msg-ai msg-loading';
   div.innerHTML = `<div class="msg-avatar msg-avatar-ai">♥</div>
-    <div class="msg-bubble"><span class="loading-text">Thinking...</span>
-    <div class="loading-dots"><span></span><span></span><span></span></div></div>`;
+    <div class="msg-bubble"><div class="loading-spinner"></div></div>`;
   container.appendChild(div);
   requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
   return div;
@@ -2167,7 +2248,7 @@ function showEmergencyCard(thread) {
       <p><strong>If this is an emergency, call 911 now.</strong></p>
       <p>If you need urgent care advice, call the Devoted Care OnDemand line:</p>
       <p><a href="tel:18888022738" style="color:var(--red);font-weight:700;font-size:17px;">1-888-802-2738</a></p>
-      <p style="margin-top:8px;"><button onclick="dismissEmergencyCard(this)" style="background:none;border:none;color:var(--gray-text);font-size:14px;cursor:pointer;font-family:Public Sans,sans-serif;text-decoration:underline;">This isn't an emergency</button></p>
+      <p style="margin-top:8px;"><button onclick="dismissEmergencyCard(this)" style="background:none;border:none;color:var(--gray-text);font-size:14px;cursor:pointer;font-family:Inter,sans-serif;text-decoration:underline;">This isn't an emergency</button></p>
     </div>`;
   container.appendChild(div);
   thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: '🚨 If this is an emergency, call 911 now. Care OnDemand: 1-888-802-2738' });
@@ -2207,13 +2288,44 @@ function dismissEscalation() {
 }
 
 // ── Determine escalation team from conversation content ──
-const BENEFITS_KEYWORDS = /benefit|claim|coverage|food.*card|home.*card|wellness.*buck|otc|billing|copay|deductible|id card|reimburse|allowance/i;
+const BENEFITS_KEYWORDS = /benefit|claim|coverage|food.*card|home.*card|wellness.*buck|otc|billing|copay|deductible|id card|reimburse|allowance|prior auth|referral|cost|plan detail|premium|formulary|network/i;
 
 function determineEscalationTeam(thread) {
   const allText = thread.messages.map(m => m.text).join(' ');
   if (BENEFITS_KEYWORDS.test(allText)) return 'guide';
   return 'medical';
 }
+
+// ── Scripted human responses for usability testing ──
+const SCRIPTED_HUMAN_RESPONSES = {
+  guide: {
+    intro: (thread) => {
+      const topic = thread.title || 'your question';
+      return `Hi Laura — I'm Mary Ann, a Devoted Guide. I've reviewed your conversation about "${topic}" and I'm here to help.\n\nLet me pull up your account details. I should have an answer for you shortly.\n\n— Mary Ann B., Devoted Guide`;
+    },
+    followups: [
+      "Thanks for the additional details, Laura. I'm looking into that now. Give me just a moment.\n\n— Mary Ann B., Devoted Guide",
+      "Good question. Let me check on that for you — I want to make sure I give you the right information.\n\n— Mary Ann B., Devoted Guide",
+      "I appreciate your patience. I've confirmed the details on your account. Is there anything else I can help with today?\n\n— Mary Ann B., Devoted Guide",
+      "Of course — I'm happy to help with that too. Let me take a look.\n\n— Mary Ann B., Devoted Guide"
+    ]
+  },
+  medical: {
+    intro: (thread) => {
+      const topic = thread.title || 'your health question';
+      return `Hi Laura — I'm Dr. Holliday. I've reviewed your conversation about "${topic}" and your recent records.\n\nI want to make sure we address your concerns thoroughly. Let me take a closer look at the details.\n\n— Dr. Alison Holliday, Devoted Medical`;
+    },
+    followups: [
+      "That's a really good question, Laura. Based on what I'm seeing in your records, let me share some thoughts.\n\n— Dr. Alison Holliday, Devoted Medical",
+      "I understand your concern. This is something we can absolutely work through together. Let me explain what I'd recommend.\n\n— Dr. Alison Holliday, Devoted Medical",
+      "Thanks for sharing that. It's helpful context. I'd suggest we discuss this with Dr. Wagle at your next visit as well.\n\n— Dr. Alison Holliday, Devoted Medical",
+      "I'm glad you brought that up. Let me check on the specifics and get back to you.\n\n— Dr. Alison Holliday, Devoted Medical"
+    ]
+  }
+};
+
+// Track follow-up index per thread for scripted responses
+const humanFollowupIndex = {};
 
 const HUMAN_PROMPTS = {
   guide: {
@@ -2240,6 +2352,21 @@ Keep under 150 words.`
   }
 };
 
+function showConnectingMessage(teamKey) {
+  const container = document.getElementById('convMessages');
+  const persona = HUMAN_PROMPTS[teamKey];
+  const div = document.createElement('div');
+  div.className = 'msg msg-system';
+  div.id = 'connecting-indicator';
+  div.innerHTML = `<div class="connecting-msg">
+    <div class="connecting-dots"><span></span><span></span><span></span></div>
+    <div class="connecting-text">Connecting you with ${persona.name}...</div>
+  </div>`;
+  container.appendChild(div);
+  requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+  return div;
+}
+
 async function confirmEscalation() {
   const thread = threads.find(t => t.id === activeThreadId);
   if (!thread) return;
@@ -2255,6 +2382,11 @@ async function confirmEscalation() {
   const teamKey = determineEscalationTeam(thread);
   const persona = HUMAN_PROMPTS[teamKey];
 
+  // Show connecting animation (1-2 second delay)
+  const connectingEl = showConnectingMessage(teamKey);
+  await new Promise(r => setTimeout(r, 1800));
+  connectingEl.remove();
+
   // Update thread status
   thread.status = persona.status;
   thread.escalatedTo = { name: persona.name, team: persona.team };
@@ -2263,41 +2395,18 @@ async function confirmEscalation() {
   thread.messages.push({ role: 'system', text: `${persona.name} from ${persona.team} has joined this conversation.` });
   renderConversation();
 
-  // Show loading, wait ~3s, then call API for human response
-  const loader = showLoading();
+  // Brief pause, then show human intro message
+  await new Promise(r => setTimeout(r, 800));
 
-  try {
-    // Delay to simulate human joining
-    await new Promise(r => setTimeout(r, 3000));
+  // Use scripted intro (no API call needed for usability test)
+  const scripted = SCRIPTED_HUMAN_RESPONSES[teamKey];
+  const humanText = scripted.intro(thread);
+  humanFollowupIndex[thread.id] = 0;
 
-    const apiMessages = buildApiMessages(thread);
-    const systemPrompt = MEMBER_CONTEXT + '\n\n' + persona.systemPrompt + '\n\n' + FORMATTING_RULES;
-
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: HEADERS,
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 512,
-        system: systemPrompt,
-        messages: apiMessages
-      })
-    });
-
-    loader.remove();
-
-    const data = await response.json();
-    const humanText = data.content?.[0]?.text || `Hi Laura — I'm ${persona.name}. I've reviewed this conversation and I'm here to help. Let me look into this for you.\n\n— ${persona.name}`;
-
-    thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: humanText });
-    thread.lastActivityAt = new Date().toISOString().split('T')[0];
-    renderConversation();
-    renderSheetHeader();
-  } catch (err) {
-    loader.remove();
-    thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: `Hi Laura — I'm ${persona.name}. I've reviewed this conversation and I'm here to help. Let me look into this for you.\n\n— ${persona.name}` });
-    renderConversation();
-  }
+  thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: humanText });
+  thread.lastActivityAt = new Date().toISOString().split('T')[0];
+  renderConversation();
+  renderSheetHeader();
 }
 
 // ── Send message (main flow) ──
@@ -2351,29 +2460,23 @@ async function sendMessage(text) {
     const escalated = isThreadEscalated(thread);
 
     if (escalated) {
-      // Use human persona for responses after escalation
+      // Use scripted human responses after escalation (no API needed)
       const teamKey = thread.status === 'waiting-medical' ? 'medical' : 'guide';
       const persona = HUMAN_PROMPTS[teamKey];
-      const apiMessages = buildApiMessages(thread);
-      const systemPrompt = MEMBER_CONTEXT + '\n\n' + persona.systemPrompt + '\n\n' + FORMATTING_RULES + '\n\nCONVERSATION CONTEXT: This is a continued conversation. The member has sent a follow-up message. Respond as yourself, staying in character.';
+      const scripted = SCRIPTED_HUMAN_RESPONSES[teamKey];
 
-      // Simulate slight delay for human feel
-      await new Promise(r => setTimeout(r, 2000));
-
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: HEADERS,
-        body: JSON.stringify({
-          model: MODEL,
-          max_tokens: 512,
-          system: systemPrompt,
-          messages: apiMessages
-        })
-      });
+      // Simulate human typing delay (1.5-3s)
+      const delay = 1500 + Math.random() * 1500;
+      await new Promise(r => setTimeout(r, delay));
 
       loader.remove();
-      const data = await response.json();
-      const humanText = data.content?.[0]?.text || "Thank you for the additional details. I'm looking into this now.";
+
+      // Pick next scripted follow-up response, cycling through them
+      if (!humanFollowupIndex[thread.id]) humanFollowupIndex[thread.id] = 0;
+      const idx = humanFollowupIndex[thread.id] % scripted.followups.length;
+      const humanText = scripted.followups[idx];
+      humanFollowupIndex[thread.id]++;
+
       thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: humanText });
       thread.lastActivityAt = new Date().toISOString().split('T')[0];
       renderConversation();
