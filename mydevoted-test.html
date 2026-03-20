@@ -416,6 +416,28 @@ html, body {
 .badge-purple { background: var(--purple-light); color: var(--purple); }
 .badge-amber { background: #FEF3C7; color: var(--amber); }
 .badge-blue { background: var(--blue-light); color: var(--blue); }
+.badge-green { background: var(--green-bg); color: var(--green); }
+
+/* Response chips in conversation */
+.conv-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 16px 8px 52px;
+}
+.conv-chip {
+  background: var(--white);
+  border: 1px solid var(--gray-300);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 15px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--charcoal);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.conv-chip:active { background: var(--bg-input); border-color: var(--red); }
+.happening-card:active { background: #f0ebe6; }
 .happening-title {
   font-size: 19px;
   font-weight: 700;
@@ -1407,20 +1429,20 @@ html, body {
 
       <!-- What's Happening -->
       <div class="section-header">What's happening</div>
-      <div class="happening-card">
-        <div class="happening-badge badge-purple">NOT STARTED</div>
+      <div class="happening-card" id="hc-card" onclick="openHealthConnections()" style="cursor:pointer">
+        <div class="happening-badge badge-purple" id="hc-badge">NOT STARTED</div>
         <div class="happening-title">Health Connections Checklist</div>
-        <div class="happening-subtitle">Personalize your experience. Takes about 2 minutes.</div>
+        <div class="happening-subtitle" id="hc-subtitle">Personalize your experience. Takes about 2 minutes.</div>
       </div>
-      <div class="happening-card">
+      <div class="happening-card" id="ym-card" onclick="openYogaMatStatus()" style="cursor:pointer">
         <div class="happening-badge badge-amber">IN PROGRESS</div>
         <div class="happening-title">Yoga Mat Reimbursement</div>
         <div class="happening-subtitle">Received February 20 · $45</div>
       </div>
-      <div class="happening-card">
-        <div class="happening-badge badge-blue">UPCOMING</div>
+      <div class="happening-card" id="vi-card" onclick="openVisitIntake()" style="cursor:pointer">
+        <div class="happening-badge badge-blue" id="vi-badge">UPCOMING</div>
         <div class="happening-title">Complete visit intake</div>
-        <div class="happening-subtitle">March 4, 10am · Dr. Wagle · Primary Care</div>
+        <div class="happening-subtitle" id="vi-subtitle">March 4, 10am · Dr. Wagle · Primary Care</div>
       </div>
 
       <!-- Conversations -->
@@ -2407,6 +2429,13 @@ async function sendMessage(text) {
   const thread = threads.find(t => t.id === activeThreadId);
   if (!thread) return;
 
+  // Route to card flow if active
+  const cardFlow = getActiveCardFlow();
+  if (cardFlow) {
+    handleCardFlowInput(text);
+    return;
+  }
+
   // 1. Check emergency
   if (EMERGENCY_REGEX.test(text)) {
     thread.messages.push({ role: 'user', text: text });
@@ -2589,6 +2618,485 @@ function handleConvSend() {
 document.getElementById('aiBarInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') handleAiBarSend();
 });
+
+// ══════════════════════════════════════════════════
+// ── Card Flow System ──
+// ══════════════════════════════════════════════════
+const CARD_FLOW_IDS = {
+  HC: 'card-health-connections',
+  YM: 'card-yoga-mat',
+  VI: 'card-visit-intake'
+};
+
+let cardFlowState = {
+  hc: { threadId: null, step: 0, completed: false },
+  ym: { threadId: null, step: 0 },
+  vi: { threadId: null, step: 0, completed: false, answers: {} }
+};
+
+// Check if current thread is a card flow
+function getActiveCardFlow() {
+  if (!activeThreadId) return null;
+  if (activeThreadId === cardFlowState.hc.threadId) return 'hc';
+  if (activeThreadId === cardFlowState.ym.threadId) return 'ym';
+  if (activeThreadId === cardFlowState.vi.threadId) return 'vi';
+  return null;
+}
+
+// Show response chips in conversation
+function showConvChips(chips) {
+  removeConvChips();
+  const container = document.getElementById('convMessages');
+  const div = document.createElement('div');
+  div.className = 'conv-chips';
+  div.id = 'activeConvChips';
+  chips.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'conv-chip';
+    btn.textContent = c.label;
+    btn.onclick = () => {
+      removeConvChips();
+      handleCardFlowInput(c.value);
+    };
+    div.appendChild(btn);
+  });
+  container.appendChild(div);
+  requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+}
+
+function removeConvChips() {
+  const el = document.getElementById('activeConvChips');
+  if (el) el.remove();
+}
+
+// Add AI message to active thread and render
+function addCardAiMessage(text, chips, delay_ms) {
+  const ms = delay_ms || 600;
+  setTimeout(() => {
+    const thread = threads.find(t => t.id === activeThreadId);
+    if (!thread) return;
+    thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: text });
+    renderConversation();
+    if (chips) showConvChips(chips);
+  }, ms);
+}
+
+// Add user message to active thread
+function addCardUserMessage(text) {
+  const thread = threads.find(t => t.id === activeThreadId);
+  if (!thread) return;
+  removeConvChips();
+  thread.messages.push({ role: 'user', text: text });
+  renderConversation();
+}
+
+// Route input to the right card flow handler
+function handleCardFlowInput(text) {
+  const flow = getActiveCardFlow();
+  if (flow === 'hc') handleHCReply(text);
+  else if (flow === 'ym') handleYMReply(text);
+  else if (flow === 'vi') handleVIReply(text);
+}
+
+// ── Card 1: Health Connections Checklist ──
+function openHealthConnections() {
+  const state = cardFlowState.hc;
+
+  // Reopen existing thread
+  if (state.threadId) {
+    openThread(state.threadId);
+    openSheet();
+    return;
+  }
+
+  // Create new thread
+  threadCounter++;
+  const thread = {
+    id: CARD_FLOW_IDS.HC,
+    title: 'Health Connections',
+    status: 'open',
+    lastActivityAt: new Date().toISOString().split('T')[0],
+    messages: []
+  };
+  threads.unshift(thread);
+  state.threadId = thread.id;
+  state.step = 1;
+
+  openThread(thread.id);
+  openSheet();
+
+  // First AI message
+  const name = 'Laura';
+  const msg = `Hi ${name} — your care team at Devoted Medical would love to get to know you a little better. This isn't a form — just a conversation. And we can stop anytime.\n\nLet's start with the basics?`;
+  addCardAiMessage(msg, [
+    { label: "Sure, let's go", value: "Sure, let's go" },
+    { label: 'Maybe later', value: 'Maybe later' }
+  ], 300);
+}
+
+function handleHCReply(text) {
+  const state = cardFlowState.hc;
+  addCardUserMessage(text);
+  const name = 'Laura';
+
+  if (state.step === 1) {
+    if (/maybe later/i.test(text)) {
+      addCardAiMessage("No problem — I'll be here whenever you're ready.");
+      state.step = 0;
+      state.threadId = null;
+      // Remove thread
+      threads = threads.filter(t => t.id !== CARD_FLOW_IDS.HC);
+      return;
+    }
+    state.step = 2;
+    addCardAiMessage("I see Dr. Sarah Wagle is listed as your primary care doctor. Is that still right?", [
+      { label: "Yes, that's right", value: "Yes, that's right" },
+      { label: "I've changed doctors", value: "I've changed doctors" }
+    ]);
+  } else if (state.step === 2) {
+    if (/changed/i.test(text)) {
+      state.step = 2.5;
+      addCardAiMessage("Got it — who is your new primary care doctor?");
+      // Enable free text — input already visible
+    } else {
+      state.step = 3;
+      addCardAiMessage("Perfect. And your pharmacy — do you still pick up prescriptions at CVS on Main Street?", [
+        { label: 'Yes', value: 'Yes' },
+        { label: 'I use a different pharmacy', value: 'I use a different pharmacy' }
+      ]);
+    }
+  } else if (state.step === 2.5) {
+    state.step = 3;
+    addCardAiMessage("Thanks for that — I've noted your new doctor.\n\nAnd your pharmacy — do you still pick up prescriptions at CVS on Main Street?", [
+      { label: 'Yes', value: 'Yes' },
+      { label: 'I use a different pharmacy', value: 'I use a different pharmacy' }
+    ]);
+  } else if (state.step === 3) {
+    if (/different/i.test(text)) {
+      state.step = 3.5;
+      addCardAiMessage("No problem — which pharmacy do you use now?");
+    } else {
+      state.step = 4;
+      addCardAiMessage("Got it. By the way — we can deliver your medications right to your door at no extra cost through mail order. Want me to set that up?", [
+        { label: 'Tell me more', value: 'Tell me more' },
+        { label: 'No thanks', value: 'No thanks' }
+      ]);
+    }
+  } else if (state.step === 3.5) {
+    state.step = 4;
+    addCardAiMessage("Thanks — I've updated that.\n\nBy the way — we can deliver your medications right to your door at no extra cost through mail order. Want me to set that up?", [
+      { label: 'Tell me more', value: 'Tell me more' },
+      { label: 'No thanks', value: 'No thanks' }
+    ]);
+  } else if (state.step === 4) {
+    if (/tell me more/i.test(text)) {
+      addCardAiMessage("With mail-order pharmacy, your medications are delivered right to your door — typically in 90-day supplies, so you don't have to make monthly trips. There's no extra cost, and refills can be set up automatically. I can get that started for you anytime — just say the word.", null, 600);
+    }
+    state.step = 5;
+    const delay = /tell me more/i.test(text) ? 1800 : 600;
+    setTimeout(() => {
+      addCardAiMessage("Last one — who should we contact in an emergency? Just a name and phone number.", null, 0);
+    }, delay);
+  } else if (state.step === 5) {
+    state.step = 6;
+    state.completed = true;
+    addCardAiMessage(`That's everything for now. I'll check back in a couple days to keep getting to know you — next time we'll talk a bit about your day-to-day so we can find ways to help.\n\nThanks, ${name}!`);
+    // Update card UI
+    const badge = document.getElementById('hc-badge');
+    const subtitle = document.getElementById('hc-subtitle');
+    badge.textContent = '1 OF 5';
+    badge.className = 'happening-badge badge-amber';
+    subtitle.textContent = 'Session 1 complete · Next session in a few days';
+  }
+}
+
+// ── Card 2: Yoga Mat Reimbursement ──
+function openYogaMatStatus() {
+  const state = cardFlowState.ym;
+
+  if (state.threadId) {
+    openThread(state.threadId);
+    openSheet();
+    return;
+  }
+
+  threadCounter++;
+  const thread = {
+    id: CARD_FLOW_IDS.YM,
+    title: 'Yoga Mat Reimbursement',
+    status: 'open',
+    lastActivityAt: new Date().toISOString().split('T')[0],
+    messages: []
+  };
+  threads.unshift(thread);
+  state.threadId = thread.id;
+  state.step = 1;
+
+  openThread(thread.id);
+  openSheet();
+
+  addCardAiMessage("Here's where things stand with your yoga mat reimbursement:\n\nYou submitted a **$45 receipt** on February 20 for a yoga mat purchased with your Wellness Bucks benefit. It's currently **in review** — these typically take 10–14 business days, so you should hear back by around **March 6**.\n\nEverything looks good on our end.", [
+    { label: 'Is anything holding it up?', value: 'Is anything holding it up?' },
+    { label: 'How will I get paid?', value: 'How will I get paid?' },
+    { label: "That's all I needed", value: "That's all I needed" }
+  ], 300);
+}
+
+function handleYMReply(text) {
+  const state = cardFlowState.ym;
+  addCardUserMessage(text);
+
+  if (/holding it up|issue|problem|stuck/i.test(text)) {
+    state.step = 2;
+    addCardAiMessage("I don't see any issues — your receipt was accepted and the amount is within your Wellness Bucks balance. If something does come up, I'll let you know right away.", [
+      { label: 'How will I get paid?', value: 'How will I get paid?' },
+      { label: "That's all I needed", value: "That's all I needed" }
+    ]);
+  } else if (/how will i get paid|payment|bank|deposit/i.test(text)) {
+    state.step = 3;
+    addCardAiMessage("The reimbursement will be deposited directly into your bank account on file. You'll get a notification when it's processed.\n\nWant me to confirm the account ending in **XX42** is still correct?", [
+      { label: "Yes, that's right", value: "Yes, that's right" },
+      { label: 'I need to update it', value: 'I need to update it' }
+    ]);
+  } else if (/update it|change.*account|wrong account/i.test(text)) {
+    addCardAiMessage("Let me connect you with someone who can help with that.");
+    setTimeout(() => {
+      const thread = threads.find(t => t.id === activeThreadId);
+      if (thread) {
+        thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: "Of course — I'm connecting you with our care team. They'll see our full conversation." });
+        renderConversation();
+        // Trigger escalation to Devoted Guide
+        const teamKey = 'guide';
+        const persona = HUMAN_PROMPTS[teamKey];
+        showConnectingMessage(teamKey).then ? null : null;
+        setTimeout(async () => {
+          const connectingEl = showConnectingMessage(teamKey);
+          await new Promise(r => setTimeout(r, 1800));
+          connectingEl.remove();
+          thread.status = persona.status;
+          thread.escalatedTo = { name: persona.name, team: persona.team };
+          thread.messages.push({ role: 'system', text: `${persona.name} from ${persona.team} has joined this conversation.` });
+          renderConversation();
+          await new Promise(r => setTimeout(r, 800));
+          const scripted = SCRIPTED_HUMAN_RESPONSES[teamKey];
+          const humanText = scripted.intro(thread);
+          humanFollowupIndex[thread.id] = 0;
+          thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: humanText });
+          thread.lastActivityAt = new Date().toISOString().split('T')[0];
+          renderConversation();
+          renderSheetHeader();
+        }, 600);
+      }
+    }, 800);
+  } else if (/that's right|correct|yes/i.test(text) && state.step === 3) {
+    state.step = 5;
+    addCardAiMessage("Great — you're all set. The reimbursement will go to your account ending in XX42 once it's processed. Anything else I can help with?", [
+      { label: "That's all I needed", value: "That's all I needed" }
+    ]);
+  } else if (/that's all|no thanks|nothing else|i'm good/i.test(text)) {
+    addCardAiMessage("Great — I'll keep an eye on it and let you know when it's processed. Anything else I can help with?");
+  } else if (ESCALATION_REGEX.test(text)) {
+    showEscalationCard();
+  } else {
+    addCardAiMessage("Is there anything else about your yoga mat reimbursement I can help with?", [
+      { label: "That's all I needed", value: "That's all I needed" }
+    ]);
+  }
+}
+
+// ── Card 3: Visit Intake ──
+function openVisitIntake() {
+  const state = cardFlowState.vi;
+
+  if (state.threadId) {
+    openThread(state.threadId);
+    openSheet();
+    return;
+  }
+
+  threadCounter++;
+  const thread = {
+    id: CARD_FLOW_IDS.VI,
+    title: 'Visit Prep — Dr. Wagle',
+    status: 'open',
+    lastActivityAt: new Date().toISOString().split('T')[0],
+    messages: []
+  };
+  threads.unshift(thread);
+  state.threadId = thread.id;
+  state.step = 1;
+  state.answers = { concerns: 'None', labQuestions: 'None', medChanges: 'None', drQuestions: 'None' };
+
+  openThread(thread.id);
+  openSheet();
+
+  addCardAiMessage("Your appointment with Dr. Wagle is coming up on **March 4 at 10am**. Let's get you ready so you can make the most of your time with her — and skip the clipboard in the waiting room.\n\nThis should take about 3 minutes.", [
+    { label: "Let's do it", value: "Let's do it" },
+    { label: "I'll do it later", value: "I'll do it later" }
+  ], 300);
+}
+
+function handleVIReply(text) {
+  const state = cardFlowState.vi;
+  addCardUserMessage(text);
+  const name = 'Laura';
+
+  // Clinical escalation — check at any step after step 1
+  if (state.step > 1 && /chest pain|can't breathe|severe|passing out|blood in|seizure/i.test(text)) {
+    state.answers.concerns = text;
+    addCardAiMessage("That sounds important — I want to make sure Dr. Wagle's team knows about this before your visit. Would you like me to send them a note now, or would you rather call the office?", [
+      { label: 'Send a note now', value: 'Send a note now' },
+      { label: "I'll call the office", value: "I'll call the office" }
+    ]);
+    state.step = 99; // urgent sub-flow
+    return;
+  }
+
+  if (state.step === 99) {
+    if (/send a note/i.test(text)) {
+      addCardAiMessage("Done — I've flagged this for Dr. Wagle's team. They'll review it before your visit.");
+    } else {
+      addCardAiMessage("The office number is **(888) 802-2738**. You can call anytime during business hours.");
+    }
+    // Continue to wherever we were
+    setTimeout(() => {
+      if (!state.answers.labQuestions || state.answers.labQuestions === 'None') {
+        state.step = 3;
+        showLabsQ();
+      } else if (!state.answers.medChanges || state.answers.medChanges === 'None') {
+        state.step = 4;
+        showMedsQ();
+      } else {
+        state.step = 5;
+        showDrQQ();
+      }
+    }, 1200);
+    return;
+  }
+
+  if (state.step === 1) {
+    if (/later/i.test(text)) {
+      addCardAiMessage("No problem — I'll remind you before your appointment.");
+      state.threadId = null;
+      threads = threads.filter(t => t.id !== CARD_FLOW_IDS.VI);
+      return;
+    }
+    state.step = 2;
+    addCardAiMessage("Since your last visit, have you had any new health concerns or symptoms you want to bring up with Dr. Wagle?", [
+      { label: 'Yes', value: 'Yes' },
+      { label: 'Nothing new', value: 'Nothing new' }
+    ]);
+  } else if (state.step === 2) {
+    if (/^yes$/i.test(text.trim())) {
+      state.step = 2.5;
+      addCardAiMessage("Go ahead — what's been going on?");
+    } else if (/nothing new|no$/i.test(text.trim())) {
+      state.answers.concerns = 'None';
+      state.step = 3;
+      showLabsQ();
+    } else {
+      state.answers.concerns = text;
+      state.step = 3;
+      addCardAiMessage("Got it — I've noted that.");
+      setTimeout(() => showLabsQ(), 1000);
+    }
+  } else if (state.step === 2.5) {
+    state.answers.concerns = text;
+    state.step = 3;
+    addCardAiMessage("Got it — I've noted that for Dr. Wagle.");
+    setTimeout(() => showLabsQ(), 1000);
+  } else if (state.step === 3) {
+    if (/yes|questions/i.test(text)) {
+      state.step = 3.5;
+      addCardAiMessage("What would you like to ask about your labs?");
+    } else {
+      state.answers.labQuestions = 'None';
+      state.step = 4;
+      showMedsQ();
+    }
+  } else if (state.step === 3.5) {
+    state.answers.labQuestions = text;
+    state.step = 4;
+    addCardAiMessage("Good question — I'll add that to your visit notes.");
+    setTimeout(() => showMedsQ(), 1000);
+  } else if (state.step === 4) {
+    if (/changed|something changed/i.test(text)) {
+      state.step = 4.5;
+      addCardAiMessage("What changed? Any new medications, stopped taking something, or side effects?");
+    } else {
+      state.answers.medChanges = 'None';
+      state.step = 5;
+      showDrQQ();
+    }
+  } else if (state.step === 4.5) {
+    state.answers.medChanges = text;
+    state.step = 5;
+    addCardAiMessage("Thanks for letting us know.");
+    setTimeout(() => showDrQQ(), 1000);
+  } else if (state.step === 5) {
+    if (/^yes$/i.test(text.trim())) {
+      state.step = 5.5;
+      addCardAiMessage("Go ahead — what do you want to ask her?");
+    } else {
+      state.answers.drQuestions = 'None';
+      state.step = 6;
+      showVisitSummary();
+    }
+  } else if (state.step === 5.5) {
+    state.answers.drQuestions = text;
+    state.step = 6;
+    addCardAiMessage("Great question — I've added it.");
+    setTimeout(() => showVisitSummary(), 1000);
+  } else if (state.step === 6) {
+    if (/looks good|yes|done|good|perfect/i.test(text)) {
+      state.completed = true;
+      addCardAiMessage(`You're all set, ${name}. Dr. Wagle's team will have this before your appointment. See you March 4!`);
+      // Update card
+      const badge = document.getElementById('vi-badge');
+      const subtitle = document.getElementById('vi-subtitle');
+      badge.textContent = 'COMPLETE';
+      badge.className = 'happening-badge badge-green';
+      subtitle.textContent = 'Visit prep submitted for March 4';
+    } else if (/edit|change/i.test(text)) {
+      state.step = 6.5;
+      addCardAiMessage("No problem — what would you like to change?");
+    }
+  } else if (state.step === 6.5) {
+    addCardAiMessage("Got it — I've updated your visit notes.");
+    state.step = 6;
+    setTimeout(() => showVisitSummary(), 1000);
+  }
+}
+
+function showLabsQ() {
+  addCardAiMessage("I see your last labs were on February 10. Your A1c came in at **6.8%** — that's an improvement. Your eGFR was **58** and LDL was **112**.\n\nWant me to add any questions about these to your visit notes?", [
+    { label: 'Yes, I have questions', value: 'Yes, I have questions' },
+    { label: "No, I'm good", value: "No, I'm good" }
+  ]);
+}
+
+function showMedsQ() {
+  addCardAiMessage("Are you still taking **Metformin**, **Lisinopril**, and **Atorvastatin**? Any side effects or changes?", [
+    { label: 'All the same', value: 'All the same' },
+    { label: 'Something changed', value: 'Something changed' }
+  ]);
+}
+
+function showDrQQ() {
+  addCardAiMessage("Any other questions you want to make sure you ask Dr. Wagle? Sometimes it helps to write them down before you go in.", [
+    { label: 'Yes', value: 'Yes' },
+    { label: "I think I'm good", value: "I think I'm good" }
+  ]);
+}
+
+function showVisitSummary() {
+  const a = cardFlowState.vi.answers;
+  const summaryText = `You're all set. Here's what I've noted for Dr. Wagle's team:\n\n**New concerns:** ${a.concerns}\n**Lab questions:** ${a.labQuestions}\n**Medication changes:** ${a.medChanges}\n**Questions for Dr. Wagle:** ${a.drQuestions}\n\nThis will be shared with Dr. Wagle before your appointment. Anything you want to change?`;
+  addCardAiMessage(summaryText, [
+    { label: 'Looks good', value: 'Looks good' },
+    { label: 'I want to edit something', value: 'I want to edit something' }
+  ]);
+}
 
 // Initialize
 switchTab('home');
