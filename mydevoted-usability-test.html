@@ -1098,22 +1098,40 @@ html, body {
   padding: 8px 0;
 }
 
-/* Loading spinner */
+/* Loading / typing indicator */
 .msg-loading .msg-bubble {
   display: flex;
   align-items: center;
   gap: 10px;
 }
-.loading-spinner {
-  width: 20px;
-  height: 20px;
-  border: 2.5px solid var(--gray-300);
-  border-top-color: var(--gray-500);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.typing-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gray-400);
+  animation: typingBounce 1.4s ease-in-out infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+.typing-label {
+  font-size: 13px;
+  color: var(--gray-400);
+  margin-left: 4px;
+  white-space: nowrap;
 }
 
 /* Connecting animation for human handoff */
@@ -2264,16 +2282,23 @@ function renderHomeConversations() {
 }
 
 // ── Loading indicator ──
-function showLoading() {
+function showTypingIndicator(name) {
   const container = document.getElementById('convMessages');
   const div = document.createElement('div');
   div.className = 'msg msg-ai msg-loading';
+  const labelHtml = name ? `<span class="typing-label">${name} is typing…</span>` : '';
   div.innerHTML = `<div class="msg-avatar msg-avatar-ai">♥</div>
-    <div class="msg-bubble"><div class="loading-spinner"></div></div>`;
+    <div class="msg-bubble"><div class="typing-indicator"><div class="typing-dots"><span></span><span></span><span></span></div>${labelHtml}</div></div>`;
   container.appendChild(div);
   requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
   return div;
 }
+// Backward compat alias
+function showLoading() { return showTypingIndicator(); }
+
+// Delay helpers
+function aiDelay() { return Math.random() * 7000 + 8000; }
+function humanDelay() { return Math.random() * 10000 + 20000; }
 
 // ── Emergency card ──
 function showEmergencyCard(thread) {
@@ -2433,8 +2458,10 @@ async function confirmEscalation() {
   thread.messages.push({ role: 'system', text: `${persona.name} from ${persona.team} has joined this conversation.` });
   renderConversation();
 
-  // Brief pause, then show human intro message
-  await new Promise(r => setTimeout(r, 800));
+  // Show named typing indicator with human delay
+  const humanLoader = showTypingIndicator(persona.name);
+  await new Promise(r => setTimeout(r, humanDelay()));
+  humanLoader.remove();
 
   // Use scripted intro (no API call needed for usability test)
   const scripted = SCRIPTED_HUMAN_RESPONSES[teamKey];
@@ -2496,9 +2523,8 @@ async function sendMessage(text) {
   renderConversation();
   renderSheetHeader();
 
-  // 4. Show loading
+  // 4. Show typing indicator + delay
   isSending = true;
-  const loader = showLoading();
 
   try {
     // Check if thread is escalated — use human persona
@@ -2510,9 +2536,9 @@ async function sendMessage(text) {
       const persona = HUMAN_PROMPTS[teamKey];
       const scripted = SCRIPTED_HUMAN_RESPONSES[teamKey];
 
-      // Simulate human typing delay (1.5-3s)
-      const delay = 1500 + Math.random() * 1500;
-      await new Promise(r => setTimeout(r, delay));
+      // Show named typing indicator with 20-30s delay
+      const loader = showTypingIndicator(persona.name);
+      await new Promise(r => setTimeout(r, humanDelay()));
 
       loader.remove();
 
@@ -2526,40 +2552,53 @@ async function sendMessage(text) {
       thread.lastActivityAt = new Date().toISOString().split('T')[0];
       renderConversation();
     } else {
-      // 5. Route
-      const agent = await routeMessage(text);
+      // Show AI typing indicator
+      const loader = showTypingIndicator();
 
-      // 6. Build messages
-      const apiMessages = buildApiMessages(thread);
+      // 5. Route + API call runs in parallel with minimum delay
+      const minDelayPromise = new Promise(r => setTimeout(r, aiDelay()));
 
-      // 7. Build system prompt
-      let systemPrompt = MEMBER_CONTEXT + '\n\n' + AGENT_PROMPTS[agent] + '\n\n' + FORMATTING_RULES;
-      if (thread.messages.filter(m => m.role === 'user').length > 1) {
-        systemPrompt += '\n\nCONVERSATION CONTEXT: This is a continued conversation. Reference what was discussed. Don\'t repeat information.';
+      let aiText;
+      try {
+        // 5. Route
+        const agent = await routeMessage(text);
+
+        // 6. Build messages
+        const apiMessages = buildApiMessages(thread);
+
+        // 7. Build system prompt
+        let systemPrompt = MEMBER_CONTEXT + '\n\n' + AGENT_PROMPTS[agent] + '\n\n' + FORMATTING_RULES;
+        if (thread.messages.filter(m => m.role === 'user').length > 1) {
+          systemPrompt += '\n\nCONVERSATION CONTEXT: This is a continued conversation. Reference what was discussed. Don\'t repeat information.';
+        }
+
+        // 8. Call API
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: HEADERS,
+          body: JSON.stringify({
+            model: MODEL,
+            max_tokens: 1024,
+            system: systemPrompt,
+            messages: apiMessages
+          })
+        });
+
+        const data = await response.json();
+        aiText = data.content?.[0]?.text || "I'm having trouble right now. Please try again.";
+      } catch (err) {
+        aiText = "We're having trouble connecting. Please try again.";
       }
 
-      // 8. Call API
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: HEADERS,
-        body: JSON.stringify({
-          model: MODEL,
-          max_tokens: 1024,
-          system: systemPrompt,
-          messages: apiMessages
-        })
-      });
-
+      // Wait for minimum delay to elapse
+      await minDelayPromise;
       loader.remove();
 
-      const data = await response.json();
-      const aiText = data.content?.[0]?.text || "I'm having trouble right now. Please try again.";
       thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: aiText });
       thread.lastActivityAt = new Date().toISOString().split('T')[0];
       renderConversation();
     }
   } catch (err) {
-    loader.remove();
     thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: "We're having trouble connecting. Please try again." });
     renderConversation();
   } finally {
@@ -2695,16 +2734,21 @@ function removeConvChips() {
   if (el) el.remove();
 }
 
-// Add AI message to active thread and render
+// Add AI message to active thread and render (with typing indicator + delay)
 function addCardAiMessage(text, chips, delay_ms) {
-  const ms = delay_ms || 600;
+  // Show typing indicator immediately
+  const loader = showTypingIndicator();
+  const ms = delay_ms !== undefined ? Math.max(delay_ms, 0) : 0;
+  // Use realistic AI delay (8-15s) plus any extra delay_ms offset
+  const totalDelay = ms + aiDelay();
   setTimeout(() => {
     const thread = threads.find(t => t.id === activeThreadId);
     if (!thread) return;
+    loader.remove();
     thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: text });
     renderConversation();
     if (chips) showConvChips(chips);
-  }, ms);
+  }, totalDelay);
 }
 
 // Add user message to active thread
@@ -2894,7 +2938,6 @@ function handleYMReply(text) {
         // Trigger escalation to Devoted Guide
         const teamKey = 'guide';
         const persona = HUMAN_PROMPTS[teamKey];
-        showConnectingMessage(teamKey).then ? null : null;
         setTimeout(async () => {
           const connectingEl = showConnectingMessage(teamKey);
           await new Promise(r => setTimeout(r, 1800));
@@ -2903,7 +2946,10 @@ function handleYMReply(text) {
           thread.escalatedTo = { name: persona.name, team: persona.team };
           thread.messages.push({ role: 'system', text: `${persona.name} from ${persona.team} has joined this conversation.` });
           renderConversation();
-          await new Promise(r => setTimeout(r, 800));
+          // Named typing indicator with human delay
+          const humanLoader = showTypingIndicator(persona.name);
+          await new Promise(r => setTimeout(r, humanDelay()));
+          humanLoader.remove();
           const scripted = SCRIPTED_HUMAN_RESPONSES[teamKey];
           const humanText = scripted.intro(thread);
           humanFollowupIndex[thread.id] = 0;
