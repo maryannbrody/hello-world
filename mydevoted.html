@@ -708,26 +708,6 @@ small, .small-text {
 
 /* All attention cards use same taupe style — no overrides */
 
-.card-badge {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 3px 10px;
-  border-radius: 12px;
-  white-space: nowrap;
-  flex-shrink: 0;
-  margin-left: auto;
-}
-.card-badge-amber {
-  background: var(--amber-bg);
-  color: var(--amber);
-}
-.card-badge-green {
-  background: #dcfce7;
-  color: var(--green);
-}
-
 .card-accent {
   width: 4px;
   align-self: stretch;
@@ -3423,19 +3403,18 @@ small, .small-text {
         <div class="attention-section">
           <div class="section-header">Recent Activity</div>
 
-          <!-- Card 1: Health Connections -->
-          <button class="attention-card" id="health-connections-card" onclick="openHealthConnections()">
+          <!-- Card 1: Onboarding -->
+          <button class="attention-card" id="onboard-card" onclick="openOnboarding()">
             <div class="card-icon card-icon-purple">🌟</div>
             <div class="card-body">
-              <div class="card-label card-label-purple" id="hc-card-label">Get Started</div>
+              <div class="card-label card-label-purple">Get Started</div>
               <div class="card-title">Complete your Health Connections Checklist</div>
-              <div class="card-subtitle" id="hc-card-subtitle">Takes about 2 minutes · Tap to begin</div>
+              <div class="card-subtitle">Takes about 2 minutes · Tap to begin</div>
             </div>
-            <div class="card-badge" id="hc-card-badge" style="display:none"></div>
           </button>
 
-          <!-- Card 2: Yoga Mat Claim -->
-          <button class="attention-card" id="yoga-mat-card" onclick="openYogaMatStatus()">
+          <!-- Card 2: Claim -->
+          <button class="attention-card" onclick="switchTab('benefits')">
             <div class="card-icon card-icon-red">💳</div>
             <div class="card-body">
               <div class="card-label card-label-red">Reimbursement</div>
@@ -3444,15 +3423,14 @@ small, .small-text {
             </div>
           </button>
 
-          <!-- Card 3: Visit Intake -->
-          <button class="attention-card" id="visit-intake-card" onclick="openVisitIntake()">
+          <!-- Card 3: Appointment -->
+          <button class="attention-card" onclick="switchTab('health')">
             <div class="card-icon card-icon-blue">📅</div>
             <div class="card-body">
-              <div class="card-label card-label-blue" id="vi-card-label">Appointment</div>
+              <div class="card-label card-label-blue">Appointment</div>
               <div class="card-title">Dr. Wagle — Primary Care</div>
-              <div class="card-subtitle" id="vi-card-subtitle">March 4, 10:00am · Tap to prepare</div>
+              <div class="card-subtitle">March 4, 10:00am · Tap to prepare</div>
             </div>
-            <div class="card-badge card-badge-green" id="vi-card-badge" style="display:none"></div>
           </button>
         </div>
 
@@ -4731,24 +4709,6 @@ function resetDemo() {
   dismissPush();
   isCheckInConversation = false;
   checkInBeat = 0;
-  activeCardFlow = null;
-  // Reset card flow states
-  healthConnectionsState = { started: false, completed: false, step: 0, history: [] };
-  yogaMatState = { opened: false, history: [] };
-  visitIntakeState = { started: false, completed: false, step: 0, history: [], answers: {} };
-  // Reset card UI
-  const hcLabel = document.getElementById('hc-card-label');
-  if (hcLabel) { hcLabel.textContent = 'Get Started'; hcLabel.className = 'card-label card-label-purple'; hcLabel.style.color = ''; }
-  const hcSub = document.getElementById('hc-card-subtitle');
-  if (hcSub) hcSub.textContent = 'Takes about 2 minutes · Tap to begin';
-  const hcBadge = document.getElementById('hc-card-badge');
-  if (hcBadge) { hcBadge.style.display = 'none'; hcBadge.className = 'card-badge'; }
-  const viLabel = document.getElementById('vi-card-label');
-  if (viLabel) { viLabel.textContent = 'Appointment'; viLabel.className = 'card-label card-label-blue'; viLabel.style.color = ''; }
-  const viSub = document.getElementById('vi-card-subtitle');
-  if (viSub) viSub.textContent = 'March 4, 10:00am · Tap to prepare';
-  const viBadge = document.getElementById('vi-card-badge');
-  if (viBadge) { viBadge.style.display = 'none'; viBadge.className = 'card-badge card-badge-green'; }
   currentTab = 'home';
   navItems.forEach(n => n.classList.remove('active'));
   navItems[0].classList.add('active');
@@ -4796,20 +4756,6 @@ function handleConvSubmit() {
 
 async function sendMessage(text) {
   hideSuggestedReplies();
-
-  // Route to active card flow if one is open
-  if (activeCardFlow === 'health-connections') {
-    handleHealthConnectionsReply(text);
-    return;
-  }
-  if (activeCardFlow === 'yoga-mat') {
-    handleYogaMatReply(text);
-    return;
-  }
-  if (activeCardFlow === 'visit-intake') {
-    handleVisitIntakeReply(text);
-    return;
-  }
 
   // Tier 3: Emergency detection
   if (EMERGENCY_REGEX.test(text)) {
@@ -5029,7 +4975,6 @@ function closeConvScreen() {
   hideSuggestedReplies();
   conversationHistory = [];
   isCheckInConversation = false;
-  activeCardFlow = null;
   conversationContext = null;
   document.getElementById('conv-messages').innerHTML = '';
   document.getElementById('conv-context-banner').classList.remove('visible');
@@ -5995,554 +5940,6 @@ function showPHIPage() {
       <button class="detail-action-primary" style="margin:0 auto;max-width:280px;" onclick="closeInteriorPage(); sendPrompt('I want to manage who can access my health information')">Set up or manage access</button>
     `;
   }, null, null);
-}
-
-// ══════════════════════════════════════════════════
-// ── Card Flow State ──
-// ══════════════════════════════════════════════════
-let healthConnectionsState = { started: false, completed: false, step: 0, history: [] };
-let yogaMatState = { opened: false, history: [] };
-let visitIntakeState = { started: false, completed: false, step: 0, history: [], answers: {} };
-
-// Track which card flow is active so sendMessage can route
-let activeCardFlow = null; // 'health-connections' | 'yoga-mat' | 'visit-intake' | null
-
-// ── Card 1: Health Connections Checklist ──
-function openHealthConnections() {
-  activeCardFlow = 'health-connections';
-  const name = preferredName || 'Rebecca';
-
-  // If already completed, reopen the saved conversation
-  if (healthConnectionsState.completed) {
-    reopenCardConversation('Health Connections', healthConnectionsState.history);
-    return;
-  }
-  // If already started, reopen in-progress conversation
-  if (healthConnectionsState.started) {
-    reopenCardConversation('Health Connections', healthConnectionsState.history);
-    return;
-  }
-
-  // Fresh start
-  healthConnectionsState.started = true;
-  healthConnectionsState.step = 1;
-  conversationHistory = [];
-  document.getElementById('conv-messages').innerHTML = '';
-  document.getElementById('conv-context-banner').classList.remove('visible');
-  resetConvHeader();
-  document.getElementById('conv-agent-name').textContent = 'Health Connections';
-  document.getElementById('conv-agent-sub').textContent = 'Session 1 of 5';
-  showConvScreen();
-  // Hide live input — we use chips
-  document.getElementById('conv-live-input').classList.add('hidden');
-  document.getElementById('conv-continue-btn-area').classList.add('hidden');
-
-  const msg1 = "Hi " + name + " — your care team at Devoted Medical would love to get to know you a little better. This isn't a form — just a conversation. And we can stop anytime.\n\nLet's start with the basics?";
-  appendAiBubble(msg1);
-  healthConnectionsState.history.push({ role: 'ai', text: msg1 });
-
-  showSuggestedReplies([
-    { label: "Sure, let's go", action: 'message', value: "Sure, let's go" },
-    { label: 'Maybe later', action: 'message', value: 'Maybe later' }
-  ]);
-  scrollConvToBottom();
-}
-
-function handleHealthConnectionsReply(text) {
-  const name = preferredName || 'Rebecca';
-  hideSuggestedReplies();
-  appendUserBubble(text);
-  healthConnectionsState.history.push({ role: 'user', text: text });
-
-  const step = healthConnectionsState.step;
-
-  if (step === 1) {
-    if (/maybe later/i.test(text)) {
-      const reply = "No problem — I'll be here whenever you're ready.";
-      showCardFlowReply(reply, 'health-connections');
-      healthConnectionsState.started = false;
-      healthConnectionsState.step = 0;
-      healthConnectionsState.history = [];
-      activeCardFlow = null;
-      return;
-    }
-    // "Sure, let's go"
-    healthConnectionsState.step = 2;
-    const reply = "I see Dr. Sarah Wagle is listed as your primary care doctor. Is that still right?";
-    showCardFlowReply(reply, 'health-connections', [
-      { label: "Yes, that's right", action: 'message', value: "Yes, that's right" },
-      { label: "I've changed doctors", action: 'message', value: "I've changed doctors" }
-    ]);
-  } else if (step === 2) {
-    if (/changed/i.test(text)) {
-      // Ask for new doctor name — show live input
-      healthConnectionsState.step = 2.5;
-      const reply = "Got it — who is your new primary care doctor?";
-      showCardFlowReply(reply, 'health-connections');
-      document.getElementById('conv-live-input').classList.remove('hidden');
-    } else {
-      healthConnectionsState.step = 3;
-      const reply = "Perfect. And your pharmacy — do you still pick up prescriptions at CVS on Main Street?";
-      showCardFlowReply(reply, 'health-connections', [
-        { label: 'Yes', action: 'message', value: 'Yes' },
-        { label: 'I use a different pharmacy', action: 'message', value: 'I use a different pharmacy' }
-      ]);
-    }
-  } else if (step === 2.5) {
-    // Doctor name entered
-    document.getElementById('conv-live-input').classList.add('hidden');
-    healthConnectionsState.step = 3;
-    const reply = "Thanks for that — I've noted your new doctor. And your pharmacy — do you still pick up prescriptions at CVS on Main Street?";
-    showCardFlowReply(reply, 'health-connections', [
-      { label: 'Yes', action: 'message', value: 'Yes' },
-      { label: 'I use a different pharmacy', action: 'message', value: 'I use a different pharmacy' }
-    ]);
-  } else if (step === 3) {
-    if (/different/i.test(text)) {
-      healthConnectionsState.step = 3.5;
-      const reply = "No problem — which pharmacy do you use now?";
-      showCardFlowReply(reply, 'health-connections');
-      document.getElementById('conv-live-input').classList.remove('hidden');
-    } else {
-      healthConnectionsState.step = 4;
-      const reply = "Got it. By the way — we can deliver your medications right to your door at no extra cost through mail order. Want me to set that up?";
-      showCardFlowReply(reply, 'health-connections', [
-        { label: 'Tell me more', action: 'message', value: 'Tell me more' },
-        { label: 'No thanks', action: 'message', value: 'No thanks' }
-      ]);
-    }
-  } else if (step === 3.5) {
-    // Pharmacy name entered
-    document.getElementById('conv-live-input').classList.add('hidden');
-    healthConnectionsState.step = 4;
-    const reply = "Thanks — I've updated that. By the way — we can deliver your medications right to your door at no extra cost through mail order. Want me to set that up?";
-    showCardFlowReply(reply, 'health-connections', [
-      { label: 'Tell me more', action: 'message', value: 'Tell me more' },
-      { label: 'No thanks', action: 'message', value: 'No thanks' }
-    ]);
-  } else if (step === 4) {
-    if (/tell me more/i.test(text)) {
-      const mailReply = "With mail-order pharmacy, your medications are delivered right to your door — typically in 90-day supplies, so you don't have to make monthly trips. There's no extra cost, and refills can be set up automatically. I can get that started for you anytime — just say the word.";
-      showCardFlowReply(mailReply, 'health-connections');
-    }
-    healthConnectionsState.step = 5;
-    setTimeout(() => {
-      const reply = "Last one — who should we contact in an emergency? Just a name and phone number.";
-      showCardFlowReply(reply, 'health-connections');
-      document.getElementById('conv-live-input').classList.remove('hidden');
-    }, /tell me more/i.test(text) ? 1200 : 0);
-  } else if (step === 5) {
-    // Emergency contact entered
-    document.getElementById('conv-live-input').classList.add('hidden');
-    healthConnectionsState.step = 6;
-    healthConnectionsState.completed = true;
-    const reply = "That's everything for now. I'll check back in a couple days to keep getting to know you — next time we'll talk a bit about your day-to-day so we can find ways to help.\n\nThanks, " + name + "!";
-    showCardFlowReply(reply, 'health-connections');
-
-    // Update the card
-    updateHealthConnectionsCard();
-    activeCardFlow = null;
-  }
-}
-
-function updateHealthConnectionsCard() {
-  const card = document.getElementById('health-connections-card');
-  const label = document.getElementById('hc-card-label');
-  const subtitle = document.getElementById('hc-card-subtitle');
-  const badge = document.getElementById('hc-card-badge');
-  label.textContent = 'In Progress';
-  label.className = 'card-label';
-  label.style.color = 'var(--amber)';
-  subtitle.textContent = '1 of 5 sessions complete';
-  badge.textContent = 'IN PROGRESS';
-  badge.className = 'card-badge card-badge-amber';
-  badge.style.display = '';
-}
-
-// ── Card 2: Yoga Mat Reimbursement ──
-function openYogaMatStatus() {
-  activeCardFlow = 'yoga-mat';
-
-  // If already opened, reopen conversation
-  if (yogaMatState.opened && yogaMatState.history.length > 0) {
-    reopenCardConversation('Yoga Mat Reimbursement', yogaMatState.history);
-    return;
-  }
-
-  yogaMatState.opened = true;
-  yogaMatState.step = 1;
-  conversationHistory = [];
-  document.getElementById('conv-messages').innerHTML = '';
-  document.getElementById('conv-context-banner').classList.remove('visible');
-  resetConvHeader();
-  document.getElementById('conv-agent-name').textContent = 'Yoga Mat Reimbursement';
-  document.getElementById('conv-agent-sub').textContent = 'Status update';
-  showConvScreen();
-  document.getElementById('conv-live-input').classList.add('hidden');
-  document.getElementById('conv-continue-btn-area').classList.add('hidden');
-
-  const msg1 = "Here's where things stand with your yoga mat reimbursement:\n\nYou submitted a **$45 receipt** on February 20 for a yoga mat purchased with your Wellness Bucks benefit. It's currently **in review** — these typically take 10–14 business days, so you should hear back by around **March 6**.\n\nEverything looks good on our end.";
-  appendAiBubble(msg1);
-  yogaMatState.history.push({ role: 'ai', text: msg1 });
-
-  showSuggestedReplies([
-    { label: 'Is anything holding it up?', action: 'message', value: 'Is anything holding it up?' },
-    { label: 'How will I get paid?', action: 'message', value: 'How will I get paid?' },
-    { label: "That's all I needed", action: 'message', value: "That's all I needed" }
-  ]);
-  scrollConvToBottom();
-}
-
-function handleYogaMatReply(text) {
-  hideSuggestedReplies();
-  appendUserBubble(text);
-  yogaMatState.history.push({ role: 'user', text: text });
-
-  const step = yogaMatState.step || 1;
-
-  if (/holding it up|issue|problem|stuck/i.test(text)) {
-    yogaMatState.step = 2;
-    const reply = "I don't see any issues — your receipt was accepted and the amount is within your Wellness Bucks balance. If something does come up, I'll let you know right away.";
-    showCardFlowReply(reply, 'yoga-mat', [
-      { label: 'How will I get paid?', action: 'message', value: 'How will I get paid?' },
-      { label: "That's all I needed", action: 'message', value: "That's all I needed" }
-    ]);
-  } else if (/how will i get paid|payment|bank|deposit/i.test(text)) {
-    yogaMatState.step = 3;
-    const reply = "The reimbursement will be deposited directly into your bank account on file. You'll get a notification when it's processed.\n\nWant me to confirm the account ending in **XX42** is still correct?";
-    showCardFlowReply(reply, 'yoga-mat', [
-      { label: "Yes, that's right", action: 'message', value: "Yes, that's right" },
-      { label: 'I need to update it', action: 'message', value: 'I need to update it' }
-    ]);
-  } else if (/update it|change.*account|wrong account/i.test(text)) {
-    yogaMatState.step = 4;
-    const reply = "Let me connect you with someone who can help with that.";
-    showCardFlowReply(reply, 'yoga-mat');
-    setTimeout(() => {
-      triggerHumanHandoff('reimbursement account update');
-      activeCardFlow = null;
-    }, 600);
-  } else if (/that's right|correct|yes/i.test(text) && step === 3) {
-    yogaMatState.step = 5;
-    const reply = "Great — you're all set. The reimbursement will go to your account ending in XX42 once it's processed. Anything else I can help with?";
-    showCardFlowReply(reply, 'yoga-mat', [
-      { label: "That's all I needed", action: 'message', value: "That's all I needed" }
-    ]);
-  } else if (/that's all|no thanks|nothing else|i'm good/i.test(text)) {
-    const reply = "Great — I'll keep an eye on it and let you know when it's processed. Anything else I can help with?";
-    showCardFlowReply(reply, 'yoga-mat');
-    activeCardFlow = null;
-    // Show live input for any follow-up
-    document.getElementById('conv-live-input').classList.remove('hidden');
-  } else if (/talk.*person|human|agent|speak.*someone/i.test(text)) {
-    triggerHumanHandoff(text);
-    activeCardFlow = null;
-  } else {
-    // Fallback
-    const reply = "Is there anything else about your yoga mat reimbursement I can help with?";
-    showCardFlowReply(reply, 'yoga-mat', [
-      { label: "That's all I needed", action: 'message', value: "That's all I needed" }
-    ]);
-  }
-}
-
-// ── Card 3: Visit Intake ──
-function openVisitIntake() {
-  activeCardFlow = 'visit-intake';
-  const name = preferredName || 'Rebecca';
-
-  // If completed, reopen
-  if (visitIntakeState.completed) {
-    reopenCardConversation('Visit Prep — Dr. Wagle', visitIntakeState.history);
-    return;
-  }
-  // If started, reopen in-progress
-  if (visitIntakeState.started) {
-    reopenCardConversation('Visit Prep — Dr. Wagle', visitIntakeState.history);
-    return;
-  }
-
-  visitIntakeState.started = true;
-  visitIntakeState.step = 1;
-  visitIntakeState.answers = { concerns: 'None', labQuestions: 'None', medChanges: 'None', drQuestions: 'None' };
-  conversationHistory = [];
-  document.getElementById('conv-messages').innerHTML = '';
-  document.getElementById('conv-context-banner').classList.remove('visible');
-  resetConvHeader();
-  document.getElementById('conv-agent-name').textContent = 'Visit Prep — Dr. Wagle';
-  document.getElementById('conv-agent-sub').textContent = 'March 4, 10:00am';
-  showConvScreen();
-  document.getElementById('conv-live-input').classList.add('hidden');
-  document.getElementById('conv-continue-btn-area').classList.add('hidden');
-
-  const msg1 = "Your appointment with Dr. Wagle is coming up on **March 4 at 10am**. Let's get you ready so you can make the most of your time with her — and skip the clipboard in the waiting room.\n\nThis should take about 3 minutes.";
-  appendAiBubble(msg1);
-  visitIntakeState.history.push({ role: 'ai', text: msg1 });
-
-  showSuggestedReplies([
-    { label: "Let's do it", action: 'message', value: "Let's do it" },
-    { label: "I'll do it later", action: 'message', value: "I'll do it later" }
-  ]);
-  scrollConvToBottom();
-}
-
-function handleVisitIntakeReply(text) {
-  const name = preferredName || 'Rebecca';
-  hideSuggestedReplies();
-  appendUserBubble(text);
-  visitIntakeState.history.push({ role: 'user', text: text });
-
-  const step = visitIntakeState.step;
-
-  // Check for concerning symptoms at any step
-  if (/chest pain|can't breathe|severe|emergency|passing out|blood in/i.test(text) && step > 1) {
-    const urgentReply = "That sounds important — I want to make sure Dr. Wagle's team knows about this before your visit. Would you like me to send them a note now, or would you rather call the office?";
-    showCardFlowReply(urgentReply, 'visit-intake', [
-      { label: 'Send a note now', action: 'message', value: 'Send a note now' },
-      { label: "I'll call the office", action: 'message', value: "I'll call the office" }
-    ]);
-    visitIntakeState.answers.concerns = text;
-    return;
-  }
-
-  if (/send a note now/i.test(text)) {
-    const reply = "Done — I've flagged this for Dr. Wagle's team. They'll review it before your visit. Let's keep going with the rest of your prep.";
-    showCardFlowReply(reply, 'visit-intake');
-    // Continue from wherever we were
-    setTimeout(() => advanceVisitIntake(), 1000);
-    return;
-  }
-  if (/call the office/i.test(text)) {
-    const reply = "The office number is **(888) 802-2738**. You can call anytime during business hours. Let's keep going with the rest of your prep.";
-    showCardFlowReply(reply, 'visit-intake');
-    setTimeout(() => advanceVisitIntake(), 1000);
-    return;
-  }
-
-  if (step === 1) {
-    if (/later/i.test(text)) {
-      const reply = "No problem — I'll remind you before your appointment.";
-      showCardFlowReply(reply, 'visit-intake');
-      visitIntakeState.started = false;
-      visitIntakeState.step = 0;
-      visitIntakeState.history = [];
-      activeCardFlow = null;
-      return;
-    }
-    // "Let's do it"
-    visitIntakeState.step = 2;
-    const reply = "Since your last visit, have you had any new health concerns or symptoms you want to bring up with Dr. Wagle?";
-    showCardFlowReply(reply, 'visit-intake', [
-      { label: 'Yes', action: 'message', value: 'Yes' },
-      { label: 'Nothing new', action: 'message', value: 'Nothing new' }
-    ]);
-  } else if (step === 2) {
-    if (/^yes$/i.test(text.trim())) {
-      visitIntakeState.step = 2.5;
-      const reply = "Go ahead — what's been going on?";
-      showCardFlowReply(reply, 'visit-intake');
-      document.getElementById('conv-live-input').classList.remove('hidden');
-    } else if (/nothing new|no$/i.test(text.trim())) {
-      visitIntakeState.answers.concerns = 'None';
-      visitIntakeState.step = 3;
-      showLabsQuestion();
-    } else {
-      // They typed their concern directly
-      visitIntakeState.answers.concerns = text;
-      visitIntakeState.step = 3;
-      const ack = "Got it — I've noted that.";
-      showCardFlowReply(ack, 'visit-intake');
-      setTimeout(() => showLabsQuestion(), 800);
-    }
-  } else if (step === 2.5) {
-    // Concern entered as free text
-    document.getElementById('conv-live-input').classList.add('hidden');
-    visitIntakeState.answers.concerns = text;
-    visitIntakeState.step = 3;
-    const ack = "Got it — I've noted that for Dr. Wagle.";
-    showCardFlowReply(ack, 'visit-intake');
-    setTimeout(() => showLabsQuestion(), 800);
-  } else if (step === 3) {
-    if (/yes|questions/i.test(text)) {
-      visitIntakeState.step = 3.5;
-      const reply = "What would you like to ask about your labs?";
-      showCardFlowReply(reply, 'visit-intake');
-      document.getElementById('conv-live-input').classList.remove('hidden');
-    } else {
-      visitIntakeState.answers.labQuestions = 'None';
-      visitIntakeState.step = 4;
-      showMedsQuestion();
-    }
-  } else if (step === 3.5) {
-    document.getElementById('conv-live-input').classList.add('hidden');
-    visitIntakeState.answers.labQuestions = text;
-    visitIntakeState.step = 4;
-    const ack = "Good question — I'll add that to your visit notes.";
-    showCardFlowReply(ack, 'visit-intake');
-    setTimeout(() => showMedsQuestion(), 800);
-  } else if (step === 4) {
-    if (/changed|something changed/i.test(text)) {
-      visitIntakeState.step = 4.5;
-      const reply = "What changed? Any new medications, stopped taking something, or side effects?";
-      showCardFlowReply(reply, 'visit-intake');
-      document.getElementById('conv-live-input').classList.remove('hidden');
-    } else {
-      visitIntakeState.answers.medChanges = 'None';
-      visitIntakeState.step = 5;
-      showDrQuestionsQuestion();
-    }
-  } else if (step === 4.5) {
-    document.getElementById('conv-live-input').classList.add('hidden');
-    visitIntakeState.answers.medChanges = text;
-    visitIntakeState.step = 5;
-    const ack = "Thanks for letting us know.";
-    showCardFlowReply(ack, 'visit-intake');
-    setTimeout(() => showDrQuestionsQuestion(), 800);
-  } else if (step === 5) {
-    if (/^yes$/i.test(text.trim())) {
-      visitIntakeState.step = 5.5;
-      const reply = "Go ahead — what do you want to ask her?";
-      showCardFlowReply(reply, 'visit-intake');
-      document.getElementById('conv-live-input').classList.remove('hidden');
-    } else {
-      visitIntakeState.answers.drQuestions = 'None';
-      visitIntakeState.step = 6;
-      showVisitSummary();
-    }
-  } else if (step === 5.5) {
-    document.getElementById('conv-live-input').classList.add('hidden');
-    visitIntakeState.answers.drQuestions = text;
-    visitIntakeState.step = 6;
-    const ack = "Great question — I've added it.";
-    showCardFlowReply(ack, 'visit-intake');
-    setTimeout(() => showVisitSummary(), 800);
-  } else if (step === 6) {
-    if (/looks good|yes|done|good/i.test(text)) {
-      visitIntakeState.completed = true;
-      const reply = "You're all set, " + name + ". Dr. Wagle's team will have this before your appointment. See you March 4!";
-      showCardFlowReply(reply, 'visit-intake');
-      updateVisitIntakeCard();
-      activeCardFlow = null;
-    } else if (/edit|change/i.test(text)) {
-      const reply = "No problem — what would you like to change?";
-      showCardFlowReply(reply, 'visit-intake');
-      document.getElementById('conv-live-input').classList.remove('hidden');
-      visitIntakeState.step = 6.5;
-    }
-  } else if (step === 6.5) {
-    document.getElementById('conv-live-input').classList.add('hidden');
-    const reply = "Got it — I've updated your visit notes. Here's the revised summary:";
-    showCardFlowReply(reply, 'visit-intake');
-    setTimeout(() => showVisitSummary(), 800);
-  }
-}
-
-function advanceVisitIntake() {
-  // Resume from current step
-  if (visitIntakeState.step < 3) { visitIntakeState.step = 2; showLabsQuestion(); }
-  else if (visitIntakeState.step < 4) { showMedsQuestion(); visitIntakeState.step = 4; }
-  else if (visitIntakeState.step < 5) { showDrQuestionsQuestion(); visitIntakeState.step = 5; }
-  else { showVisitSummary(); visitIntakeState.step = 6; }
-}
-
-function showLabsQuestion() {
-  const reply = "I see your last labs were on February 10. Your A1c came in at **6.8%** — that's an improvement. Your eGFR was **58** and LDL was **112**.\n\nWant me to add any questions about these to your visit notes?";
-  showCardFlowReply(reply, 'visit-intake', [
-    { label: 'Yes, I have questions', action: 'message', value: 'Yes, I have questions' },
-    { label: "No, I'm good", action: 'message', value: "No, I'm good" }
-  ]);
-}
-
-function showMedsQuestion() {
-  const reply = "Are you still taking **Metformin**, **Lisinopril**, and **Atorvastatin**? Any side effects or changes?";
-  showCardFlowReply(reply, 'visit-intake', [
-    { label: 'All the same', action: 'message', value: 'All the same' },
-    { label: 'Something changed', action: 'message', value: 'Something changed' }
-  ]);
-}
-
-function showDrQuestionsQuestion() {
-  const reply = "Any other questions you want to make sure you ask Dr. Wagle? Sometimes it helps to write them down before you go in.";
-  showCardFlowReply(reply, 'visit-intake', [
-    { label: 'Yes', action: 'message', value: 'Yes' },
-    { label: "I think I'm good", action: 'message', value: "I think I'm good" }
-  ]);
-}
-
-function showVisitSummary() {
-  const a = visitIntakeState.answers;
-  const summaryHtml = '<div style="background:var(--white);border:1px solid var(--gray-mid);border-radius:10px;padding:16px;margin-top:8px;">' +
-    '<div style="font-weight:700;font-size:14px;color:var(--charcoal);margin-bottom:12px;">Visit Summary for Dr. Wagle</div>' +
-    '<div style="font-size:13px;color:var(--gray-text);line-height:1.6;">' +
-      '<div style="margin-bottom:8px;"><strong>New concerns:</strong> ' + escHtml(a.concerns) + '</div>' +
-      '<div style="margin-bottom:8px;"><strong>Lab questions:</strong> ' + escHtml(a.labQuestions) + '</div>' +
-      '<div style="margin-bottom:8px;"><strong>Medication changes:</strong> ' + escHtml(a.medChanges) + '</div>' +
-      '<div><strong>Questions for Dr. Wagle:</strong> ' + escHtml(a.drQuestions) + '</div>' +
-    '</div>' +
-  '</div>';
-
-  const reply = "You're all set. Here's what I've noted for Dr. Wagle's team:";
-  const msgs = document.getElementById('conv-messages');
-  // Add AI message
-  setTimeout(() => {
-    appendAiBubble(reply);
-    visitIntakeState.history.push({ role: 'ai', text: reply });
-    // Add summary card
-    const cardRow = document.createElement('div');
-    cardRow.className = 'msg-row ai';
-    cardRow.innerHTML = '<div class="msg-avatar" style="background:var(--red)">♥</div><div class="msg-bubble-wrap"><div class="msg-bubble">' + summaryHtml + '<div style="margin-top:12px;font-size:14px;color:var(--gray-text);">This will be shared with Dr. Wagle before your appointment. Anything you want to change?</div></div></div>';
-    msgs.appendChild(cardRow);
-    visitIntakeState.history.push({ role: 'ai', text: reply + '\n[Summary Card]' });
-    showSuggestedReplies([
-      { label: 'Looks good', action: 'message', value: 'Looks good' },
-      { label: 'I want to edit something', action: 'message', value: 'I want to edit something' }
-    ]);
-    scrollConvToBottom();
-  }, 600);
-}
-
-function updateVisitIntakeCard() {
-  const label = document.getElementById('vi-card-label');
-  const subtitle = document.getElementById('vi-card-subtitle');
-  const badge = document.getElementById('vi-card-badge');
-  label.textContent = 'Complete';
-  label.className = 'card-label';
-  label.style.color = 'var(--green)';
-  subtitle.textContent = 'Visit prep submitted for March 4';
-  badge.textContent = 'COMPLETE';
-  badge.className = 'card-badge card-badge-green';
-  badge.style.display = '';
-}
-
-// ── Shared Card Flow Helpers ──
-function showCardFlowReply(text, flowType, chips) {
-  const msgs = document.getElementById('conv-messages');
-  setTimeout(() => {
-    appendAiBubble(text);
-    if (flowType === 'health-connections') healthConnectionsState.history.push({ role: 'ai', text: text });
-    else if (flowType === 'yoga-mat') yogaMatState.history.push({ role: 'ai', text: text });
-    else if (flowType === 'visit-intake') visitIntakeState.history.push({ role: 'ai', text: text });
-    if (chips) showSuggestedReplies(chips);
-    scrollConvToBottom();
-  }, 600);
-}
-
-function reopenCardConversation(title, history) {
-  conversationHistory = [];
-  document.getElementById('conv-messages').innerHTML = '';
-  document.getElementById('conv-context-banner').classList.remove('visible');
-  resetConvHeader();
-  document.getElementById('conv-agent-name').textContent = title;
-  showConvScreen();
-  document.getElementById('conv-live-input').classList.add('hidden');
-  document.getElementById('conv-continue-btn-area').classList.add('hidden');
-
-  // Replay history
-  history.forEach(turn => {
-    if (turn.role === 'user') appendUserBubble(turn.text);
-    else appendAiBubble(turn.text);
-  });
-  scrollConvToBottom();
 }
 
 // ── Init ──
