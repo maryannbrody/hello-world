@@ -1093,6 +1093,44 @@ html, body {
   to { transform: rotate(360deg); }
 }
 
+/* Connecting animation for human handoff */
+.connecting-msg {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--gray-100);
+  border-radius: 12px;
+  margin: 8px 0;
+  animation: connecting-pulse 1.5s ease-in-out infinite;
+}
+.connecting-msg .connecting-dots {
+  display: flex;
+  gap: 4px;
+}
+.connecting-msg .connecting-dots span {
+  width: 6px;
+  height: 6px;
+  background: var(--gray-600);
+  border-radius: 50%;
+  animation: connecting-bounce 1.2s ease-in-out infinite;
+}
+.connecting-msg .connecting-dots span:nth-child(2) { animation-delay: 0.15s; }
+.connecting-msg .connecting-dots span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes connecting-bounce {
+  0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1.1); }
+}
+@keyframes connecting-pulse {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+.connecting-msg .connecting-text {
+  font-size: 14px;
+  color: var(--gray-600);
+  font-style: italic;
+}
+
 /* Conversation input */
 .conv-input-area {
   flex-shrink: 0;
@@ -1824,21 +1862,21 @@ const SEEDED_THREADS = [
   {
     id: 'thread-4',
     title: 'Billing question about specialist',
-    status: 'waiting-guide',
+    status: 'resolved',
     lastActivityAt: '2026-03-10',
-    escalatedTo: { name: 'Mary Ann B.', team: 'Devoted Guide' },
     messages: [
       { role: 'user', text: "I got a bill for $150 from a specialist. I thought my plan covered this?" },
       { role: 'ai', sender: 'MyDevoted', text: "With a PCP referral, in-network dermatology visits should have a **$30 copay**. A $150 bill sounds like it may have been processed incorrectly.\n\nWould you like me to connect you with a Devoted Guide who can look into the claim details?" },
       { role: 'user', text: "Yes please." },
       { role: 'system', text: 'Mary Ann B. from Devoted Guide has joined this conversation.' },
-      { role: 'human', sender: 'Mary Ann B., Devoted Guide', team: 'guide', text: "Hi Laura — I'm Mary Ann, a Devoted Guide. I can see you're asking about a $150 bill from a dermatology visit. I'm pulling up your claim details now. I'll get back to you here shortly." }
+      { role: 'human', sender: 'Mary Ann B., Devoted Guide', team: 'guide', text: "Hi Laura — I'm Mary Ann, a Devoted Guide. I can see you're asking about a $150 bill from a dermatology visit. I'm pulling up your claim details now. I'll get back to you here shortly." },
+      { role: 'human', sender: 'Mary Ann B., Devoted Guide', team: 'guide', text: "Good news, Laura — I reviewed the claim. It was processed as out-of-network by mistake. I've submitted a correction. You should see the adjusted amount ($30 copay) within 7-10 business days. Let me know if you have any other questions!\n\n— Mary Ann B., Devoted Guide" }
     ]
   },
   {
     id: 'thread-5',
     title: 'Preparing for Dr. Wagle appointment',
-    status: 'open',
+    status: 'resolved',
     lastActivityAt: '2026-03-12',
     messages: [
       { role: 'user', text: "My appointment with Dr. Wagle is coming up. Can you help me prepare?" },
@@ -1903,7 +1941,9 @@ function renderSheetHeader() {
       </div>`;
   } else {
     const thread = threads.find(t => t.id === activeThreadId);
-    const subtitle = thread ? thread.title : '';
+    const escalated = thread && isThreadEscalated(thread);
+    const title = escalated && thread.escalatedTo ? thread.escalatedTo.name : 'MyDevoted AI';
+    const subtitle = escalated && thread.escalatedTo ? thread.escalatedTo.team : (thread ? thread.title : '');
     header.innerHTML = `
       <div class="sheet-header-left">
         <button class="sheet-btn" onclick="showThreadList()" aria-label="Back">
@@ -1911,7 +1951,7 @@ function renderSheetHeader() {
         </button>
       </div>
       <div class="sheet-header-center">
-        <div class="sheet-header-title">MyDevoted</div>
+        <div class="sheet-header-title">${title}</div>
         <div class="sheet-header-subtitle">${subtitle}</div>
       </div>
       <div class="sheet-header-right">
@@ -2248,13 +2288,44 @@ function dismissEscalation() {
 }
 
 // ── Determine escalation team from conversation content ──
-const BENEFITS_KEYWORDS = /benefit|claim|coverage|food.*card|home.*card|wellness.*buck|otc|billing|copay|deductible|id card|reimburse|allowance/i;
+const BENEFITS_KEYWORDS = /benefit|claim|coverage|food.*card|home.*card|wellness.*buck|otc|billing|copay|deductible|id card|reimburse|allowance|prior auth|referral|cost|plan detail|premium|formulary|network/i;
 
 function determineEscalationTeam(thread) {
   const allText = thread.messages.map(m => m.text).join(' ');
   if (BENEFITS_KEYWORDS.test(allText)) return 'guide';
   return 'medical';
 }
+
+// ── Scripted human responses for usability testing ──
+const SCRIPTED_HUMAN_RESPONSES = {
+  guide: {
+    intro: (thread) => {
+      const topic = thread.title || 'your question';
+      return `Hi Laura — I'm Mary Ann, a Devoted Guide. I've reviewed your conversation about "${topic}" and I'm here to help.\n\nLet me pull up your account details. I should have an answer for you shortly.\n\n— Mary Ann B., Devoted Guide`;
+    },
+    followups: [
+      "Thanks for the additional details, Laura. I'm looking into that now. Give me just a moment.\n\n— Mary Ann B., Devoted Guide",
+      "Good question. Let me check on that for you — I want to make sure I give you the right information.\n\n— Mary Ann B., Devoted Guide",
+      "I appreciate your patience. I've confirmed the details on your account. Is there anything else I can help with today?\n\n— Mary Ann B., Devoted Guide",
+      "Of course — I'm happy to help with that too. Let me take a look.\n\n— Mary Ann B., Devoted Guide"
+    ]
+  },
+  medical: {
+    intro: (thread) => {
+      const topic = thread.title || 'your health question';
+      return `Hi Laura — I'm Dr. Holliday. I've reviewed your conversation about "${topic}" and your recent records.\n\nI want to make sure we address your concerns thoroughly. Let me take a closer look at the details.\n\n— Dr. Alison Holliday, Devoted Medical`;
+    },
+    followups: [
+      "That's a really good question, Laura. Based on what I'm seeing in your records, let me share some thoughts.\n\n— Dr. Alison Holliday, Devoted Medical",
+      "I understand your concern. This is something we can absolutely work through together. Let me explain what I'd recommend.\n\n— Dr. Alison Holliday, Devoted Medical",
+      "Thanks for sharing that. It's helpful context. I'd suggest we discuss this with Dr. Wagle at your next visit as well.\n\n— Dr. Alison Holliday, Devoted Medical",
+      "I'm glad you brought that up. Let me check on the specifics and get back to you.\n\n— Dr. Alison Holliday, Devoted Medical"
+    ]
+  }
+};
+
+// Track follow-up index per thread for scripted responses
+const humanFollowupIndex = {};
 
 const HUMAN_PROMPTS = {
   guide: {
@@ -2281,6 +2352,21 @@ Keep under 150 words.`
   }
 };
 
+function showConnectingMessage(teamKey) {
+  const container = document.getElementById('convMessages');
+  const persona = HUMAN_PROMPTS[teamKey];
+  const div = document.createElement('div');
+  div.className = 'msg msg-system';
+  div.id = 'connecting-indicator';
+  div.innerHTML = `<div class="connecting-msg">
+    <div class="connecting-dots"><span></span><span></span><span></span></div>
+    <div class="connecting-text">Connecting you with ${persona.name}...</div>
+  </div>`;
+  container.appendChild(div);
+  requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+  return div;
+}
+
 async function confirmEscalation() {
   const thread = threads.find(t => t.id === activeThreadId);
   if (!thread) return;
@@ -2296,6 +2382,11 @@ async function confirmEscalation() {
   const teamKey = determineEscalationTeam(thread);
   const persona = HUMAN_PROMPTS[teamKey];
 
+  // Show connecting animation (1-2 second delay)
+  const connectingEl = showConnectingMessage(teamKey);
+  await new Promise(r => setTimeout(r, 1800));
+  connectingEl.remove();
+
   // Update thread status
   thread.status = persona.status;
   thread.escalatedTo = { name: persona.name, team: persona.team };
@@ -2304,41 +2395,18 @@ async function confirmEscalation() {
   thread.messages.push({ role: 'system', text: `${persona.name} from ${persona.team} has joined this conversation.` });
   renderConversation();
 
-  // Show loading, wait ~3s, then call API for human response
-  const loader = showLoading();
+  // Brief pause, then show human intro message
+  await new Promise(r => setTimeout(r, 800));
 
-  try {
-    // Delay to simulate human joining
-    await new Promise(r => setTimeout(r, 3000));
+  // Use scripted intro (no API call needed for usability test)
+  const scripted = SCRIPTED_HUMAN_RESPONSES[teamKey];
+  const humanText = scripted.intro(thread);
+  humanFollowupIndex[thread.id] = 0;
 
-    const apiMessages = buildApiMessages(thread);
-    const systemPrompt = MEMBER_CONTEXT + '\n\n' + persona.systemPrompt + '\n\n' + FORMATTING_RULES;
-
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: HEADERS,
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 512,
-        system: systemPrompt,
-        messages: apiMessages
-      })
-    });
-
-    loader.remove();
-
-    const data = await response.json();
-    const humanText = data.content?.[0]?.text || `Hi Laura — I'm ${persona.name}. I've reviewed this conversation and I'm here to help. Let me look into this for you.\n\n— ${persona.name}`;
-
-    thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: humanText });
-    thread.lastActivityAt = new Date().toISOString().split('T')[0];
-    renderConversation();
-    renderSheetHeader();
-  } catch (err) {
-    loader.remove();
-    thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: `Hi Laura — I'm ${persona.name}. I've reviewed this conversation and I'm here to help. Let me look into this for you.\n\n— ${persona.name}` });
-    renderConversation();
-  }
+  thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: humanText });
+  thread.lastActivityAt = new Date().toISOString().split('T')[0];
+  renderConversation();
+  renderSheetHeader();
 }
 
 // ── Send message (main flow) ──
@@ -2392,29 +2460,23 @@ async function sendMessage(text) {
     const escalated = isThreadEscalated(thread);
 
     if (escalated) {
-      // Use human persona for responses after escalation
+      // Use scripted human responses after escalation (no API needed)
       const teamKey = thread.status === 'waiting-medical' ? 'medical' : 'guide';
       const persona = HUMAN_PROMPTS[teamKey];
-      const apiMessages = buildApiMessages(thread);
-      const systemPrompt = MEMBER_CONTEXT + '\n\n' + persona.systemPrompt + '\n\n' + FORMATTING_RULES + '\n\nCONVERSATION CONTEXT: This is a continued conversation. The member has sent a follow-up message. Respond as yourself, staying in character.';
+      const scripted = SCRIPTED_HUMAN_RESPONSES[teamKey];
 
-      // Simulate slight delay for human feel
-      await new Promise(r => setTimeout(r, 2000));
-
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: HEADERS,
-        body: JSON.stringify({
-          model: MODEL,
-          max_tokens: 512,
-          system: systemPrompt,
-          messages: apiMessages
-        })
-      });
+      // Simulate human typing delay (1.5-3s)
+      const delay = 1500 + Math.random() * 1500;
+      await new Promise(r => setTimeout(r, delay));
 
       loader.remove();
-      const data = await response.json();
-      const humanText = data.content?.[0]?.text || "Thank you for the additional details. I'm looking into this now.";
+
+      // Pick next scripted follow-up response, cycling through them
+      if (!humanFollowupIndex[thread.id]) humanFollowupIndex[thread.id] = 0;
+      const idx = humanFollowupIndex[thread.id] % scripted.followups.length;
+      const humanText = scripted.followups[idx];
+      humanFollowupIndex[thread.id]++;
+
       thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: humanText });
       thread.lastActivityAt = new Date().toISOString().split('T')[0];
       renderConversation();
