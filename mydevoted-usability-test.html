@@ -1054,9 +1054,14 @@ html, body {
   color: var(--white);
   margin-top: 4px;
 }
-.msg-avatar-ai { background: var(--red); }
-.msg-avatar-guide { background: var(--red); }
-.msg-avatar-medical { background: var(--purple); }
+.msg-avatar-ai {
+  background: var(--red);
+}
+.msg-avatar-ai svg { width: 20px; height: 20px; }
+.msg-avatar-human {
+  background: var(--purple);
+}
+.msg-avatar-human svg { width: 18px; height: 18px; fill: var(--white); }
 
 .msg-bubble {
   padding: 12px 16px;
@@ -2130,16 +2135,14 @@ function renderConversation() {
       html += `<div class="msg msg-user"><div class="msg-bubble">${formatMessageText(msg.text)}</div></div>`;
     } else if (msg.role === 'ai') {
       html += `<div class="msg msg-ai">
-        <div class="msg-avatar msg-avatar-ai">♥</div>
+        ${AI_AVATAR}
         <div class="msg-bubble">${formatMessageText(msg.text)}</div>
       </div>`;
     } else if (msg.role === 'system') {
       html += `<div class="msg msg-system"><div class="msg-system-text">— ${msg.text} —</div></div>`;
     } else if (msg.role === 'human') {
-      const avatarClass = msg.team === 'medical' ? 'msg-avatar-medical' : 'msg-avatar-guide';
-      const initials = msg.sender.split(' ').map(w => w[0]).join('').substring(0, 2);
       html += `<div class="msg msg-human">
-        <div class="msg-avatar ${avatarClass}">${initials}</div>
+        ${HUMAN_AVATAR}
         <div><div class="msg-bubble">${formatMessageText(msg.text)}</div>
         <div class="msg-attribution">${msg.sender}</div></div>
       </div>`;
@@ -2315,13 +2318,19 @@ function renderHomeConversations() {
   // Home page shows static seeded rows — no dynamic update needed for prototype
 }
 
+// ── Avatar helpers ──
+const AI_AVATAR = `<div class="msg-avatar msg-avatar-ai"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 28C16 28 4 20 4 12.5C4 9.5 6.5 7 9.5 7C11.5 7 13.3 8 14.5 9.5L16 11.5L17.5 9.5C18.7 8 20.5 7 22.5 7C25.5 7 28 9.5 28 12.5C28 20 16 28 16 28Z" fill="white"/><path d="M22 4L22.9 6.1L25 7L22.9 7.9L22 10L21.1 7.9L19 7L21.1 6.1L22 4Z" fill="white" opacity="0.9"/><path d="M10 3L10.6 4.4L12 5L10.6 5.6L10 7L9.4 5.6L8 5L9.4 4.4L10 3Z" fill="white" opacity="0.7"/></svg></div>`;
+
+const HUMAN_AVATAR = `<div class="msg-avatar msg-avatar-human"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg></div>`;
+
 // ── Loading indicator ──
 function showTypingIndicator(name) {
   const container = document.getElementById('convMessages');
   const div = document.createElement('div');
   div.className = 'msg msg-ai msg-loading';
+  const avatar = name ? HUMAN_AVATAR : AI_AVATAR;
   const labelHtml = name ? `<span class="typing-label">${name} is typing…</span>` : '';
-  div.innerHTML = `<div class="msg-avatar msg-avatar-ai">♥</div>
+  div.innerHTML = `${avatar}
     <div class="msg-bubble"><div class="typing-indicator"><div class="typing-dots"><span></span><span></span><span></span></div>${labelHtml}</div></div>`;
   container.appendChild(div);
   requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
@@ -2339,7 +2348,7 @@ function showEmergencyCard(thread) {
   const container = document.getElementById('convMessages');
   const div = document.createElement('div');
   div.className = 'msg msg-ai';
-  div.innerHTML = `<div class="msg-avatar msg-avatar-ai">♥</div>
+  div.innerHTML = `${AI_AVATAR}
     <div class="msg-bubble" style="background:var(--red-light);border-color:var(--red);">
       <p style="font-size:20px;text-align:center;">🚨</p>
       <p><strong>If this is an emergency, call 911 now.</strong></p>
@@ -2365,7 +2374,7 @@ function showEscalationCard() {
   const div = document.createElement('div');
   div.className = 'msg msg-ai';
   escalationCardEl = div;
-  div.innerHTML = `<div class="msg-avatar msg-avatar-ai">♥</div>
+  div.innerHTML = `${AI_AVATAR}
     <div class="msg-bubble escalation-card">
       <div class="escalation-card-icon">👤</div>
       <div class="escalation-card-title">Would you like to talk to someone?</div>
