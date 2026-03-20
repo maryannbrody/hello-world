@@ -1432,8 +1432,8 @@ html, body {
       <div class="section-header">What's happening</div>
       <div class="happening-card" id="hc-card" onclick="openHealthConnections()" style="cursor:pointer">
         <div class="happening-badge badge-purple" id="hc-badge">NOT STARTED</div>
-        <div class="happening-title">Health Connections Checklist</div>
-        <div class="happening-subtitle" id="hc-subtitle">Personalize your experience. Takes about 2 minutes.</div>
+        <div class="happening-title">Meet Your Care Team</div>
+        <div class="happening-subtitle" id="hc-subtitle">Get to know your Devoted Medical team. Takes about 2 minutes.</div>
       </div>
       <div class="happening-card" id="ym-card" onclick="openYogaMatStatus()" style="cursor:pointer">
         <div class="happening-badge badge-amber">IN PROGRESS</div>
@@ -2714,7 +2714,7 @@ function openHealthConnections() {
   threadCounter++;
   const thread = {
     id: CARD_FLOW_IDS.HC,
-    title: 'Health Connections',
+    title: 'Meet Your Care Team',
     status: 'open',
     lastActivityAt: new Date().toISOString().split('T')[0],
     messages: []
