@@ -1490,22 +1490,23 @@ html, body {
 }
 .talk-to-person-link {
   display: none;
-  text-align: right;
-  padding: 4px 12px 2px;
-}
-.talk-to-person-link a {
-  font-size: 15px;
-  color: var(--gray-mid);
-  text-decoration: none;
-  cursor: pointer;
-  min-height: 48px;
-  min-width: 48px;
-  display: inline-flex;
-  align-items: center;
   justify-content: flex-end;
+  padding: 0 12px 8px;
 }
-.talk-to-person-link a:active {
-  color: var(--charcoal);
+.talk-to-person-link button {
+  font-size: 16px !important;
+  color: #555;
+  background: #f5f0eb;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  min-height: 48px;
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1;
+}
+.talk-to-person-link button:active {
+  background: #e8e0d8;
 }
 .conv-footer-status {
   display: block;
@@ -2143,7 +2144,7 @@ html, body {
       <div class="conv-messages" id="convMessages"></div>
       <div class="conv-input-area">
         <div class="talk-to-person-link" id="talkToPersonLink">
-          <a onclick="handleTalkToPerson()" role="button" tabindex="0">Talk to a person</a>
+          <button onclick="handleTalkToPerson()">Talk to a person</button>
         </div>
         <div class="conv-input-row">
           <div class="conv-input-pill">
@@ -2704,7 +2705,7 @@ function renderConversation() {
   } else {
     input.placeholder = 'Ask me anything...';
     footer.innerHTML = '';
-    if (talkLink) talkLink.style.display = 'block';
+    if (talkLink) talkLink.style.display = 'flex';
   }
 
   // Scroll so the last message's top is visible
