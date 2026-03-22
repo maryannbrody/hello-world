@@ -136,6 +136,8 @@ html, body {
   background: var(--white);
   border-top: 1px solid var(--gray-300);
   flex-shrink: 0;
+  position: relative;
+  z-index: 850;
 }
 .ai-bar.hidden { display: none; }
 .ai-bar-pill {
@@ -192,6 +194,8 @@ html, body {
   border-top: 1px solid var(--border-warm);
   flex-shrink: 0;
   padding-bottom: env(safe-area-inset-bottom, 0px);
+  position: relative;
+  z-index: 850;
 }
 .tab-bar-item {
   flex: 1;
@@ -825,7 +829,7 @@ html, body {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 100px;
+  padding-bottom: 130px;
 }
 .benefit-detail-hero {
   background: var(--white);
@@ -1975,9 +1979,6 @@ html, body {
         </div>
       </div>
     </div>
-    <div class="benefit-detail-cta">
-      <button onclick="openBenefitChat('food')">♥ Ask about your Food & Home Card</button>
-    </div>
   </div>
 
   <div class="benefit-detail" id="detail-wellness">
@@ -2022,9 +2023,6 @@ html, body {
         <div class="benefit-detail-step"><div class="benefit-detail-step-num">3</div><div>Submit through MyDevoted or call us</div></div>
         <div class="benefit-detail-step"><div class="benefit-detail-step-num">4</div><div>Reimbursement arrives in 5–7 business days</div></div>
       </div>
-    </div>
-    <div class="benefit-detail-cta">
-      <button onclick="openBenefitChat('wellness')">♥ Ask about your Wellness Bucks</button>
     </div>
   </div>
 
@@ -2071,9 +2069,6 @@ html, body {
           <div style="font-size:16px;color:var(--charcoal);line-height:1.5">Order through the OTC Health Solutions catalog — items ship directly to your home.</div>
         </div>
       </div>
-    </div>
-    <div class="benefit-detail-cta">
-      <button onclick="openBenefitChat('otc')">♥ Ask about your OTC benefit</button>
     </div>
   </div>
 
@@ -2202,6 +2197,7 @@ function handleAiBarSend() {
   const input = document.getElementById('aiBarInput');
   const text = input.value.trim();
   if (text) {
+    closeBenefitDetail();
     openConvSheet(text);
     input.value = '';
   }
@@ -2244,12 +2240,31 @@ function getBenefitChip(text) {
   return '';
 }
 
+const detailPlaceholders = {
+  food: 'Ask about your Food & Home Card...',
+  wellness: 'Ask about your Wellness Bucks...',
+  otc: 'Ask about your OTC benefit...'
+};
+
 function openBenefitDetail(benefitKey) {
   document.getElementById('detail-' + benefitKey).classList.add('open');
+  // Show AI bar with contextual placeholder
+  const aiBar = document.getElementById('aiBar');
+  const aiInput = document.getElementById('aiBarInput');
+  aiBar.classList.remove('hidden');
+  aiInput.placeholder = detailPlaceholders[benefitKey] || 'Ask about your benefits...';
 }
 
 function closeBenefitDetail() {
   document.querySelectorAll('.benefit-detail.open').forEach(el => el.classList.remove('open'));
+  // Restore AI bar state for current tab
+  const aiBar = document.getElementById('aiBar');
+  const aiInput = document.getElementById('aiBarInput');
+  if (currentTab === 'home') {
+    aiBar.classList.add('hidden');
+  } else {
+    aiInput.placeholder = aiBarPlaceholders[currentTab] || '';
+  }
 }
 
 function openBenefitChat(benefitKey) {
