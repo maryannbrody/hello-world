@@ -1094,7 +1094,7 @@ html, body {
 
 /* Thread list */
 .thread-list-view { display: none; }
-.thread-list-view.active { display: flex; flex-direction: column; height: 100%; }
+.thread-list-view.active { display: flex; flex-direction: column; flex: 1; min-height: 0; }
 .thread-new-btn {
   display: block;
   margin: 8px 20px 12px;
@@ -1170,7 +1170,7 @@ html, body {
 
 /* Conversation view */
 .conv-view { display: none; }
-.conv-view.active { display: flex; flex-direction: column; height: 100%; }
+.conv-view.active { display: flex; flex-direction: column; flex: 1; min-height: 0; }
 .conv-messages {
   flex: 1;
   overflow-y: auto;
