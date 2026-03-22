@@ -2167,8 +2167,16 @@ function renderConversation() {
     if (talkWrap) talkWrap.style.display = 'flex';
   }
 
-  // Scroll to bottom
-  requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+  // Scroll so the last message's top is visible
+  requestAnimationFrame(() => {
+    const msgs = container.querySelectorAll('.msg');
+    const last = msgs[msgs.length - 1];
+    if (last) {
+      last.scrollIntoView({ block: 'start', behavior: 'instant' });
+    } else {
+      container.scrollTop = container.scrollHeight;
+    }
+  });
 }
 
 // ── Handle "Talk to a person" link tap ──
@@ -2333,7 +2341,7 @@ function showTypingIndicator(name) {
   div.innerHTML = `${avatar}
     <div class="msg-bubble"><div class="typing-indicator"><div class="typing-dots"><span></span><span></span><span></span></div>${labelHtml}</div></div>`;
   container.appendChild(div);
-  requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+  requestAnimationFrame(() => { div.scrollIntoView({ block: 'start', behavior: 'instant' }); });
   return div;
 }
 // Backward compat alias
@@ -2358,7 +2366,7 @@ function showEmergencyCard(thread) {
     </div>`;
   container.appendChild(div);
   thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: '🚨 If this is an emergency, call 911 now. Care OnDemand: 1-888-802-2738' });
-  requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+  requestAnimationFrame(() => { div.scrollIntoView({ block: 'start', behavior: 'instant' }); });
 }
 
 function dismissEmergencyCard(btn) {
@@ -2379,11 +2387,11 @@ function showEscalationCard() {
       <div class="escalation-card-icon">👤</div>
       <div class="escalation-card-title">Would you like to talk to someone?</div>
       <div class="escalation-card-desc">A member of our team will respond in this conversation.</div>
-      <button class="escalation-btn-primary" onclick="confirmEscalation()">Send to care team</button>
+      <button class="escalation-btn-primary" onclick="confirmEscalation()">Send to a Devoted Guide</button>
       <button class="escalation-btn-secondary" onclick="dismissEscalation()">Continue with AI</button>
     </div>`;
   container.appendChild(div);
-  requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+  requestAnimationFrame(() => { div.scrollIntoView({ block: 'start', behavior: 'instant' }); });
 }
 
 function dismissEscalation() {
@@ -2469,7 +2477,7 @@ function showConnectingMessage(teamKey) {
     <div class="connecting-text">Connecting you with ${persona.name}...</div>
   </div>`;
   container.appendChild(div);
-  requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+  requestAnimationFrame(() => { div.scrollIntoView({ block: 'start', behavior: 'instant' }); });
   return div;
 }
 
@@ -2769,7 +2777,7 @@ function showConvChips(chips) {
     div.appendChild(btn);
   });
   container.appendChild(div);
-  requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+  requestAnimationFrame(() => { div.scrollIntoView({ block: 'start', behavior: 'instant' }); });
 }
 
 function removeConvChips() {
