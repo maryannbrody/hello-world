@@ -1659,21 +1659,21 @@ html, body {
         <div class="conv-header-title">Conversations</div>
         <button class="conv-header-link" onclick="openThreadList()">See all →</button>
       </div>
-      <div class="conv-row" onclick="openConvSheet('Your A1c improved to 6.8%')">
+      <div class="conv-row" onclick="openExistingThread('thread-1')">
         <div class="conv-row-top">
           <div class="conv-row-title">Your A1c improved to 6.8%</div>
           <div class="conv-row-date">Feb 26</div>
         </div>
         <div class="conv-row-preview">Great news — your latest HbA1c result shows improvement from your previous reading...</div>
       </div>
-      <div class="conv-row" onclick="openConvSheet('What does my eGFR mean?')">
+      <div class="conv-row" onclick="openExistingThread('thread-2')">
         <div class="conv-row-top">
           <div class="conv-row-title">What does my eGFR mean?</div>
           <div class="conv-row-date">Feb 27</div>
         </div>
         <div class="conv-row-preview">Your eGFR of 58 indicates mild kidney function change. Here's what that means...</div>
       </div>
-      <div class="conv-row" onclick="openConvSheet('Yoga mat reimbursement')">
+      <div class="conv-row" onclick="openExistingThread('thread-3')">
         <div class="conv-row-top">
           <div class="conv-row-title">Yoga mat reimbursement</div>
           <div class="conv-row-date">Feb 23</div>
@@ -2336,6 +2336,7 @@ function openSheet() {
 function closeSheet() {
   sheetOpen = false;
   activeThreadId = null;
+  isSending = false;
   document.getElementById('sheet').classList.remove('open');
   document.querySelector('.content-area').style.display = '';
   // Restore AI bar based on current tab
@@ -3193,19 +3194,21 @@ function startNewConversation() {
 
 // ── Public API: open sheet ──
 function openConvSheet(prefill) {
-  // Check if prefill matches a seeded thread title
-  const existing = threads.find(t => t.title === prefill);
-  if (existing) {
-    openThread(existing.id);
-    openSheet();
-    return;
-  }
-  // Create new thread and send first message
+  // Always create a fresh thread for new conversations
+  isSending = false; // Reset in case a previous API call is still in flight
   const thread = createThread(prefill);
   openThread(thread.id);
   openSheet();
   // Send the first message through the AI pipeline
   sendMessage(prefill);
+}
+
+// Open an existing thread by ID (used for seeded conversation rows)
+function openExistingThread(threadId) {
+  const thread = threads.find(t => t.id === threadId);
+  if (!thread) return;
+  openThread(threadId);
+  openSheet();
 }
 
 function openThreadList() {
@@ -3368,11 +3371,21 @@ function handleHCReply(text) {
 
   if (state.step === 1) {
     if (/maybe later/i.test(text)) {
-      addCardAiMessage("No problem — I'll be here whenever you're ready.");
+      // Add dismissal message, then clean up thread after message renders
+      const hcThreadId = state.threadId;
       state.step = 0;
       state.threadId = null;
-      // Remove thread
-      threads = threads.filter(t => t.id !== CARD_FLOW_IDS.HC);
+      const loader = showTypingIndicator();
+      setTimeout(() => {
+        const thread = threads.find(t => t.id === hcThreadId);
+        loader.remove();
+        if (thread) {
+          thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: "No problem — I'll be here whenever you're ready." });
+          renderConversation();
+        }
+        // Remove thread after message displayed
+        threads = threads.filter(t => t.id !== CARD_FLOW_IDS.HC);
+      }, aiDelay());
       return;
     }
     state.step = 2;
@@ -3431,9 +3444,8 @@ function handleHCReply(text) {
     // Update card UI
     const badge = document.getElementById('hc-badge');
     const subtitle = document.getElementById('hc-subtitle');
-    badge.textContent = '1 OF 5';
-    badge.className = 'happening-badge badge-amber';
-    subtitle.textContent = 'Session 1 complete · Next session in a few days';
+    if (badge) { badge.textContent = '1 OF 5'; badge.className = 'happening-badge badge-amber'; }
+    if (subtitle) subtitle.textContent = 'Session 1 complete · Next session in a few days';
   }
 }
 
@@ -3618,9 +3630,20 @@ function handleVIReply(text) {
 
   if (state.step === 1) {
     if (/later/i.test(text)) {
-      addCardAiMessage("No problem — I'll remind you before your appointment.");
+      // Add dismissal message, then clean up thread after message renders
+      const viThreadId = state.threadId;
+      state.step = 0;
       state.threadId = null;
-      threads = threads.filter(t => t.id !== CARD_FLOW_IDS.VI);
+      const loader = showTypingIndicator();
+      setTimeout(() => {
+        const thread = threads.find(t => t.id === viThreadId);
+        loader.remove();
+        if (thread) {
+          thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: "No problem — I'll remind you before your appointment." });
+          renderConversation();
+        }
+        threads = threads.filter(t => t.id !== CARD_FLOW_IDS.VI);
+      }, aiDelay());
       return;
     }
     state.step = 2;
@@ -3696,9 +3719,8 @@ function handleVIReply(text) {
       // Update card
       const badge = document.getElementById('vi-badge');
       const subtitle = document.getElementById('vi-subtitle');
-      badge.textContent = 'COMPLETE';
-      badge.className = 'happening-badge badge-green';
-      subtitle.textContent = 'Visit prep submitted for March 25';
+      if (badge) { badge.textContent = 'COMPLETE'; badge.className = 'happening-badge badge-green'; }
+      if (subtitle) subtitle.textContent = 'Visit prep submitted for March 25';
     } else if (/edit|change/i.test(text)) {
       state.step = 6.5;
       addCardAiMessage("No problem — what would you like to change?");
@@ -3744,12 +3766,6 @@ function showVisitSummary() {
 function openRescheduleFlow(existingThread) {
   const state = cardFlowState.rs;
 
-  // Reopen existing reschedule thread
-  if (state.threadId) {
-    openThread(state.threadId);
-    return;
-  }
-
   // Reuse thread if rescheduling intent came from an existing conversation
   let thread;
   if (existingThread) {
@@ -3777,6 +3793,25 @@ function openRescheduleFlow(existingThread) {
   ]);
 }
 
+// Helper: add AI message directly with typing indicator, then call onDone
+function rsAddMessage(text, delay, onDone) {
+  const loader = showTypingIndicator();
+  setTimeout(() => {
+    const thread = threads.find(t => t.id === activeThreadId);
+    if (!thread) return;
+    loader.remove();
+    thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: text });
+    renderConversation();
+    if (onDone) onDone(thread);
+  }, delay);
+}
+
+function showRSTimeSlots(slots) {
+  showConvChips(slots.map(s => ({ label: s, value: s })).concat([
+    { label: "None of these work", value: "None of these work" }
+  ]));
+}
+
 function handleRSReply(text) {
   const state = cardFlowState.rs;
   addCardUserMessage(text);
@@ -3785,23 +3820,20 @@ function handleRSReply(text) {
     if (/never mind|no/i.test(text)) {
       addCardAiMessage("No problem — your appointment stays as is. See you March 25!");
       state.step = 0;
+      state.threadId = null;
       return;
     }
     state.step = 2;
-    addCardAiMessage("Let me check what's available with Dr. Wagle's office this week...");
-    // Show typing for 3-5s then show time options
-    setTimeout(() => {
-      const thread = threads.find(t => t.id === activeThreadId);
-      if (!thread) return;
-      thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: "Here's what I found:" });
-      renderConversation();
-      showConvChips([
-        { label: 'Thursday, March 27 at 2:00pm', value: 'Thursday, March 27 at 2:00pm' },
-        { label: 'Monday, March 30 at 9:00am', value: 'Monday, March 30 at 9:00am' },
-        { label: 'Tuesday, March 31 at 11:30am', value: 'Tuesday, March 31 at 11:30am' },
-        { label: "None of these work", value: "None of these work" }
-      ]);
-    }, Math.random() * 2000 + 3000);
+    // Show "checking" message, then after a pause show time slots
+    rsAddMessage("Let me check what's available with Dr. Wagle's office this week...", aiDelay(), function() {
+      rsAddMessage("Here's what I found:", Math.random() * 2000 + 3000, function() {
+        showRSTimeSlots([
+          'Thursday, March 27 at 2:00pm',
+          'Monday, March 30 at 9:00am',
+          'Tuesday, March 31 at 11:30am'
+        ]);
+      });
+    });
     return;
   }
 
@@ -3817,35 +3849,43 @@ function handleRSReply(text) {
     // They picked a time slot
     state.selectedTime = text;
     state.step = 4;
-    addCardAiMessage(`Got it — I'll move your appointment to ${text} with Dr. Wagle at Devoted Medical Group.`);
-    // Brief pause then confirmation card
-    setTimeout(() => {
-      showRescheduleConfirmation(text);
-    }, Math.random() * 1000 + 2000);
+    rsAddMessage("Got it — I'll move your appointment to " + text + " with Dr. Wagle at Devoted Medical Group.", aiDelay(), function(thread) {
+      // Show confirmation card after brief pause
+      const confirmationHtml = "✅ **Appointment Rescheduled**\n\n**Dr. Sarah Wagle** — Primary Care\n" + text + "\nDevoted Medical Group\n\n_You'll receive a confirmation message shortly._";
+      rsAddMessage(confirmationHtml, Math.random() * 1000 + 2000, function(thread) {
+        updateAppointmentDate(text);
+        // Follow-up with chips
+        setTimeout(function() {
+          thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: 'Anything else I can help with?' });
+          renderConversation();
+          showConvChips([
+            { label: 'Help me prepare for this visit', value: 'Help me prepare for this visit' },
+            { label: "That's all, thanks", value: "That's all, thanks" }
+          ]);
+        }, 1500);
+      });
+    });
     return;
   }
 
   if (state.step === 3) {
     if (/check next week/i.test(text)) {
       state.step = 2;
-      addCardAiMessage("Checking the following week...");
-      setTimeout(() => {
-        const thread = threads.find(t => t.id === activeThreadId);
-        if (!thread) return;
-        thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: "Here are some options:" });
-        renderConversation();
-        showConvChips([
-          { label: 'Wednesday, April 2 at 10:00am', value: 'Wednesday, April 2 at 10:00am' },
-          { label: 'Thursday, April 3 at 3:30pm', value: 'Thursday, April 3 at 3:30pm' },
-          { label: 'Friday, April 4 at 9:00am', value: 'Friday, April 4 at 9:00am' },
-          { label: "None of these work", value: "None of these work" }
-        ]);
-      }, Math.random() * 2000 + 3000);
+      rsAddMessage("Checking the following week...", aiDelay(), function() {
+        rsAddMessage("Here are some options:", Math.random() * 2000 + 3000, function() {
+          showRSTimeSlots([
+            'Wednesday, April 2 at 10:00am',
+            'Thursday, April 3 at 3:30pm',
+            'Friday, April 4 at 9:00am'
+          ]);
+        });
+      });
       return;
     }
     // "I'll call them"
     addCardAiMessage("Of course. The office is open Monday through Friday, 8am to 5pm. Is there anything else I can help with?");
     state.step = 0;
+    state.threadId = null;
     return;
   }
 
@@ -3853,39 +3893,16 @@ function handleRSReply(text) {
     if (/prepare|prep/i.test(text)) {
       // Open visit intake flow with the new date
       state.step = 0;
+      state.threadId = null;
       openVisitIntake();
       return;
     }
     // "That's all, thanks" or anything else
     addCardAiMessage("You're all set. Have a great day!");
     state.step = 0;
+    state.threadId = null;
     return;
   }
-}
-
-function showRescheduleConfirmation(selectedTime) {
-  const thread = threads.find(t => t.id === activeThreadId);
-  if (!thread) return;
-  const loader = showTypingIndicator();
-  setTimeout(() => {
-    loader.remove();
-    const confirmationHtml = `✅ **Appointment Rescheduled**\n\n**Dr. Sarah Wagle** — Primary Care\n${selectedTime}\nDevoted Medical Group\n\n_You'll receive a confirmation message shortly._`;
-    thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: confirmationHtml });
-    renderConversation();
-
-    // Update dates across the app
-    updateAppointmentDate(selectedTime);
-
-    // Follow-up
-    setTimeout(() => {
-      thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: 'Anything else I can help with?' });
-      renderConversation();
-      showConvChips([
-        { label: 'Help me prepare for this visit', value: 'Help me prepare for this visit' },
-        { label: "That's all, thanks", value: "That's all, thanks" }
-      ]);
-    }, 1500);
-  }, Math.random() * 1000 + 2000);
 }
 
 function updateAppointmentDate(newDateStr) {
