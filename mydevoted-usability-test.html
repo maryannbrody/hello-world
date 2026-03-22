@@ -782,6 +782,207 @@ html, body {
   line-height: 1.5;
 }
 
+/* ── Benefit detail pages ── */
+.benefit-detail {
+  position: fixed;
+  inset: 0;
+  z-index: 800;
+  background: var(--taupe);
+  display: none;
+  flex-direction: column;
+}
+.benefit-detail.open { display: flex; }
+.benefit-detail-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border-warm);
+  min-height: 48px;
+}
+.benefit-detail-back {
+  width: 48px;
+  height: 48px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: var(--charcoal);
+  flex-shrink: 0;
+}
+.benefit-detail-header-title {
+  flex: 1;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-right: 48px;
+}
+.benefit-detail-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 100px;
+}
+.benefit-detail-hero {
+  background: var(--white);
+  padding: 24px 20px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.benefit-detail-balance {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+.benefit-detail-balance-sub {
+  font-size: 16px;
+  color: var(--gray-text);
+  margin-top: 2px;
+}
+.benefit-detail-progress {
+  height: 8px;
+  background: var(--bg-input);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 16px 0 8px;
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.benefit-detail-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--blue);
+}
+.benefit-detail-progress-fill.fill-red { background: var(--red); }
+.benefit-detail-progress-fill.fill-amber { background: var(--amber); }
+.benefit-detail-reset {
+  font-size: 16px;
+  color: var(--gray-text);
+  margin-top: 4px;
+}
+.benefit-detail-section {
+  background: var(--white);
+  margin: 0 0 16px;
+  padding: 20px;
+}
+.benefit-detail-section-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 12px;
+}
+.benefit-detail-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 16px;
+  color: var(--charcoal);
+  line-height: 1.4;
+}
+.benefit-detail-list-item .icon-yes { color: var(--green); flex-shrink: 0; }
+.benefit-detail-list-item .icon-no { color: var(--red); flex-shrink: 0; }
+.benefit-detail-list-item .icon-loc { color: var(--blue); flex-shrink: 0; }
+.benefit-detail-txn {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bg-input);
+  font-size: 16px;
+}
+.benefit-detail-txn:last-child { border-bottom: none; }
+.benefit-detail-txn-desc { color: var(--charcoal); }
+.benefit-detail-txn-amount { font-weight: 600; color: var(--charcoal); }
+.benefit-detail-txn-date { font-size: 14px; color: var(--gray-text); }
+.benefit-detail-pending {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  background: #FEF3C7;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.benefit-detail-pending-badge {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--amber);
+  background: var(--white);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.benefit-detail-step {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  font-size: 16px;
+  color: var(--charcoal);
+  line-height: 1.4;
+}
+.benefit-detail-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--red);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.benefit-detail-cta {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 20px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  background: var(--white);
+  border-top: 1px solid var(--border-warm);
+  z-index: 801;
+}
+.benefit-detail-cta button {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--white);
+  background: var(--red);
+  border: none;
+  border-radius: var(--button-radius);
+  cursor: pointer;
+  min-height: 48px;
+}
+.benefit-detail-cta button:active { background: var(--red-dark); }
+
+/* Benefit link chips in AI messages */
+.benefit-link-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--red);
+  background: var(--red-light);
+  border: 1px solid var(--red-light-border);
+  border-radius: 20px;
+  cursor: pointer;
+  min-height: 48px;
+}
+.benefit-link-chip:active { background: var(--red-light-border); }
+
 /* ── Profile tab ── */
 .profile-header {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -1460,10 +1661,10 @@ html, body {
       <!-- Suggested prompt chips -->
       <div class="chips-label">You could ask</div>
       <div class="chips-scroll" id="chipsScroll">
-        <button class="chip-card" onclick="sendPrompt('How can I have more energy?')">How can I have more energy?</button>
-        <button class="chip-card" onclick="sendPrompt('Food & Home Card balance')">Food &amp; Home Card balance</button>
-        <button class="chip-card" onclick="sendPrompt('What do my labs mean?')">What do my labs mean?</button>
-        <button class="chip-card" onclick="sendPrompt('Prepare for my visit')">Prepare for my visit</button>
+        <button class="chip-card" onclick="sendPrompt('Help me prepare for a doctor visit')">Help me prepare for a doctor visit</button>
+        <button class="chip-card" onclick="sendPrompt('How much is left on my food & home card?')">How much is left on my food &amp; home card?</button>
+        <button class="chip-card" onclick="sendPrompt('Help me find a good provider')">Help me find a good provider</button>
+        <button class="chip-card" onclick="sendPrompt('How are my labs looking?')">How are my labs looking?</button>
       </div>
       <div class="scroll-dots" id="scrollDots">
         <div class="dot active"></div>
@@ -1617,33 +1818,33 @@ html, body {
       <div class="benefits-header">Your Benefits</div>
 
       <!-- Food & Home Card -->
-      <div class="benefit-card">
+      <div class="benefit-card" style="cursor:pointer" onclick="openBenefitDetail('food')">
         <div class="benefit-card-label">FOOD &amp; HOME CARD</div>
         <div class="benefit-card-amount">$125 <span style="font-size:15px;font-weight:400;color:var(--gray-text)">remaining</span></div>
-        <div class="benefit-card-sub">of $300 quarterly allowance</div>
+        <div class="benefit-card-sub">of $200 monthly allowance</div>
         <div class="benefit-progress-track">
-          <div class="benefit-progress-fill" style="width:42%"></div>
+          <div class="benefit-progress-fill" style="width:62.5%"></div>
         </div>
-        <div class="benefit-card-link" onclick="sendPrompt('Tell me about my Food and Home Card balance and how to use it')">See details →</div>
+        <div class="benefit-card-link">See details →</div>
       </div>
 
       <!-- Wellness Bucks -->
-      <div class="benefit-card">
+      <div class="benefit-card" style="cursor:pointer" onclick="openBenefitDetail('wellness')">
         <div class="benefit-card-label">WELLNESS BUCKS</div>
         <div class="benefit-card-amount">$155 <span style="font-size:15px;font-weight:400;color:var(--gray-text)">remaining</span></div>
-        <div class="benefit-card-sub">of $500 annual allowance</div>
+        <div class="benefit-card-sub">of $200 annual allowance</div>
         <div class="benefit-progress-track">
-          <div class="benefit-progress-fill amber" style="width:31%"></div>
+          <div class="benefit-progress-fill amber" style="width:77.5%"></div>
         </div>
         <div class="benefit-pending">Pending: Yoga Mat $45</div>
       </div>
 
       <!-- OTC Allowance -->
-      <div class="benefit-card">
+      <div class="benefit-card" style="cursor:pointer" onclick="openBenefitDetail('otc')">
         <div class="benefit-card-label">OTC ALLOWANCE</div>
         <div class="benefit-card-amount">$100 <span style="font-size:15px;font-weight:400;color:var(--gray-text)">/quarter</span></div>
-        <div class="benefit-card-sub">Use at participating pharmacies for health essentials</div>
-        <div class="benefit-card-link" onclick="sendPrompt('How do I use my OTC allowance?')">Learn more →</div>
+        <div class="benefit-card-sub">Q1 2026 — use at participating pharmacies</div>
+        <div class="benefit-card-link">See details →</div>
       </div>
 
       <!-- ID Card -->
@@ -1725,6 +1926,156 @@ html, body {
       </div>
     </div>
   </main>
+
+  <!-- Benefit Detail Pages -->
+  <div class="benefit-detail" id="detail-food">
+    <div class="benefit-detail-header">
+      <button class="benefit-detail-back" onclick="closeBenefitDetail()">‹</button>
+      <div class="benefit-detail-header-title">Food & Home Card</div>
+    </div>
+    <div class="benefit-detail-scroll">
+      <div class="benefit-detail-hero">
+        <div class="benefit-detail-balance">$125</div>
+        <div class="benefit-detail-balance-sub">of $200 monthly allowance</div>
+        <div class="benefit-detail-progress"><div class="benefit-detail-progress-fill" style="width:62.5%"></div></div>
+        <div class="benefit-detail-reset">Resets March 1, 2026</div>
+      </div>
+      <div class="benefit-detail-section">
+        <div class="benefit-detail-section-title">Where to use it</div>
+        <div class="benefit-detail-list-item"><span class="icon-loc">📍</span> Walmart & Walmart Grocery</div>
+        <div class="benefit-detail-list-item"><span class="icon-loc">📍</span> Amazon Fresh</div>
+        <div class="benefit-detail-list-item"><span class="icon-loc">📍</span> Stop & Shop, Shaw's, Hannaford</div>
+        <div class="benefit-detail-list-item"><span class="icon-loc">📍</span> CVS (select food items)</div>
+        <div class="benefit-detail-list-item"><span class="icon-loc">📍</span> Instacart (grocery delivery)</div>
+      </div>
+      <div class="benefit-detail-section">
+        <div class="benefit-detail-section-title">What's covered</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Fresh fruits & vegetables</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Dairy & eggs</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Meat, poultry & fish</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Bread & grains</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Canned & frozen foods</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Household cleaning supplies</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Paper products (toilet paper, paper towels)</div>
+        <div style="height:8px"></div>
+        <div class="benefit-detail-list-item"><span class="icon-no">❌</span> Alcohol</div>
+        <div class="benefit-detail-list-item"><span class="icon-no">❌</span> Tobacco</div>
+        <div class="benefit-detail-list-item"><span class="icon-no">❌</span> Pet food</div>
+        <div class="benefit-detail-list-item"><span class="icon-no">❌</span> Non-food items (cosmetics, electronics)</div>
+      </div>
+      <div class="benefit-detail-section">
+        <div class="benefit-detail-section-title">Recent transactions</div>
+        <div class="benefit-detail-txn">
+          <div><div class="benefit-detail-txn-desc">Stop & Shop</div><div class="benefit-detail-txn-date">Feb 18, 2026</div></div>
+          <div class="benefit-detail-txn-amount">−$47.23</div>
+        </div>
+        <div class="benefit-detail-txn">
+          <div><div class="benefit-detail-txn-desc">Walmart</div><div class="benefit-detail-txn-date">Feb 12, 2026</div></div>
+          <div class="benefit-detail-txn-amount">−$28.50</div>
+        </div>
+      </div>
+    </div>
+    <div class="benefit-detail-cta">
+      <button onclick="openBenefitChat('food')">♥ Ask about your Food & Home Card</button>
+    </div>
+  </div>
+
+  <div class="benefit-detail" id="detail-wellness">
+    <div class="benefit-detail-header">
+      <button class="benefit-detail-back" onclick="closeBenefitDetail()">‹</button>
+      <div class="benefit-detail-header-title">Wellness Bucks</div>
+    </div>
+    <div class="benefit-detail-scroll">
+      <div class="benefit-detail-hero">
+        <div class="benefit-detail-balance">$155</div>
+        <div class="benefit-detail-balance-sub">of $200 annual allowance</div>
+        <div class="benefit-detail-progress"><div class="benefit-detail-progress-fill fill-red" style="width:77.5%"></div></div>
+        <div class="benefit-detail-reset">Annual benefit — use by December 31, 2026</div>
+      </div>
+      <div class="benefit-detail-section">
+        <div class="benefit-detail-section-title">Pending claims</div>
+        <div class="benefit-detail-pending">
+          <div>🧘</div>
+          <div style="flex:1">
+            <div style="font-weight:600;color:var(--charcoal)">Yoga Mat — $45</div>
+            <div style="font-size:14px;color:var(--gray-text);margin-top:2px">Submitted Feb 20, 2026</div>
+            <div style="margin-top:4px"><span class="benefit-detail-pending-badge">In Progress</span></div>
+            <div style="font-size:14px;color:var(--gray-text);margin-top:4px">Typically processed within 5–7 business days</div>
+          </div>
+        </div>
+      </div>
+      <div class="benefit-detail-section">
+        <div class="benefit-detail-section-title">What qualifies</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Gym & fitness center memberships</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Yoga, tai chi, swimming classes</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Fitness equipment (dumbbells, resistance bands, yoga mats)</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Wellness classes & programs</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Fitness trackers & pedometers</div>
+        <div style="height:8px"></div>
+        <div class="benefit-detail-list-item"><span class="icon-no">❌</span> Athletic clothing or shoes</div>
+        <div class="benefit-detail-list-item"><span class="icon-no">❌</span> Supplements or vitamins (use OTC benefit instead)</div>
+      </div>
+      <div class="benefit-detail-section">
+        <div class="benefit-detail-section-title">How to submit a claim</div>
+        <div class="benefit-detail-step"><div class="benefit-detail-step-num">1</div><div>Purchase an eligible item or service</div></div>
+        <div class="benefit-detail-step"><div class="benefit-detail-step-num">2</div><div>Keep your receipt</div></div>
+        <div class="benefit-detail-step"><div class="benefit-detail-step-num">3</div><div>Submit through MyDevoted or call us</div></div>
+        <div class="benefit-detail-step"><div class="benefit-detail-step-num">4</div><div>Reimbursement arrives in 5–7 business days</div></div>
+      </div>
+    </div>
+    <div class="benefit-detail-cta">
+      <button onclick="openBenefitChat('wellness')">♥ Ask about your Wellness Bucks</button>
+    </div>
+  </div>
+
+  <div class="benefit-detail" id="detail-otc">
+    <div class="benefit-detail-header">
+      <button class="benefit-detail-back" onclick="closeBenefitDetail()">‹</button>
+      <div class="benefit-detail-header-title">OTC Allowance</div>
+    </div>
+    <div class="benefit-detail-scroll">
+      <div class="benefit-detail-hero">
+        <div class="benefit-detail-balance">$100</div>
+        <div class="benefit-detail-balance-sub">Q1 2026 quarterly allowance</div>
+        <div class="benefit-detail-progress"><div class="benefit-detail-progress-fill" style="width:100%"></div></div>
+        <div class="benefit-detail-reset">Resets April 1, 2026 — use it or lose it</div>
+      </div>
+      <div class="benefit-detail-section">
+        <div class="benefit-detail-section-title">Where to shop</div>
+        <div class="benefit-detail-list-item"><span class="icon-loc">📍</span> CVS (in-store or online)</div>
+        <div class="benefit-detail-list-item"><span class="icon-loc">📍</span> Walgreens</div>
+        <div class="benefit-detail-list-item"><span class="icon-loc">📍</span> Walmart pharmacy</div>
+        <div class="benefit-detail-list-item"><span class="icon-loc">📍</span> OTC Health Solutions catalog (included with your plan)</div>
+      </div>
+      <div class="benefit-detail-section">
+        <div class="benefit-detail-section-title">What's covered</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Vitamins & supplements</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Pain relief (Tylenol, Advil, Aleve)</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Cold & allergy medication</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Digestive health (antacids, fiber)</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> First aid supplies (bandages, antiseptic)</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Diabetes supplies (glucose tablets)</div>
+        <div class="benefit-detail-list-item"><span class="icon-yes">✅</span> Dental care (toothpaste, floss)</div>
+        <div style="height:8px"></div>
+        <div class="benefit-detail-list-item"><span class="icon-no">❌</span> Prescription medications (covered separately)</div>
+        <div class="benefit-detail-list-item"><span class="icon-no">❌</span> Cosmetics & beauty products</div>
+      </div>
+      <div class="benefit-detail-section">
+        <div class="benefit-detail-section-title">How to use</div>
+        <div style="margin-bottom:12px">
+          <div style="font-weight:600;color:var(--charcoal);margin-bottom:4px">In-store</div>
+          <div style="font-size:16px;color:var(--charcoal);line-height:1.5">Show your Devoted member ID at checkout. The OTC amount is applied automatically at participating pharmacies.</div>
+        </div>
+        <div>
+          <div style="font-weight:600;color:var(--charcoal);margin-bottom:4px">Online</div>
+          <div style="font-size:16px;color:var(--charcoal);line-height:1.5">Order through the OTC Health Solutions catalog — items ship directly to your home.</div>
+        </div>
+      </div>
+    </div>
+    <div class="benefit-detail-cta">
+      <button onclick="openBenefitChat('otc')">♥ Ask about your OTC benefit</button>
+    </div>
+  </div>
 
   <!-- AI bar -->
   <div class="ai-bar" id="aiBar">
@@ -1869,6 +2220,41 @@ function handleHomeSend() {
 function sendPrompt(text) {
   console.log('send:', text);
   openConvSheet(text);
+}
+
+// ── Benefit detail pages ──
+const BENEFIT_CHAT_PREFILLS = {
+  food: 'Tell me about my Food & Home Card balance and how to use it',
+  wellness: 'Tell me about my Wellness Bucks balance and what I can use them for',
+  otc: 'How do I use my OTC allowance and what can I buy?'
+};
+
+const BENEFIT_KEYWORDS = [
+  { key: 'food', pattern: /food.{0,4}home.{0,4}card|food card|home card|grocery/i, label: 'View Food & Home Card details →' },
+  { key: 'wellness', pattern: /wellness.{0,4}buck|wellness benefit|yoga mat|fitness reimburs/i, label: 'View Wellness Bucks details →' },
+  { key: 'otc', pattern: /otc.{0,4}allowance|otc.{0,4}benefit|over.the.counter/i, label: 'View OTC Allowance details →' }
+];
+
+function getBenefitChip(text) {
+  for (const b of BENEFIT_KEYWORDS) {
+    if (b.pattern.test(text)) {
+      return `<div class="benefit-link-chip" onclick="event.stopPropagation();closeSheet();openBenefitDetail('${b.key}')">${b.label}</div>`;
+    }
+  }
+  return '';
+}
+
+function openBenefitDetail(benefitKey) {
+  document.getElementById('detail-' + benefitKey).classList.add('open');
+}
+
+function closeBenefitDetail() {
+  document.querySelectorAll('.benefit-detail.open').forEach(el => el.classList.remove('open'));
+}
+
+function openBenefitChat(benefitKey) {
+  closeBenefitDetail();
+  sendPrompt(BENEFIT_CHAT_PREFILLS[benefitKey]);
 }
 
 // ── Scroll dots for chips ──
@@ -2134,9 +2520,10 @@ function renderConversation() {
     if (msg.role === 'user') {
       html += `<div class="msg msg-user"><div class="msg-bubble">${formatMessageText(msg.text)}</div></div>`;
     } else if (msg.role === 'ai') {
+      const chip = getBenefitChip(msg.text);
       html += `<div class="msg msg-ai">
         ${AI_AVATAR}
-        <div class="msg-bubble">${formatMessageText(msg.text)}</div>
+        <div><div class="msg-bubble">${formatMessageText(msg.text)}</div>${chip}</div>
       </div>`;
     } else if (msg.role === 'system') {
       html += `<div class="msg msg-system"><div class="msg-system-text">— ${msg.text} —</div></div>`;
@@ -2497,6 +2884,54 @@ NEVER:
   }
 };
 
+// ── Mid-conversation handoff detection ──
+const HANDOFF_OFFER_REGEX = /loop.{0,6}in|connect you with|devoted medical|clinical team|dr\.?\s*holliday|bring in.{0,10}doctor/i;
+const HANDOFF_CONFIRM_REGEX = /^(yes|yeah|yep|sure|please|ok|okay|go ahead|that.?d be great|sounds good|i.?d like that|definitely|absolutely)/i;
+
+function checkHandoffOffer(text) {
+  return HANDOFF_OFFER_REGEX.test(text);
+}
+
+async function performHandoff(thread) {
+  const newTeamKey = thread.status === 'waiting-guide' ? 'medical' : 'guide';
+  const persona = HUMAN_PROMPTS[newTeamKey];
+
+  // System message
+  thread.messages.push({ role: 'system', text: `${persona.name} from ${persona.team} has joined this conversation.` });
+  thread.status = persona.status;
+  thread.escalatedTo = { name: persona.name, team: persona.team };
+  renderConversation();
+  renderSheetHeader();
+
+  // Typing indicator + API call
+  const loader = showTypingIndicator(persona.name);
+  const minDelayPromise = new Promise(r => setTimeout(r, humanDelay()));
+
+  let humanText;
+  try {
+    const apiMessages = buildApiMessages(thread);
+    const systemPrompt = MEMBER_CONTEXT + '\n\n' + persona.systemPrompt;
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: HEADERS,
+      body: JSON.stringify({ model: MODEL, max_tokens: 1024, system: systemPrompt, messages: apiMessages })
+    });
+    const data = await response.json();
+    humanText = data.content?.[0]?.text || "Hi Laura — I've been following along. Let me take a look.";
+  } catch (err) {
+    humanText = "Hi Laura — I've reviewed the conversation. Give me just a moment.";
+  }
+
+  await minDelayPromise;
+  loader.remove();
+
+  thread.messages.push({ role: 'human', sender: persona.title, team: newTeamKey, text: humanText });
+  thread.lastActivityAt = new Date().toISOString().split('T')[0];
+  delete thread.pendingHandoff;
+  renderConversation();
+  renderSheetHeader();
+}
+
 function showConnectingMessage(teamKey) {
   const container = document.getElementById('convMessages');
   const persona = HUMAN_PROMPTS[teamKey];
@@ -2630,6 +3065,14 @@ async function sendMessage(text) {
     const escalated = isThreadEscalated(thread);
 
     if (escalated) {
+      // Check if this is a handoff confirmation
+      if (thread.pendingHandoff && HANDOFF_CONFIRM_REGEX.test(text)) {
+        await performHandoff(thread);
+        isSending = false;
+        return;
+      }
+      delete thread.pendingHandoff;
+
       // Use API-generated human responses after escalation
       const teamKey = thread.status === 'waiting-medical' ? 'medical' : 'guide';
       const persona = HUMAN_PROMPTS[teamKey];
@@ -2663,6 +3106,12 @@ async function sendMessage(text) {
 
       thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: humanText });
       thread.lastActivityAt = new Date().toISOString().split('T')[0];
+
+      // Check if this response offers a handoff to the other team
+      if (checkHandoffOffer(humanText)) {
+        thread.pendingHandoff = true;
+      }
+
       renderConversation();
     } else {
       // Show AI typing indicator
