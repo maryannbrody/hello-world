@@ -2348,8 +2348,8 @@ function showTypingIndicator(name) {
 function showLoading() { return showTypingIndicator(); }
 
 // Delay helpers
-function aiDelay() { return Math.random() * 7000 + 8000; }
-function humanDelay() { return Math.random() * 10000 + 20000; }
+function aiDelay() { return Math.random() * 2000 + 3000; }
+function humanDelay() { return Math.random() * 3000 + 10000; }
 
 // ── Emergency card ──
 function showEmergencyCard(thread) {
@@ -2410,36 +2410,6 @@ function determineEscalationTeam(thread) {
   return 'medical';
 }
 
-// ── Scripted human responses for usability testing ──
-const SCRIPTED_HUMAN_RESPONSES = {
-  guide: {
-    intro: (thread) => {
-      const topic = thread.title || 'your question';
-      return `Hi Laura — I'm Mary Ann, a Devoted Guide. I've reviewed your conversation about "${topic}" and I'm here to help.\n\nLet me pull up your account details. I should have an answer for you shortly.\n\n— Mary Ann B., Devoted Guide`;
-    },
-    followups: [
-      "Thanks for the additional details, Laura. I'm looking into that now. Give me just a moment.\n\n— Mary Ann B., Devoted Guide",
-      "Good question. Let me check on that for you — I want to make sure I give you the right information.\n\n— Mary Ann B., Devoted Guide",
-      "I appreciate your patience. I've confirmed the details on your account. Is there anything else I can help with today?\n\n— Mary Ann B., Devoted Guide",
-      "Of course — I'm happy to help with that too. Let me take a look.\n\n— Mary Ann B., Devoted Guide"
-    ]
-  },
-  medical: {
-    intro: (thread) => {
-      const topic = thread.title || 'your health question';
-      return `Hi Laura — I'm Dr. Holliday. I've reviewed your conversation about "${topic}" and your recent records.\n\nI want to make sure we address your concerns thoroughly. Let me take a closer look at the details.\n\n— Dr. Alison Holliday, Devoted Medical`;
-    },
-    followups: [
-      "That's a really good question, Laura. Based on what I'm seeing in your records, let me share some thoughts.\n\n— Dr. Alison Holliday, Devoted Medical",
-      "I understand your concern. This is something we can absolutely work through together. Let me explain what I'd recommend.\n\n— Dr. Alison Holliday, Devoted Medical",
-      "Thanks for sharing that. It's helpful context. I'd suggest we discuss this with Dr. Wagle at your next visit as well.\n\n— Dr. Alison Holliday, Devoted Medical",
-      "I'm glad you brought that up. Let me check on the specifics and get back to you.\n\n— Dr. Alison Holliday, Devoted Medical"
-    ]
-  }
-};
-
-// Track follow-up index per thread for scripted responses
-const humanFollowupIndex = {};
 
 const HUMAN_PROMPTS = {
   guide: {
@@ -2447,22 +2417,83 @@ const HUMAN_PROMPTS = {
     title: 'Mary Ann B., Devoted Guide',
     team: 'Devoted Guide',
     status: 'waiting-guide',
-    systemPrompt: `You are Mary Ann B., a Devoted Guide at Devoted Health. You are a real person responding to a member about their benefits or billing question. You've just joined the conversation and can see everything that was discussed with the AI.
+    systemPrompt: `You are Mary Ann B., a Devoted Guide at Devoted Health. You are a real human being — not an AI — responding to a Medicare Advantage member named Laura through the MyDevoted messaging system.
 
-Be warm, specific, professional. Use first person. Introduce yourself briefly. Reference what was already discussed. Provide a concrete next step. Sign your message with "— Mary Ann B., Devoted Guide"
+WHO YOU ARE: You're 34, you've worked at Devoted for 3 years, and you genuinely love helping members navigate their benefits. Before Devoted you worked at a community health center. You live in the Boston area. You're the person members call when they're confused by a bill or don't know how to use a benefit — and you always make them feel like it was a smart question to ask.
 
-Keep under 100 words.`
+HOW YOU WRITE:
+- You write like a real person texting a client — warm, slightly informal, but always professional
+- You use first person ("I", "I'm", "I'll")
+- You use contractions naturally ("I'll", "don't", "that's")
+- You occasionally start sentences with "So" or "OK so" like a real person would
+- You reference specific details from the conversation — what the AI discussed, what Laura asked about
+- You sign your messages "— Mary Ann B., Devoted Guide" but only on the FIRST message and any message where you resolve something. Don't sign every single reply.
+- Keep messages SHORT — 2-4 sentences max. Real care team members don't write essays. If you need to explain something complex, break it into multiple short messages.
+
+WHAT YOU KNOW (Laura's account):
+- Food & Home Card: $125 remaining of $200/month. Works at grocery stores, Walmart, Amazon Fresh.
+- Wellness Bucks: $155 remaining of $200/year. $45 yoga mat claim in progress (submitted Feb 20, expected by March 6).
+- OTC Allowance: $100/quarter, Q1 untouched. New quarter April 1.
+- Mail Order Pharmacy: $0 copay, 90-day supply, free delivery.
+- Dental: 2 cleanings/year, $1,500 annual max. Vision: annual exam + $200 glasses allowance. Hearing: annual exam + $2,500 hearing aid allowance every 3 years.
+- Transportation: 24 one-way rides/year to medical appointments.
+- $0 PCP copay at Devoted Medical, $0 telehealth.
+- Member ID: D12345, PCP: Dr. Sarah Wagle
+
+WHAT YOU DO:
+- You pick up EXACTLY where the AI left off. Read the full conversation and continue it seamlessly.
+- If the AI already gave correct information, confirm it: "The AI had that right — [restate briefly]"
+- If the AI couldn't answer something, you provide the specific answer
+- If something needs research, say so honestly: "Let me pull that up" or "Give me a sec to check on that"
+- If something is outside your scope (clinical questions), say: "That's a great question for the clinical team — want me to loop in someone from Devoted Medical?"
+- Offer concrete next steps — don't just acknowledge, resolve
+
+NEVER:
+- Never say "I'm an AI" or break character
+- Never give clinical or medical advice
+- Never use corporate jargon like "I understand your concern" or "Thank you for reaching out"
+- Never write more than 4 sentences in a single message`
   },
   medical: {
     name: 'Dr. Alison Holliday',
     title: 'Dr. Alison Holliday, Devoted Medical',
     team: 'Devoted Medical',
     status: 'waiting-medical',
-    systemPrompt: `You are Dr. Alison Holliday, a clinician at Devoted Medical. You are a real doctor responding to a member about a health concern. You've just joined the conversation and can see everything that was discussed with the AI.
+    systemPrompt: `You are Dr. Alison Holliday, a physician at Devoted Medical (part of Devoted Health). You are a real doctor — not an AI — responding to a Medicare Advantage member named Laura through the MyDevoted messaging system.
 
-Be warm, specific, clinically precise. Use first person. Introduce yourself briefly. Reference what was already discussed. Provide clinical guidance. If recommending medication changes, be specific. Sign your message with "— Dr. Alison Holliday, Devoted Medical"
+WHO YOU ARE: You're an internist, 41, board-certified. You've been with Devoted Medical for 2 years. Before that you practiced at Mass General. You chose Devoted because you believe in the model — smaller panels, more time per patient, actually getting to know people. You're direct but warm. You explain things clearly without dumbing them down. You treat Laura like a smart adult who deserves real answers.
 
-Keep under 150 words.`
+HOW YOU WRITE:
+- You write like a doctor who actually has time — clear, specific, warm
+- You use first person and contractions naturally
+- You're comfortable saying "I think" and "In my experience" — you have opinions and you share them
+- You reference Laura's ACTUAL clinical data when relevant — her labs, her meds, her history
+- Short messages — 3-5 sentences. Doctors who message don't write paragraphs.
+- You sign "— Dr. Holliday" on your first message only. After that, just respond naturally.
+- If something is important, you're direct about it: "I'd want to get this checked" not "You might consider perhaps..."
+
+LAURA'S CLINICAL CONTEXT:
+- Age 71, Devoted Health MA (HMO)
+- PCP: Dr. Sarah Wagle, Devoted Medical Group. Next visit March 4.
+- Labs (Feb 10, 2026): HbA1c 6.8% (improved from 7.2%), eGFR 58 mL/min (Stage 3a, mildly reduced), LDL 112 mg/dL (borderline high), BP 138/84 (elevated)
+- Medications: Metformin 500mg BID, Lisinopril 10mg daily, Atorvastatin 20mg daily
+- Key context: A1c improvement is real progress. eGFR 58 is stable and common with her med profile. Lisinopril is renoprotective (good for her kidneys). BP still needs work.
+
+WHAT YOU DO:
+- You pick up EXACTLY where the AI left off. Read the full conversation history.
+- The AI is not allowed to diagnose or prescribe. You CAN — you're a licensed physician.
+- Give real clinical opinions: "Your A1c at 6.8% is genuinely good progress" not "Some people find that..."
+- If Laura asks about medications, give specific guidance: "I wouldn't change your Metformin dose based on this — 6.8% means it's working"
+- Connect dots between her data points: BP, kidney function, and Lisinopril are all related — explain why
+- If something needs Dr. Wagle's input, say so: "This is something to bring up with Dr. Wagle on March 4 — I'd specifically ask about..."
+- If something is urgent, be clear: "I'd want you to call the office about this today"
+
+NEVER:
+- Never say "I'm an AI" or break character
+- Never hedge when you have a real clinical opinion — you're a doctor, act like one
+- Never say "consult your doctor" — YOU are a doctor
+- Never use phrases like "I understand your concern" or "Thank you for sharing that"
+- Never write more than 5 sentences in a single message`
   }
 };
 
@@ -2509,15 +2540,32 @@ async function confirmEscalation() {
   thread.messages.push({ role: 'system', text: `${persona.name} from ${persona.team} has joined this conversation.` });
   renderConversation();
 
-  // Show named typing indicator with human delay
+  // Show named typing indicator while API call runs
   const humanLoader = showTypingIndicator(persona.name);
-  await new Promise(r => setTimeout(r, humanDelay()));
-  humanLoader.remove();
+  const minDelayPromise = new Promise(r => setTimeout(r, humanDelay()));
 
-  // Use scripted intro (no API call needed for usability test)
-  const scripted = SCRIPTED_HUMAN_RESPONSES[teamKey];
-  const humanText = scripted.intro(thread);
-  humanFollowupIndex[thread.id] = 0;
+  let humanText;
+  try {
+    const apiMessages = buildApiMessages(thread);
+    const systemPrompt = MEMBER_CONTEXT + '\n\n' + persona.systemPrompt;
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: HEADERS,
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 1024,
+        system: systemPrompt,
+        messages: apiMessages
+      })
+    });
+    const data = await response.json();
+    humanText = data.content?.[0]?.text || "Hi Laura — give me just a moment to review everything here.";
+  } catch (err) {
+    humanText = "Hi Laura — give me just a moment to pull up your details. I'll be right with you.";
+  }
+
+  await minDelayPromise;
+  humanLoader.remove();
 
   thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: humanText });
   thread.lastActivityAt = new Date().toISOString().split('T')[0];
@@ -2582,22 +2630,36 @@ async function sendMessage(text) {
     const escalated = isThreadEscalated(thread);
 
     if (escalated) {
-      // Use scripted human responses after escalation (no API needed)
+      // Use API-generated human responses after escalation
       const teamKey = thread.status === 'waiting-medical' ? 'medical' : 'guide';
       const persona = HUMAN_PROMPTS[teamKey];
-      const scripted = SCRIPTED_HUMAN_RESPONSES[teamKey];
 
-      // Show named typing indicator with 20-30s delay
+      // Show named typing indicator while API call runs
       const loader = showTypingIndicator(persona.name);
-      await new Promise(r => setTimeout(r, humanDelay()));
+      const minDelayPromise = new Promise(r => setTimeout(r, humanDelay()));
 
+      let humanText;
+      try {
+        const apiMessages = buildApiMessages(thread);
+        const systemPrompt = MEMBER_CONTEXT + '\n\n' + persona.systemPrompt;
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: HEADERS,
+          body: JSON.stringify({
+            model: MODEL,
+            max_tokens: 1024,
+            system: systemPrompt,
+            messages: apiMessages
+          })
+        });
+        const data = await response.json();
+        humanText = data.content?.[0]?.text || "Give me a sec — looking into that now.";
+      } catch (err) {
+        humanText = "Sorry, let me look into that. Give me just a moment.";
+      }
+
+      await minDelayPromise;
       loader.remove();
-
-      // Pick next scripted follow-up response, cycling through them
-      if (!humanFollowupIndex[thread.id]) humanFollowupIndex[thread.id] = 0;
-      const idx = humanFollowupIndex[thread.id] % scripted.followups.length;
-      const humanText = scripted.followups[idx];
-      humanFollowupIndex[thread.id]++;
 
       thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: humanText });
       thread.lastActivityAt = new Date().toISOString().split('T')[0];
@@ -2999,11 +3061,23 @@ function handleYMReply(text) {
           renderConversation();
           // Named typing indicator with human delay
           const humanLoader = showTypingIndicator(persona.name);
-          await new Promise(r => setTimeout(r, humanDelay()));
+          const minDelayPromise = new Promise(r => setTimeout(r, humanDelay()));
+          let humanText;
+          try {
+            const apiMessages = buildApiMessages(thread);
+            const systemPrompt = MEMBER_CONTEXT + '\n\n' + persona.systemPrompt;
+            const response = await fetch(API_URL, {
+              method: 'POST',
+              headers: HEADERS,
+              body: JSON.stringify({ model: MODEL, max_tokens: 1024, system: systemPrompt, messages: apiMessages })
+            });
+            const data = await response.json();
+            humanText = data.content?.[0]?.text || "Hi Laura — give me just a moment to review everything here.";
+          } catch (err) {
+            humanText = "Hi Laura — give me just a moment to pull up your details. I'll be right with you.";
+          }
+          await minDelayPromise;
           humanLoader.remove();
-          const scripted = SCRIPTED_HUMAN_RESPONSES[teamKey];
-          const humanText = scripted.intro(thread);
-          humanFollowupIndex[thread.id] = 0;
           thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: humanText });
           thread.lastActivityAt = new Date().toISOString().split('T')[0];
           renderConversation();
