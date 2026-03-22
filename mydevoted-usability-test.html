@@ -2234,6 +2234,9 @@ function switchTab(tab) {
   if (tab === 'chat') {
     renderChatTabThreads();
   }
+
+  // Refresh badge after tab change (clears when on Chat, shows when leaving)
+  updateChatBadge();
 }
 
 function goHome() {
@@ -2284,9 +2287,11 @@ function startChatFromTab() {
 function updateChatBadge() {
   const badge = document.getElementById('chatTabBadge');
   if (!badge) return;
-  const unreadCount = threads.filter(t => isThreadEscalated(t) && !t.badgeRead).length;
-  if (unreadCount > 0) {
-    badge.textContent = unreadCount;
+  const hasEscalated = threads.some(t => isThreadEscalated(t));
+  // Member is "on Chat" if the Chat tab is active OR they have the sheet open
+  const isOnChat = currentTab === 'chat' || sheetOpen;
+  if (hasEscalated && !isOnChat) {
+    badge.textContent = threads.filter(t => isThreadEscalated(t)).length;
     badge.classList.add('visible');
   } else {
     badge.classList.remove('visible');
@@ -2495,6 +2500,7 @@ function openSheet() {
   document.querySelector('.content-area').style.display = 'none';
   document.getElementById('aiBar').classList.add('hidden');
   document.getElementById('sheet').classList.add('open');
+  updateChatBadge();
 }
 
 function closeSheet() {
@@ -2720,16 +2726,12 @@ function handleTalkToPerson() {
 function openThread(threadId) {
   activeThreadId = threadId;
   sheetView = 'conversation';
-  const thread = threads.find(t => t.id === threadId);
-  if (thread && isThreadEscalated(thread)) {
-    thread.badgeRead = true;
-    updateChatBadge();
-  }
   renderSheetHeader();
   renderConversation();
   document.getElementById('threadListView').classList.remove('active');
   document.getElementById('convView').classList.add('active');
   if (!sheetOpen) openSheet();
+  updateChatBadge();
 }
 
 // ── API config ──
@@ -3133,8 +3135,6 @@ async function confirmEscalation() {
   // Update thread status
   thread.status = persona.status;
   thread.escalatedTo = { name: persona.name, team: persona.team };
-  // User is viewing this thread right now, so mark badge as read
-  thread.badgeRead = (activeThreadId === thread.id);
 
   // System message
   thread.messages.push({ role: 'system', text: `${persona.name} from ${persona.team} has joined this conversation.` });
@@ -3696,7 +3696,6 @@ function handleYMReply(text) {
           connectingEl.remove();
           thread.status = persona.status;
           thread.escalatedTo = { name: persona.name, team: persona.team };
-          thread.badgeRead = (activeThreadId === thread.id);
           thread.messages.push({ role: 'system', text: `${persona.name} from ${persona.team} has joined this conversation.` });
           renderConversation();
           // Named typing indicator with human delay
