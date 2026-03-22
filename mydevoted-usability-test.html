@@ -2537,15 +2537,13 @@ function renderConversation() {
   }
 
   // Scroll so the last message's top is visible
-  requestAnimationFrame(() => {
-    const msgs = container.querySelectorAll('.msg');
-    const last = msgs[msgs.length - 1];
-    if (last) {
-      last.scrollIntoView({ block: 'start', behavior: 'instant' });
-    } else {
-      container.scrollTop = container.scrollHeight;
-    }
-  });
+  const msgs = container.querySelectorAll('.msg');
+  const last = msgs[msgs.length - 1];
+  if (last) {
+    scrollIntoConvView(last);
+  } else {
+    requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+  }
 }
 
 // ── Handle "Talk to a person" link tap ──
@@ -2701,6 +2699,18 @@ const AI_AVATAR = `<div class="msg-avatar msg-avatar-ai"><svg viewBox="0 0 32 32
 
 const HUMAN_AVATAR = `<div class="msg-avatar msg-avatar-human"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg></div>`;
 
+// Scroll an element into view within convMessages only, without scrolling ancestor containers
+function scrollIntoConvView(el) {
+  const container = document.getElementById('convMessages');
+  if (!container || !el) return;
+  requestAnimationFrame(() => {
+    const containerRect = container.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+    const offset = elRect.top - containerRect.top + container.scrollTop;
+    container.scrollTop = offset;
+  });
+}
+
 // ── Loading indicator ──
 function showTypingIndicator(name) {
   const container = document.getElementById('convMessages');
@@ -2711,7 +2721,7 @@ function showTypingIndicator(name) {
   div.innerHTML = `${avatar}
     <div class="msg-bubble"><div class="typing-indicator"><div class="typing-dots"><span></span><span></span><span></span></div>${labelHtml}</div></div>`;
   container.appendChild(div);
-  requestAnimationFrame(() => { div.scrollIntoView({ block: 'start', behavior: 'instant' }); });
+  scrollIntoConvView(div);
   return div;
 }
 // Backward compat alias
@@ -2736,7 +2746,7 @@ function showEmergencyCard(thread) {
     </div>`;
   container.appendChild(div);
   thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: '🚨 If this is an emergency, call 911 now. Care OnDemand: 1-888-802-2738' });
-  requestAnimationFrame(() => { div.scrollIntoView({ block: 'start', behavior: 'instant' }); });
+  scrollIntoConvView(div);
 }
 
 function dismissEmergencyCard(btn) {
@@ -2761,7 +2771,7 @@ function showEscalationCard() {
       <button class="escalation-btn-secondary" onclick="dismissEscalation()">Continue with AI</button>
     </div>`;
   container.appendChild(div);
-  requestAnimationFrame(() => { div.scrollIntoView({ block: 'start', behavior: 'instant' }); });
+  scrollIntoConvView(div);
 }
 
 function dismissEscalation() {
@@ -2926,7 +2936,7 @@ function showConnectingMessage(teamKey) {
     <div class="connecting-text">Connecting you with ${persona.name}...</div>
   </div>`;
   container.appendChild(div);
-  requestAnimationFrame(() => { div.scrollIntoView({ block: 'start', behavior: 'instant' }); });
+  scrollIntoConvView(div);
   return div;
 }
 
@@ -3285,7 +3295,7 @@ function showConvChips(chips) {
     div.appendChild(btn);
   });
   container.appendChild(div);
-  requestAnimationFrame(() => { div.scrollIntoView({ block: 'start', behavior: 'instant' }); });
+  scrollIntoConvView(div);
 }
 
 function removeConvChips() {
