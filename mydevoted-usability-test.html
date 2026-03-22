@@ -100,23 +100,6 @@ html, body {
   gap: 8px;
 }
 .app-header .logo-wrap svg { height: 28px; width: auto; }
-.app-header .profile-btn {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  border-radius: 50%;
-}
-.app-header .profile-btn:active { background: var(--bg-input); }
-.app-header .profile-btn svg { width: 28px; height: 28px; color: var(--charcoal); }
 
 /* ── Content area ── */
 .content-area {
@@ -1625,7 +1608,7 @@ html, body {
   <main class="content-area">
     <!-- App header (scrolls with content) -->
     <header class="app-header">
-      <div class="logo-wrap">
+      <div class="logo-wrap" onclick="goHome()" style="cursor:pointer">
         <!-- Devoted Health logo mark -->
         <svg width="32" height="32" viewBox="0 0 100 100" fill="none">
           <circle cx="50" cy="35" r="18" fill="#F04B24"/>
@@ -1637,10 +1620,6 @@ html, body {
           <text x="0" y="46" font-family="Inter, sans-serif" font-weight="700" font-size="48" fill="#1D252C">Devoted</text>
         </svg>
       </div>
-      <button class="profile-btn" aria-label="Profile" onclick="switchTab('profile')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg>
-      </button>
     </header>
     <div id="tab-home" class="tab-view active">
       <!-- Greeting (matches production Greeting component) -->
@@ -2136,9 +2115,9 @@ html, body {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
       <span>Benefits</span>
     </button>
-    <button class="tab-bar-item" data-tab="chat" onclick="openChatTab()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-      <span>Chat</span>
+    <button class="tab-bar-item" data-tab="profile" onclick="switchTab('profile')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg>
+      <span>Profile</span>
     </button>
   </nav>
 </div>
@@ -2162,6 +2141,12 @@ const aiBarPlaceholders = {
 };
 
 function switchTab(tab) {
+  // Close companion sheet if open
+  if (sheetOpen) closeSheet();
+
+  // Close any open benefit detail pages
+  closeBenefitDetail();
+
   currentTab = tab;
 
   // Update tab views
@@ -2185,12 +2170,10 @@ function switchTab(tab) {
   }
 }
 
-function openChatTab() {
-  // Highlight chat tab
-  document.querySelectorAll('.tab-bar-item').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.tab === 'chat');
-  });
-  openThreadList();
+function goHome() {
+  if (sheetOpen) closeSheet();
+  closeBenefitDetail();
+  switchTab('home');
 }
 
 function handleAiBarSend() {
