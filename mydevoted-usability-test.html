@@ -1489,30 +1489,24 @@ html, body {
 .conv-footer-link {
   display: none;
 }
-.talk-to-person-btn {
-  width: 44px;
-  height: 44px;
-  min-width: 48px;
-  min-height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 50%;
+.talk-to-person-link {
+  display: none;
+  text-align: right;
+  padding: 4px 12px 2px;
+}
+.talk-to-person-link a {
+  font-size: 15px;
+  color: var(--gray-mid);
+  text-decoration: none;
   cursor: pointer;
-  flex-shrink: 0;
-  color: var(--gray-400);
-  transition: background 0.15s, color 0.15s;
+  min-height: 48px;
+  min-width: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
 }
-.talk-to-person-btn:active {
-  background: var(--bg-input);
+.talk-to-person-link a:active {
   color: var(--charcoal);
-}
-.talk-to-person-btn svg {
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
 }
 .conv-footer-status {
   display: block;
@@ -2149,10 +2143,10 @@ html, body {
     <div class="conv-view" id="convView">
       <div class="conv-messages" id="convMessages"></div>
       <div class="conv-input-area">
+        <div class="talk-to-person-link" id="talkToPersonLink">
+          <a onclick="handleTalkToPerson()" role="button" tabindex="0">Talk to a person</a>
+        </div>
         <div class="conv-input-row">
-          <button class="talk-to-person-btn" id="talkToPersonBtn" onclick="handleTalkToPerson()" aria-label="Talk to a person" style="display:none;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>
-          </button>
           <div class="conv-input-pill">
             <input type="text" id="convInput" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter')handleConvSend()">
           </div>
@@ -2185,10 +2179,6 @@ html, body {
         <span class="tab-bar-badge" id="chatTabBadge">1</span>
       </span>
       <span>Chat</span>
-    </button>
-    <button class="tab-bar-item" data-tab="profile" onclick="switchTab('profile')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg>
-      <span>Profile</span>
     </button>
   </nav>
 </div>
@@ -2698,18 +2688,18 @@ function renderConversation() {
 
   // Footer: escalated vs normal
   const escalated = isThreadEscalated(thread);
-  const talkBtn = document.getElementById('talkToPersonBtn');
+  const talkLink = document.getElementById('talkToPersonLink');
   if (escalated) {
     input.placeholder = 'Add more details...';
     footer.innerHTML = `<div class="conv-turnaround">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       Your care team typically responds in 5–10 minutes
     </div>`;
-    if (talkBtn) talkBtn.style.display = 'none';
+    if (talkLink) talkLink.style.display = 'none';
   } else {
     input.placeholder = 'Ask me anything...';
     footer.innerHTML = '';
-    if (talkBtn) talkBtn.style.display = 'flex';
+    if (talkLink) talkLink.style.display = 'block';
   }
 
   // Scroll so the last message's top is visible
