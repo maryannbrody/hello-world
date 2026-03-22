@@ -109,6 +109,27 @@ html, body {
   gap: 8px;
 }
 .app-header .logo-wrap svg { height: 28px; width: auto; }
+.app-header-profile {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  min-width: 48px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--gray-600);
+  border-radius: 50%;
+  transition: background 0.15s;
+}
+.app-header-profile:active { background: var(--bg-input); }
+.app-header-profile svg { width: 24px; height: 24px; }
 
 /* ── Content area ── */
 .content-area {
@@ -118,6 +139,7 @@ html, body {
 }
 .tab-view { display: none; padding: 24px 20px 24px; min-height: 100%; }
 .tab-view.active { display: block; }
+#tab-chat { padding: 8px 0 0; }
 
 /* ── AI bar ── */
 .ai-bar {
@@ -211,6 +233,28 @@ html, body {
 .tab-bar-item.active { color: var(--red); }
 .tab-bar-item svg { width: 26px; height: 26px; }
 .tab-bar-item span { font-size: var(--text-base); }
+.tab-bar-icon-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.tab-bar-badge {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 9999px;
+  background: var(--red);
+  color: var(--white);
+  font-size: 10px;
+  font-weight: 700;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.tab-bar-badge.visible { display: flex; }
 
 /* ── Home tab ── */
 .home-greeting {
@@ -1444,34 +1488,29 @@ html, body {
 .conv-footer-link {
   display: none;
 }
-.talk-to-person-wrap {
-  display: flex;
-  justify-content: flex-end;
-  padding: 6px 16px;
-  flex-shrink: 0;
-  background: var(--white);
-}
 .talk-to-person-btn {
-  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  min-width: 48px;
+  min-height: 48px;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  background: var(--taupe, #f5f0eb);
+  justify-content: center;
+  background: transparent;
   border: none;
-  border-radius: 9999px;
-  padding: 0 16px;
-  min-height: var(--tap-min);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: var(--text-base);
-  color: var(--charcoal);
+  border-radius: 50%;
   cursor: pointer;
-  transition: background 0.15s;
+  flex-shrink: 0;
+  color: var(--gray-400);
+  transition: background 0.15s, color 0.15s;
 }
 .talk-to-person-btn:active {
-  background: var(--border-warm, #e5ddd4);
+  background: var(--bg-input);
+  color: var(--charcoal);
 }
 .talk-to-person-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   flex-shrink: 0;
 }
 .conv-footer-status {
@@ -1640,6 +1679,9 @@ html, body {
           <text x="0" y="46" font-family="Inter, sans-serif" font-weight="700" font-size="48" fill="#1D252C">Devoted</text>
         </svg>
       </div>
+      <button class="app-header-profile" onclick="switchTab('profile')" aria-label="Profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0116 0v1"/></svg>
+      </button>
     </header>
     <div id="tab-home" class="tab-view active">
       <!-- Greeting (matches production Greeting component) -->
@@ -1928,6 +1970,14 @@ html, body {
         </div>
       </div>
     </div>
+
+    <!-- Chat tab (thread list as full page) -->
+    <div id="tab-chat" class="tab-view">
+      <div style="padding:0;">
+        <button class="thread-new-btn" onclick="startChatFromTab()">New conversation</button>
+        <div id="chatTabThreadRows"></div>
+      </div>
+    </div>
   </main>
 
   <!-- Benefit Detail Pages -->
@@ -2097,14 +2147,11 @@ html, body {
     <!-- Conversation view -->
     <div class="conv-view" id="convView">
       <div class="conv-messages" id="convMessages"></div>
-      <div class="talk-to-person-wrap" id="talkToPersonWrap" style="display:none;">
-        <button class="talk-to-person-btn" onclick="handleTalkToPerson()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>
-          Talk to a person
-        </button>
-      </div>
       <div class="conv-input-area">
         <div class="conv-input-row">
+          <button class="talk-to-person-btn" id="talkToPersonBtn" onclick="handleTalkToPerson()" aria-label="Talk to a person" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>
+          </button>
           <div class="conv-input-pill">
             <input type="text" id="convInput" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter')handleConvSend()">
           </div>
@@ -2131,6 +2178,13 @@ html, body {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
       <span>Benefits</span>
     </button>
+    <button class="tab-bar-item" data-tab="chat" onclick="switchTab('chat')">
+      <span class="tab-bar-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span class="tab-bar-badge" id="chatTabBadge">1</span>
+      </span>
+      <span>Chat</span>
+    </button>
     <button class="tab-bar-item" data-tab="profile" onclick="switchTab('profile')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg>
       <span>Profile</span>
@@ -2153,6 +2207,7 @@ const aiBarPlaceholders = {
   home: '',
   health: 'Ask about your health...',
   benefits: 'Ask about your benefits...',
+  chat: '',
   profile: 'Help me to...'
 };
 
@@ -2178,11 +2233,16 @@ function switchTab(tab) {
   // AI bar visibility & placeholder
   const aiBar = document.getElementById('aiBar');
   const aiInput = document.getElementById('aiBarInput');
-  if (tab === 'home') {
+  if (tab === 'home' || tab === 'chat') {
     aiBar.classList.add('hidden');
   } else {
     aiBar.classList.remove('hidden');
     aiInput.placeholder = aiBarPlaceholders[tab] || '';
+  }
+
+  // Render chat tab thread list when switching to it
+  if (tab === 'chat') {
+    renderChatTabThreads();
   }
 }
 
@@ -2190,6 +2250,57 @@ function goHome() {
   if (sheetOpen) closeSheet();
   closeBenefitDetail();
   switchTab('home');
+}
+
+// ── Chat tab thread list ──
+function renderChatTabThreads() {
+  const container = document.getElementById('chatTabThreadRows');
+  if (!container) return;
+  const sorted = [...threads].sort((a, b) => new Date(b.lastActivityAt) - new Date(a.lastActivityAt));
+  container.innerHTML = sorted.map(t => {
+    const lastMsg = t.messages[t.messages.length - 1];
+    let preview = lastMsg ? lastMsg.text.replace(/\*\*/g, '').replace(/\n/g, ' ') : '';
+    if (preview.length > 60) preview = preview.substring(0, 60) + '...';
+    const isActive = t.status === 'waiting-guide' || t.status === 'waiting-medical';
+    const badge = isActive ? '<span class="thread-active-badge">Active</span>' : '';
+    return `<div class="thread-row" onclick="openThreadFromChatTab('${t.id}')">
+      <div class="thread-row-content">
+        <div class="thread-row-top">
+          <span class="thread-row-title">${t.title}</span>
+          <span class="thread-row-date">${formatThreadDate(t.lastActivityAt)}</span>
+        </div>
+        <div class="thread-row-bottom">
+          <span class="thread-row-preview">${preview}</span>
+          ${badge}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  updateChatBadge();
+}
+
+function openThreadFromChatTab(threadId) {
+  const thread = threads.find(t => t.id === threadId);
+  if (!thread) return;
+  openThread(threadId);
+  openSheet();
+}
+
+function startChatFromTab() {
+  startNewConversation();
+  openSheet();
+}
+
+function updateChatBadge() {
+  const badge = document.getElementById('chatTabBadge');
+  if (!badge) return;
+  const activeCount = threads.filter(t => t.status === 'waiting-guide' || t.status === 'waiting-medical').length;
+  if (activeCount > 0) {
+    badge.textContent = activeCount;
+    badge.classList.add('visible');
+  } else {
+    badge.classList.remove('visible');
+  }
 }
 
 function handleAiBarSend() {
@@ -2412,6 +2523,7 @@ function closeSheet() {
   document.querySelectorAll('.tab-bar-item').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.tab === currentTab);
   });
+  updateChatBadge();
 }
 
 // ── Render sheet header ──
@@ -2585,18 +2697,18 @@ function renderConversation() {
 
   // Footer: escalated vs normal
   const escalated = isThreadEscalated(thread);
-  const talkWrap = document.getElementById('talkToPersonWrap');
+  const talkBtn = document.getElementById('talkToPersonBtn');
   if (escalated) {
     input.placeholder = 'Add more details...';
     footer.innerHTML = `<div class="conv-turnaround">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       Your care team typically responds in 5–10 minutes
     </div>`;
-    if (talkWrap) talkWrap.style.display = 'none';
+    if (talkBtn) talkBtn.style.display = 'none';
   } else {
     input.placeholder = 'Ask me anything...';
     footer.innerHTML = '';
-    if (talkWrap) talkWrap.style.display = 'flex';
+    if (talkBtn) talkBtn.style.display = 'flex';
   }
 
   // Scroll so the last message's top is visible
@@ -3062,6 +3174,7 @@ async function confirmEscalation() {
   thread.lastActivityAt = new Date().toISOString().split('T')[0];
   renderConversation();
   renderSheetHeader();
+  updateChatBadge();
 }
 
 // ── Send message (main flow) ──
