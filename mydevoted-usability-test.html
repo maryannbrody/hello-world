@@ -1651,7 +1651,7 @@ html, body {
       <div class="happening-card" id="vi-card" onclick="openVisitIntake()" style="cursor:pointer">
         <div class="happening-badge badge-blue" id="vi-badge">UPCOMING</div>
         <div class="happening-title">Complete visit intake</div>
-        <div class="happening-subtitle" id="vi-subtitle">March 4, 10am · Dr. Wagle · Primary Care</div>
+        <div class="happening-subtitle" id="vi-subtitle">March 25, 10am · Dr. Wagle · Primary Care</div>
       </div>
 
       <!-- Conversations -->
@@ -1693,7 +1693,7 @@ html, body {
           <button class="care-team-btn" onclick="sendPrompt('I want to message my care team')">Message your team</button>
           <button class="care-team-btn" onclick="sendPrompt('Help me prepare for my visit with Dr. Wagle')">Prepare for visit</button>
         </div>
-        <div class="care-team-next">Next visit: March 4, 10:00am</div>
+        <div class="care-team-next">Next visit: March 25, 10:00am</div>
       </div>
 
       <!-- Manage My Care -->
@@ -1864,7 +1864,7 @@ html, body {
         </div>
         <div class="member-card-row">
           <span class="member-card-row-label">Next visit</span>
-          <span class="member-card-row-value">March 4, 10:00am</span>
+          <span class="member-card-row-value" id="profile-next-visit">March 25, 10:00am</span>
         </div>
       </div>
 
@@ -2269,7 +2269,7 @@ const SEEDED_THREADS = [
       { role: 'user', text: "I saw my eGFR was 58. What does that mean?" },
       { role: 'ai', sender: 'MyDevoted', text: "Your eGFR of 58 measures how well your kidneys are filtering. At 58, they're working at roughly 60% capacity.\n\nThis is called Stage 3a — which sounds more alarming than it usually is. It's quite common alongside diabetes and blood pressure management.\n\nYour lisinopril is specifically chosen to protect kidney function." },
       { role: 'user', text: "I've been feeling more tired lately. Could it be connected?" },
-      { role: 'ai', sender: 'MyDevoted', text: "That's a thoughtful connection. For some people, reduced kidney function can contribute to tiredness.\n\nThis would be a great thing to bring up with Dr. Wagle on March 4. Would you like me to help you draft a question?" }
+      { role: 'ai', sender: 'MyDevoted', text: "That's a thoughtful connection. For some people, reduced kidney function can contribute to tiredness.\n\nThis would be a great thing to bring up with Dr. Wagle on March 25. Would you like me to help you draft a question?" }
     ]
   },
   {
@@ -2303,7 +2303,7 @@ const SEEDED_THREADS = [
     lastActivityAt: '2026-03-12',
     messages: [
       { role: 'user', text: "My appointment with Dr. Wagle is coming up. Can you help me prepare?" },
-      { role: 'ai', sender: 'MyDevoted', text: "Your appointment is on **March 4 at 10:00am**. Based on your recent labs:\n\n- **A1c improvement** (6.8%) — worth celebrating\n- **Kidney function** (eGFR 58) — stable, ask about monitoring\n- **Fatigue** — you mentioned feeling tired\n\n**What feels most important to YOU going into this visit?**" }
+      { role: 'ai', sender: 'MyDevoted', text: "Your appointment is on **March 25 at 10:00am**. Based on your recent labs:\n\n- **A1c improvement** (6.8%) — worth celebrating\n- **Kidney function** (eGFR 58) — stable, ask about monitoring\n- **Fatigue** — you mentioned feeling tired\n\n**What feels most important to YOU going into this visit?**" }
     ]
   }
 ];
@@ -2578,7 +2578,7 @@ Laura Ingalls Wilder, age 71
 Plan: Devoted Health Medicare Advantage (HMO)
 Member ID: D12345
 PCP: Dr. Sarah Wagle, Devoted Medical Group
-Next appointment: March 4, 2026 at 10:00am
+Next appointment: March 25, 2026 at 10:00am
 
 Recent labs (Feb 10, 2026):
 - HbA1c: 6.8% (improved from 7.2%)
@@ -2650,6 +2650,7 @@ Default to CLINICAL if ambiguous. Navigation questions route to whichever catego
 
 const EMERGENCY_REGEX = /chest pain|can't breathe|cannot breathe|heart attack|stroke|suicidal|want to die|kill myself|overdose|seizure|unconscious|choking|severe bleeding|anaphylaxis/i;
 const ESCALATION_REGEX = /talk to a person|talk to someone|speak to someone|live agent|real person|human agent|representative|need a person|want a person|need to talk|can I speak/i;
+const RESCHEDULE_REGEX = /reschedul|move my appointment|change my appointment|cancel my appointment|can't make my appointment|can not make my appointment|cannot make my appointment|need to change the date|need a different time/i;
 
 // ── Route message ──
 async function routeMessage(text) {
@@ -2842,7 +2843,7 @@ HOW YOU WRITE:
 
 LAURA'S CLINICAL CONTEXT:
 - Age 71, Devoted Health MA (HMO)
-- PCP: Dr. Sarah Wagle, Devoted Medical Group. Next visit March 4.
+- PCP: Dr. Sarah Wagle, Devoted Medical Group. Next visit March 25.
 - Labs (Feb 10, 2026): HbA1c 6.8% (improved from 7.2%), eGFR 58 mL/min (Stage 3a, mildly reduced), LDL 112 mg/dL (borderline high), BP 138/84 (elevated)
 - Medications: Metformin 500mg BID, Lisinopril 10mg daily, Atorvastatin 20mg daily
 - Key context: A1c improvement is real progress. eGFR 58 is stable and common with her med profile. Lisinopril is renoprotective (good for her kidneys). BP still needs work.
@@ -2853,7 +2854,7 @@ WHAT YOU DO:
 - Give real clinical opinions: "Your A1c at 6.8% is genuinely good progress" not "Some people find that..."
 - If Laura asks about medications, give specific guidance: "I wouldn't change your Metformin dose based on this — 6.8% means it's working"
 - Connect dots between her data points: BP, kidney function, and Lisinopril are all related — explain why
-- If something needs Dr. Wagle's input, say so: "This is something to bring up with Dr. Wagle on March 4 — I'd specifically ask about..."
+- If something needs Dr. Wagle's input, say so: "This is something to bring up with Dr. Wagle on March 25 — I'd specifically ask about..."
 - If something is urgent, be clear: "I'd want you to call the office about this today"
 
 NEVER:
@@ -3001,6 +3002,15 @@ async function sendMessage(text) {
   const cardFlow = getActiveCardFlow();
   if (cardFlow) {
     handleCardFlowInput(text);
+    return;
+  }
+
+  // 0. Check rescheduling intent
+  if (RESCHEDULE_REGEX.test(text)) {
+    thread.messages.push({ role: 'user', text: text });
+    thread.lastActivityAt = new Date().toISOString().split('T')[0];
+    renderConversation();
+    openRescheduleFlow(thread);
     return;
   }
 
@@ -3233,13 +3243,15 @@ document.getElementById('aiBarInput').addEventListener('keydown', function(e) {
 const CARD_FLOW_IDS = {
   HC: 'card-health-connections',
   YM: 'card-yoga-mat',
-  VI: 'card-visit-intake'
+  VI: 'card-visit-intake',
+  RS: 'card-reschedule'
 };
 
 let cardFlowState = {
   hc: { threadId: null, step: 0, completed: false },
   ym: { threadId: null, step: 0 },
-  vi: { threadId: null, step: 0, completed: false, answers: {} }
+  vi: { threadId: null, step: 0, completed: false, answers: {} },
+  rs: { threadId: null, step: 0, selectedTime: null }
 };
 
 // Check if current thread is a card flow
@@ -3248,6 +3260,7 @@ function getActiveCardFlow() {
   if (activeThreadId === cardFlowState.hc.threadId) return 'hc';
   if (activeThreadId === cardFlowState.ym.threadId) return 'ym';
   if (activeThreadId === cardFlowState.vi.threadId) return 'vi';
+  if (activeThreadId === cardFlowState.rs.threadId) return 'rs';
   return null;
 }
 
@@ -3309,6 +3322,7 @@ function handleCardFlowInput(text) {
   if (flow === 'hc') handleHCReply(text);
   else if (flow === 'ym') handleYMReply(text);
   else if (flow === 'vi') handleVIReply(text);
+  else if (flow === 'rs') handleRSReply(text);
 }
 
 // ── Card 1: Health Connections Checklist ──
@@ -3557,7 +3571,8 @@ function openVisitIntake() {
   openThread(thread.id);
   openSheet();
 
-  addCardAiMessage("Your appointment with Dr. Wagle is coming up on **March 4 at 10am**. Let's get you ready so you can make the most of your time with her — and skip the clipboard in the waiting room.\n\nThis should take about 3 minutes.", [
+  const apptDate = cardFlowState.rs.selectedTime || 'March 25 at 10am';
+  addCardAiMessage(`Your appointment with Dr. Wagle is coming up on **${apptDate}**. Let's get you ready so you can make the most of your time with her — and skip the clipboard in the waiting room.\n\nThis should take about 3 minutes.`, [
     { label: "Let's do it", value: "Let's do it" },
     { label: "I'll do it later", value: "I'll do it later" }
   ], 300);
@@ -3677,13 +3692,13 @@ function handleVIReply(text) {
   } else if (state.step === 6) {
     if (/looks good|yes|done|good|perfect/i.test(text)) {
       state.completed = true;
-      addCardAiMessage(`You're all set, ${name}. Dr. Wagle's team will have this before your appointment. See you March 4!`);
+      addCardAiMessage(`You're all set, ${name}. Dr. Wagle's team will have this before your appointment. See you March 25!`);
       // Update card
       const badge = document.getElementById('vi-badge');
       const subtitle = document.getElementById('vi-subtitle');
       badge.textContent = 'COMPLETE';
       badge.className = 'happening-badge badge-green';
-      subtitle.textContent = 'Visit prep submitted for March 4';
+      subtitle.textContent = 'Visit prep submitted for March 25';
     } else if (/edit|change/i.test(text)) {
       state.step = 6.5;
       addCardAiMessage("No problem — what would you like to change?");
@@ -3723,6 +3738,170 @@ function showVisitSummary() {
     { label: 'Looks good', value: 'Looks good' },
     { label: 'I want to edit something', value: 'I want to edit something' }
   ]);
+}
+
+// ── Card: Appointment Rescheduling ──
+function openRescheduleFlow(existingThread) {
+  const state = cardFlowState.rs;
+
+  // Reopen existing reschedule thread
+  if (state.threadId) {
+    openThread(state.threadId);
+    return;
+  }
+
+  // Reuse thread if rescheduling intent came from an existing conversation
+  let thread;
+  if (existingThread) {
+    thread = existingThread;
+    thread.title = 'Reschedule Dr. Wagle';
+  } else {
+    threadCounter++;
+    thread = {
+      id: CARD_FLOW_IDS.RS,
+      title: 'Reschedule Dr. Wagle',
+      status: 'open',
+      lastActivityAt: new Date().toISOString().split('T')[0],
+      messages: []
+    };
+    threads.unshift(thread);
+  }
+  state.threadId = thread.id;
+  state.step = 1;
+  state.selectedTime = null;
+
+  // First AI message
+  addCardAiMessage("I see you have an appointment with Dr. Wagle on Tuesday, March 25 at 10:00am. Would you like to reschedule it?", [
+    { label: 'Yes, reschedule', value: 'Yes, reschedule' },
+    { label: 'Actually, never mind', value: 'Actually, never mind' }
+  ]);
+}
+
+function handleRSReply(text) {
+  const state = cardFlowState.rs;
+  addCardUserMessage(text);
+
+  if (state.step === 1) {
+    if (/never mind|no/i.test(text)) {
+      addCardAiMessage("No problem — your appointment stays as is. See you March 25!");
+      state.step = 0;
+      return;
+    }
+    state.step = 2;
+    addCardAiMessage("Let me check what's available with Dr. Wagle's office this week...");
+    // Show typing for 3-5s then show time options
+    setTimeout(() => {
+      const thread = threads.find(t => t.id === activeThreadId);
+      if (!thread) return;
+      thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: "Here's what I found:" });
+      renderConversation();
+      showConvChips([
+        { label: 'Thursday, March 27 at 2:00pm', value: 'Thursday, March 27 at 2:00pm' },
+        { label: 'Monday, March 30 at 9:00am', value: 'Monday, March 30 at 9:00am' },
+        { label: 'Tuesday, March 31 at 11:30am', value: 'Tuesday, March 31 at 11:30am' },
+        { label: "None of these work", value: "None of these work" }
+      ]);
+    }, Math.random() * 2000 + 3000);
+    return;
+  }
+
+  if (state.step === 2) {
+    if (/none of these/i.test(text)) {
+      state.step = 3;
+      addCardAiMessage("No problem — would you like me to check the following week, or would you prefer to call Dr. Wagle's office directly? The number is (888) 802-2738.", [
+        { label: 'Check next week', value: 'Check next week' },
+        { label: "I'll call them", value: "I'll call them" }
+      ]);
+      return;
+    }
+    // They picked a time slot
+    state.selectedTime = text;
+    state.step = 4;
+    addCardAiMessage(`Got it — I'll move your appointment to ${text} with Dr. Wagle at Devoted Medical Group.`);
+    // Brief pause then confirmation card
+    setTimeout(() => {
+      showRescheduleConfirmation(text);
+    }, Math.random() * 1000 + 2000);
+    return;
+  }
+
+  if (state.step === 3) {
+    if (/check next week/i.test(text)) {
+      state.step = 2;
+      addCardAiMessage("Checking the following week...");
+      setTimeout(() => {
+        const thread = threads.find(t => t.id === activeThreadId);
+        if (!thread) return;
+        thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: "Here are some options:" });
+        renderConversation();
+        showConvChips([
+          { label: 'Wednesday, April 2 at 10:00am', value: 'Wednesday, April 2 at 10:00am' },
+          { label: 'Thursday, April 3 at 3:30pm', value: 'Thursday, April 3 at 3:30pm' },
+          { label: 'Friday, April 4 at 9:00am', value: 'Friday, April 4 at 9:00am' },
+          { label: "None of these work", value: "None of these work" }
+        ]);
+      }, Math.random() * 2000 + 3000);
+      return;
+    }
+    // "I'll call them"
+    addCardAiMessage("Of course. The office is open Monday through Friday, 8am to 5pm. Is there anything else I can help with?");
+    state.step = 0;
+    return;
+  }
+
+  if (state.step === 4) {
+    if (/prepare|prep/i.test(text)) {
+      // Open visit intake flow with the new date
+      state.step = 0;
+      openVisitIntake();
+      return;
+    }
+    // "That's all, thanks" or anything else
+    addCardAiMessage("You're all set. Have a great day!");
+    state.step = 0;
+    return;
+  }
+}
+
+function showRescheduleConfirmation(selectedTime) {
+  const thread = threads.find(t => t.id === activeThreadId);
+  if (!thread) return;
+  const loader = showTypingIndicator();
+  setTimeout(() => {
+    loader.remove();
+    const confirmationHtml = `✅ **Appointment Rescheduled**\n\n**Dr. Sarah Wagle** — Primary Care\n${selectedTime}\nDevoted Medical Group\n\n_You'll receive a confirmation message shortly._`;
+    thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: confirmationHtml });
+    renderConversation();
+
+    // Update dates across the app
+    updateAppointmentDate(selectedTime);
+
+    // Follow-up
+    setTimeout(() => {
+      thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: 'Anything else I can help with?' });
+      renderConversation();
+      showConvChips([
+        { label: 'Help me prepare for this visit', value: 'Help me prepare for this visit' },
+        { label: "That's all, thanks", value: "That's all, thanks" }
+      ]);
+    }, 1500);
+  }, Math.random() * 1000 + 2000);
+}
+
+function updateAppointmentDate(newDateStr) {
+  // Update care team card on Health tab
+  const careTeamNext = document.querySelector('.care-team-next');
+  if (careTeamNext) careTeamNext.textContent = 'Next visit: ' + newDateStr;
+
+  // Update visit intake card subtitle on Home tab
+  const viSubtitle = document.getElementById('vi-subtitle');
+  if (viSubtitle && !/submitted/i.test(viSubtitle.textContent)) {
+    viSubtitle.textContent = newDateStr + ' · Dr. Wagle · Primary Care';
+  }
+
+  // Update profile tab appointment row
+  const profileVisit = document.getElementById('profile-next-visit');
+  if (profileVisit) profileVisit.textContent = newDateStr;
 }
 
 // Initialize
