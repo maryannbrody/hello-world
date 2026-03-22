@@ -2884,6 +2884,54 @@ NEVER:
   }
 };
 
+// ── Mid-conversation handoff detection ──
+const HANDOFF_OFFER_REGEX = /loop.{0,6}in|connect you with|devoted medical|clinical team|dr\.?\s*holliday|bring in.{0,10}doctor/i;
+const HANDOFF_CONFIRM_REGEX = /^(yes|yeah|yep|sure|please|ok|okay|go ahead|that.?d be great|sounds good|i.?d like that|definitely|absolutely)/i;
+
+function checkHandoffOffer(text) {
+  return HANDOFF_OFFER_REGEX.test(text);
+}
+
+async function performHandoff(thread) {
+  const newTeamKey = thread.status === 'waiting-guide' ? 'medical' : 'guide';
+  const persona = HUMAN_PROMPTS[newTeamKey];
+
+  // System message
+  thread.messages.push({ role: 'system', text: `${persona.name} from ${persona.team} has joined this conversation.` });
+  thread.status = persona.status;
+  thread.escalatedTo = { name: persona.name, team: persona.team };
+  renderConversation();
+  renderSheetHeader();
+
+  // Typing indicator + API call
+  const loader = showTypingIndicator(persona.name);
+  const minDelayPromise = new Promise(r => setTimeout(r, humanDelay()));
+
+  let humanText;
+  try {
+    const apiMessages = buildApiMessages(thread);
+    const systemPrompt = MEMBER_CONTEXT + '\n\n' + persona.systemPrompt;
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: HEADERS,
+      body: JSON.stringify({ model: MODEL, max_tokens: 1024, system: systemPrompt, messages: apiMessages })
+    });
+    const data = await response.json();
+    humanText = data.content?.[0]?.text || "Hi Laura — I've been following along. Let me take a look.";
+  } catch (err) {
+    humanText = "Hi Laura — I've reviewed the conversation. Give me just a moment.";
+  }
+
+  await minDelayPromise;
+  loader.remove();
+
+  thread.messages.push({ role: 'human', sender: persona.title, team: newTeamKey, text: humanText });
+  thread.lastActivityAt = new Date().toISOString().split('T')[0];
+  delete thread.pendingHandoff;
+  renderConversation();
+  renderSheetHeader();
+}
+
 function showConnectingMessage(teamKey) {
   const container = document.getElementById('convMessages');
   const persona = HUMAN_PROMPTS[teamKey];
@@ -3017,6 +3065,14 @@ async function sendMessage(text) {
     const escalated = isThreadEscalated(thread);
 
     if (escalated) {
+      // Check if this is a handoff confirmation
+      if (thread.pendingHandoff && HANDOFF_CONFIRM_REGEX.test(text)) {
+        await performHandoff(thread);
+        isSending = false;
+        return;
+      }
+      delete thread.pendingHandoff;
+
       // Use API-generated human responses after escalation
       const teamKey = thread.status === 'waiting-medical' ? 'medical' : 'guide';
       const persona = HUMAN_PROMPTS[teamKey];
@@ -3050,6 +3106,12 @@ async function sendMessage(text) {
 
       thread.messages.push({ role: 'human', sender: persona.title, team: teamKey, text: humanText });
       thread.lastActivityAt = new Date().toISOString().split('T')[0];
+
+      // Check if this response offers a handoff to the other team
+      if (checkHandoffOffer(humanText)) {
+        thread.pendingHandoff = true;
+      }
+
       renderConversation();
     } else {
       // Show AI typing indicator
