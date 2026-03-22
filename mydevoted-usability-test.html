@@ -2285,9 +2285,9 @@ function startChatFromTab() {
 function updateChatBadge() {
   const badge = document.getElementById('chatTabBadge');
   if (!badge) return;
-  const activeCount = threads.filter(t => t.status === 'waiting-guide' || t.status === 'waiting-medical').length;
-  if (activeCount > 0) {
-    badge.textContent = activeCount;
+  const unreadCount = threads.filter(t => isThreadEscalated(t) && !t.badgeRead).length;
+  if (unreadCount > 0) {
+    badge.textContent = unreadCount;
     badge.classList.add('visible');
   } else {
     badge.classList.remove('visible');
@@ -2721,6 +2721,11 @@ function handleTalkToPerson() {
 function openThread(threadId) {
   activeThreadId = threadId;
   sheetView = 'conversation';
+  const thread = threads.find(t => t.id === threadId);
+  if (thread && isThreadEscalated(thread)) {
+    thread.badgeRead = true;
+    updateChatBadge();
+  }
   renderSheetHeader();
   renderConversation();
   document.getElementById('threadListView').classList.remove('active');
@@ -3129,6 +3134,8 @@ async function confirmEscalation() {
   // Update thread status
   thread.status = persona.status;
   thread.escalatedTo = { name: persona.name, team: persona.team };
+  // User is viewing this thread right now, so mark badge as read
+  thread.badgeRead = (activeThreadId === thread.id);
 
   // System message
   thread.messages.push({ role: 'system', text: `${persona.name} from ${persona.team} has joined this conversation.` });
@@ -3690,6 +3697,7 @@ function handleYMReply(text) {
           connectingEl.remove();
           thread.status = persona.status;
           thread.escalatedTo = { name: persona.name, team: persona.team };
+          thread.badgeRead = (activeThreadId === thread.id);
           thread.messages.push({ role: 'system', text: `${persona.name} from ${persona.team} has joined this conversation.` });
           renderConversation();
           // Named typing indicator with human delay
@@ -3715,6 +3723,7 @@ function handleYMReply(text) {
           thread.lastActivityAt = new Date().toISOString().split('T')[0];
           renderConversation();
           renderSheetHeader();
+          updateChatBadge();
         }, 600);
       }
     }, 800);
