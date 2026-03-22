@@ -978,6 +978,45 @@ html, body {
   min-height: var(--tap-min);
 }
 .benefit-link-chip:active { background: var(--red-light-border); }
+.benefit-link-chip.pressed { background: var(--red-light-border); }
+
+/* Benefit navigation loading overlay */
+.benefit-nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.95);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.benefit-nav-overlay.visible { opacity: 1; }
+.benefit-nav-overlay-text {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--charcoal);
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.benefit-nav-dots span {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--red);
+  animation: benefitDotBounce 1s ease-in-out infinite;
+}
+.benefit-nav-dots span:nth-child(2) { animation-delay: 0.15s; }
+.benefit-nav-dots span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes benefitDotBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-5px); }
+}
 
 /* ── Profile tab ── */
 .profile-header {
@@ -2191,10 +2230,34 @@ const BENEFIT_KEYWORDS = [
   { key: 'otc', pattern: /otc.{0,4}allowance|otc.{0,4}benefit|over.the.counter/i, label: 'View OTC Allowance details →' }
 ];
 
+const BENEFIT_NAMES = {
+  food: 'Food & Home Card',
+  wellness: 'Wellness Bucks',
+  otc: 'OTC Allowance'
+};
+
+function navigateToBenefit(chip, key) {
+  event.stopPropagation();
+  chip.classList.add('pressed');
+  setTimeout(() => {
+    const overlay = document.createElement('div');
+    overlay.className = 'benefit-nav-overlay';
+    overlay.innerHTML = `<div class="benefit-nav-overlay-text">Opening ${BENEFIT_NAMES[key] || key}<span class="benefit-nav-dots"><span></span><span></span><span></span></span></div>`;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('visible'));
+    setTimeout(() => {
+      closeSheet();
+      openBenefitDetail(key);
+      overlay.classList.remove('visible');
+      setTimeout(() => overlay.remove(), 150);
+    }, 800);
+  }, 200);
+}
+
 function getBenefitChip(text) {
   for (const b of BENEFIT_KEYWORDS) {
     if (b.pattern.test(text)) {
-      return `<div class="benefit-link-chip" onclick="event.stopPropagation();closeSheet();openBenefitDetail('${b.key}')">${b.label}</div>`;
+      return `<div class="benefit-link-chip" onclick="navigateToBenefit(this,'${b.key}')">${b.label}</div>`;
     }
   }
   return '';
