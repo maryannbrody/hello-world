@@ -2952,11 +2952,15 @@ function renderConversation() {
   });
 
   // Append feedback card for closed session-completed conversations
-  if (thread.status === 'closed' && thread.feedbackSeen !== true) {
-    // Mark as seen when they open it (but still show the card)
+  // Mark feedbackSeen when member navigates TO a closed thread (not when it closes while they're viewing)
+  if (thread.status === 'closed' && thread.feedbackSeen === false && thread.feedbackSeenDeferred) {
     thread.feedbackSeen = true;
     updateChatBadge();
     renderChatTabThreads();
+  }
+  // After first render of a just-closed thread, set deferred flag so next open marks it seen
+  if (thread.status === 'closed' && thread.feedbackSeen === false && !thread.feedbackSeenDeferred) {
+    thread.feedbackSeenDeferred = true;
   }
   const feedbackHtml = renderFeedbackCard(thread);
   if (feedbackHtml) html += feedbackHtml;
