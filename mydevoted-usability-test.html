@@ -1508,6 +1508,142 @@ html, body {
 .talk-to-person-link button:active {
   background: #e8e0d8;
 }
+/* Feedback card */
+.feedback-card {
+  margin: 16px 24px;
+  padding: 20px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-warm);
+  border-radius: 16px;
+  text-align: center;
+}
+.feedback-card-header {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 14px;
+}
+.feedback-card-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.feedback-card-btn {
+  font-family: inherit;
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--charcoal);
+  background: var(--white);
+  border: 1px solid var(--border-warm);
+  border-radius: 999px;
+  padding: 10px 18px;
+  min-height: 44px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.feedback-card-btn:active { background: var(--bg-input); }
+.feedback-card-btn.selected {
+  background: var(--charcoal);
+  color: var(--white);
+  border-color: var(--charcoal);
+}
+.feedback-card-thanks {
+  font-size: var(--text-base);
+  color: var(--gray-text);
+  margin-top: 2px;
+}
+.feedback-card-tellmore {
+  font-size: var(--text-base);
+  color: var(--blue);
+  cursor: pointer;
+  margin-top: 10px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  padding: 0;
+}
+.feedback-card-tellmore:active { opacity: 0.7; }
+.feedback-card-input-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  align-items: center;
+}
+.feedback-card-input-row input {
+  flex: 1;
+  border: 1px solid var(--border-warm);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: var(--text-base);
+  color: var(--charcoal);
+  outline: none;
+  background: var(--white);
+}
+.feedback-card-input-row input:focus {
+  border-color: var(--blue);
+  outline: 2px solid var(--blue);
+  outline-offset: -1px;
+}
+.feedback-card-input-row button {
+  font-family: inherit;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--white);
+  background: var(--purple);
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  min-height: 44px;
+  cursor: pointer;
+}
+.feedback-card-input-row button:active { background: #472069; }
+.feedback-card .fade-in {
+  animation: feedbackFadeIn 0.3s ease;
+}
+@keyframes feedbackFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* Continue conversation button */
+.conv-continue-btn {
+  display: block;
+  width: 100%;
+  font-family: inherit;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--purple);
+  background: var(--white);
+  border: 2px solid var(--purple);
+  border-radius: 999px;
+  padding: 14px;
+  min-height: 48px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.conv-continue-btn:active { background: #f5f0fb; }
+/* Thread list closed/feedback indicators */
+.thread-closed-icon {
+  color: var(--gray-400);
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+.thread-feedback-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--blue);
+  flex-shrink: 0;
+}
+.thread-row-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+.thread-row-title-wrap .thread-row-title { flex: 1; }
 .conv-footer-status {
   display: block;
   text-align: center;
@@ -2251,16 +2387,26 @@ function renderChatTabThreads() {
   const container = document.getElementById('chatTabThreadRows');
   if (!container) return;
   const sorted = [...threads].sort((a, b) => new Date(b.lastActivityAt) - new Date(a.lastActivityAt));
+  const unseenClosed = sorted.filter(t => t.status === 'closed' && t.feedbackSeen === false);
+  const feedbackUnseenIds = new Set(unseenClosed.slice(0, 2).map(t => t.id));
   container.innerHTML = sorted.map(t => {
     const lastMsg = t.messages[t.messages.length - 1];
     let preview = lastMsg ? lastMsg.text.replace(/\*\*/g, '').replace(/\n/g, ' ') : '';
     if (preview.length > 60) preview = preview.substring(0, 60) + '...';
     const isActive = t.status === 'waiting-guide' || t.status === 'waiting-medical';
-    const badge = isActive ? '<span class="thread-active-badge">Active</span>' : '';
+    const isClosed = t.status === 'closed';
+    const showFeedbackDot = isClosed && t.feedbackSeen === false && feedbackUnseenIds.has(t.id);
+    let badge = '';
+    if (isActive) badge = '<span class="thread-active-badge">Active</span>';
+    const closedIcon = isClosed ? '<span class="thread-closed-icon material-icons">check_circle</span>' : '';
+    const feedbackDot = showFeedbackDot ? '<span class="thread-feedback-dot"></span>' : '';
+    const titleStyle = isClosed ? ' style="color:var(--gray-text)"' : '';
     return `<div class="thread-row" onclick="openThreadFromChatTab('${t.id}')">
       <div class="thread-row-content">
         <div class="thread-row-top">
-          <span class="thread-row-title">${t.title}</span>
+          <div class="thread-row-title-wrap">
+            ${closedIcon}<span class="thread-row-title"${titleStyle}>${t.title}</span>${feedbackDot}
+          </div>
           <span class="thread-row-date">${formatThreadDate(t.lastActivityAt)}</span>
         </div>
         <div class="thread-row-bottom">
@@ -2288,11 +2434,15 @@ function startChatFromTab() {
 function updateChatBadge() {
   const badge = document.getElementById('chatTabBadge');
   if (!badge) return;
-  const hasEscalated = threads.some(t => isThreadEscalated(t));
+  const escalatedCount = threads.filter(t => isThreadEscalated(t)).length;
+  const feedbackUnseenCount = threads.filter(t => t.status === 'closed' && t.feedbackSeen === false).length;
   // Member is "on Chat" if the Chat tab is active OR they have the sheet open
   const isOnChat = currentTab === 'chat' || sheetOpen;
-  if (hasEscalated && !isOnChat) {
-    badge.textContent = threads.filter(t => isThreadEscalated(t)).length;
+  const showEscalated = escalatedCount > 0 && !isOnChat;
+  const showFeedback = feedbackUnseenCount > 0 && !isOnChat;
+  const totalCount = (showEscalated ? escalatedCount : 0) + (showFeedback ? feedbackUnseenCount : 0);
+  if (totalCount > 0) {
+    badge.textContent = totalCount;
     badge.classList.add('visible');
   } else {
     badge.classList.remove('visible');
@@ -2420,7 +2570,8 @@ const SEEDED_THREADS = [
   {
     id: 'thread-1',
     title: 'Your A1c improved to 6.8%',
-    status: 'resolved',
+    status: 'closed',
+    feedbackSeen: true,
     lastActivityAt: '2026-02-26',
     messages: [
       { role: 'ai', sender: 'MyDevoted', text: "Laura, I wanted to share something from your recent labs. Your HbA1c came back at 6.8% — that's down from 7.2% last time. That's a meaningful improvement.\n\nThis number reflects the last 2-3 months of your life — your meals, your movement, your daily rhythms.\n\nHow does it feel to hear that?" },
@@ -2433,7 +2584,8 @@ const SEEDED_THREADS = [
   {
     id: 'thread-2',
     title: 'What does my eGFR of 58 mean?',
-    status: 'resolved',
+    status: 'closed',
+    feedbackSeen: true,
     lastActivityAt: '2026-02-27',
     messages: [
       { role: 'user', text: "I saw my eGFR was 58. What does that mean?" },
@@ -2445,7 +2597,8 @@ const SEEDED_THREADS = [
   {
     id: 'thread-3',
     title: 'Yoga mat reimbursement',
-    status: 'resolved',
+    status: 'closed',
+    feedbackSeen: true,
     lastActivityAt: '2026-02-23',
     messages: [
       { role: 'user', text: "I bought a yoga mat for $45. Can I get reimbursed?" },
@@ -2455,7 +2608,8 @@ const SEEDED_THREADS = [
   {
     id: 'thread-4',
     title: 'Billing question about specialist',
-    status: 'resolved',
+    status: 'closed',
+    feedbackSeen: true,
     lastActivityAt: '2026-03-10',
     messages: [
       { role: 'user', text: "I got a bill for $150 from a specialist. I thought my plan covered this?" },
@@ -2469,7 +2623,8 @@ const SEEDED_THREADS = [
   {
     id: 'thread-5',
     title: 'Preparing for Dr. Wagle appointment',
-    status: 'resolved',
+    status: 'closed',
+    feedbackSeen: true,
     lastActivityAt: '2026-03-12',
     messages: [
       { role: 'user', text: "My appointment with Dr. Wagle is coming up. Can you help me prepare?" },
@@ -2568,16 +2723,26 @@ function renderSheetHeader() {
 function renderThreadList() {
   const container = document.getElementById('threadListRows');
   const sorted = [...threads].sort((a, b) => new Date(b.lastActivityAt) - new Date(a.lastActivityAt));
+  const unseenClosed = sorted.filter(t => t.status === 'closed' && t.feedbackSeen === false);
+  const feedbackUnseenIds = new Set(unseenClosed.slice(0, 2).map(t => t.id));
   container.innerHTML = sorted.map(t => {
     const lastMsg = t.messages[t.messages.length - 1];
     let preview = lastMsg ? lastMsg.text.replace(/\*\*/g, '').replace(/\n/g, ' ') : '';
     if (preview.length > 60) preview = preview.substring(0, 60) + '...';
     const isActive = t.status === 'waiting-guide' || t.status === 'waiting-medical';
-    const badge = isActive ? '<span class="thread-active-badge">Active</span>' : '';
+    const isClosed = t.status === 'closed';
+    const showFeedbackDot = isClosed && t.feedbackSeen === false && feedbackUnseenIds.has(t.id);
+    let badge = '';
+    if (isActive) badge = '<span class="thread-active-badge">Active</span>';
+    const closedIcon = isClosed ? '<span class="thread-closed-icon material-icons">check_circle</span>' : '';
+    const feedbackDot = showFeedbackDot ? '<span class="thread-feedback-dot"></span>' : '';
+    const titleStyle = isClosed ? ' style="color:var(--gray-text)"' : '';
     return `<div class="thread-row" onclick="openThread('${t.id}')">
       <div class="thread-row-content">
         <div class="thread-row-top">
-          <span class="thread-row-title">${t.title}</span>
+          <div class="thread-row-title-wrap">
+            ${closedIcon}<span class="thread-row-title"${titleStyle}>${t.title}</span>${feedbackDot}
+          </div>
           <span class="thread-row-date">${formatThreadDate(t.lastActivityAt)}</span>
         </div>
         <div class="thread-row-bottom">
@@ -2645,6 +2810,102 @@ function findActiveEscalatedThread() {
   return threads.find(t => isThreadEscalated(t));
 }
 
+// ── Feedback card for closed conversations ──
+function renderFeedbackCard(thread) {
+  if (!thread || thread.status !== 'closed') return '';
+  // Seeded past conversations: feedbackSeen starts true, no feedbackRating → no card
+  // Session-completed: feedbackSeen starts false, gets set true on view → show card
+  if (!thread.feedbackRating && !thread.sessionCompleted) return '';
+
+  // Already submitted final answer — show final state
+  if (thread.feedbackHabit) {
+    let html = '<div class="feedback-card"><div class="feedback-card-thanks">Appreciate it.</div>';
+    if (thread.feedbackText) {
+      html += `<div class="feedback-card-thanks" style="margin-top:6px;font-size:13px;">Feedback sent</div>`;
+    } else if (!thread.feedbackTextDismissed) {
+      html += `<button class="feedback-card-tellmore" onclick="showFeedbackTextInput('${thread.id}')">Tell us more...</button>`;
+    }
+    html += '</div>';
+    return html;
+  }
+
+  // Already picked rating — show habit question
+  if (thread.feedbackRating) {
+    return `<div class="feedback-card">
+      <div class="feedback-card-header fade-in">Would you come back to MyDevoted for something like this?</div>
+      <div class="feedback-card-buttons fade-in">
+        <button class="feedback-card-btn" onclick="submitFeedbackHabit('${thread.id}','yes')">Yes</button>
+        <button class="feedback-card-btn" onclick="submitFeedbackHabit('${thread.id}','no')">No</button>
+      </div>
+    </div>`;
+  }
+
+  // Initial state — rating buttons
+  return `<div class="feedback-card">
+    <div class="feedback-card-header">How did that go?</div>
+    <div class="feedback-card-buttons">
+      <button class="feedback-card-btn" onclick="submitFeedbackRating('${thread.id}','not_helpful')">Not helpful</button>
+      <button class="feedback-card-btn" onclick="submitFeedbackRating('${thread.id}','okay')">It was okay</button>
+      <button class="feedback-card-btn" onclick="submitFeedbackRating('${thread.id}','really_helpful')">Really helpful</button>
+    </div>
+  </div>`;
+}
+
+function submitFeedbackRating(threadId, rating) {
+  const thread = threads.find(t => t.id === threadId);
+  if (!thread) return;
+  thread.feedbackRating = rating;
+  renderConversation();
+}
+
+function submitFeedbackHabit(threadId, habit) {
+  const thread = threads.find(t => t.id === threadId);
+  if (!thread) return;
+  thread.feedbackHabit = habit;
+  renderConversation();
+}
+
+function showFeedbackTextInput(threadId) {
+  const thread = threads.find(t => t.id === threadId);
+  if (!thread) return;
+  thread.feedbackTextDismissed = true;
+  const card = document.querySelector('.feedback-card');
+  if (!card) return;
+  const tellMore = card.querySelector('.feedback-card-tellmore');
+  if (tellMore) tellMore.remove();
+  const row = document.createElement('div');
+  row.className = 'feedback-card-input-row fade-in';
+  row.innerHTML = `<input type="text" id="feedbackTextInput" placeholder="What could be better?" autofocus>
+    <button onclick="submitFeedbackText('${threadId}')">Send</button>`;
+  card.appendChild(row);
+  const inp = document.getElementById('feedbackTextInput');
+  if (inp) {
+    inp.focus();
+    inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') submitFeedbackText(threadId); });
+  }
+}
+
+function submitFeedbackText(threadId) {
+  const thread = threads.find(t => t.id === threadId);
+  const inp = document.getElementById('feedbackTextInput');
+  if (!thread || !inp) return;
+  const text = inp.value.trim();
+  if (text) thread.feedbackText = text;
+  renderConversation();
+}
+
+function continueClosedConversation(threadId) {
+  const thread = threads.find(t => t.id === threadId);
+  if (!thread) return;
+  thread.status = 'open';
+  renderConversation();
+  renderSheetHeader();
+  updateChatBadge();
+  renderChatTabThreads();
+  const input = document.getElementById('convInput');
+  if (input) input.focus();
+}
+
 function renderConversation() {
   const thread = threads.find(t => t.id === activeThreadId);
   const container = document.getElementById('convMessages');
@@ -2690,12 +2951,30 @@ function renderConversation() {
     }
   });
 
+  // Append feedback card for closed session-completed conversations
+  if (thread.status === 'closed' && thread.feedbackSeen !== true) {
+    // Mark as seen when they open it (but still show the card)
+    thread.feedbackSeen = true;
+    updateChatBadge();
+    renderChatTabThreads();
+  }
+  const feedbackHtml = renderFeedbackCard(thread);
+  if (feedbackHtml) html += feedbackHtml;
+
   container.innerHTML = html;
 
-  // Footer: escalated vs normal
+  // Footer: escalated vs normal vs closed
   const escalated = isThreadEscalated(thread);
+  const isClosed = thread.status === 'closed';
   const talkLink = document.getElementById('talkToPersonLink');
-  if (escalated) {
+  const inputRow = document.querySelector('.conv-input-row');
+  if (isClosed) {
+    // Hide normal compose bar, show Continue button
+    if (inputRow) inputRow.style.display = 'none';
+    if (talkLink) talkLink.style.display = 'none';
+    footer.innerHTML = `<button class="conv-continue-btn" onclick="continueClosedConversation('${thread.id}')">Continue this conversation →</button>`;
+  } else if (escalated) {
+    if (inputRow) inputRow.style.display = '';
     input.placeholder = 'Add more details...';
     footer.innerHTML = `<div class="conv-turnaround">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -2703,13 +2982,14 @@ function renderConversation() {
     </div>`;
     if (talkLink) talkLink.style.display = 'none';
   } else {
+    if (inputRow) inputRow.style.display = '';
     input.placeholder = 'Ask me anything...';
     footer.innerHTML = '';
     if (talkLink) talkLink.style.display = 'flex';
   }
 
   // Scroll so the last message's top is visible
-  const msgs = container.querySelectorAll('.msg');
+  const msgs = container.querySelectorAll('.msg, .feedback-card');
   const last = msgs[msgs.length - 1];
   if (last) {
     scrollIntoConvView(last);
@@ -3478,7 +3758,7 @@ function removeConvChips() {
 }
 
 // Add AI message to active thread and render (with typing indicator + delay)
-function addCardAiMessage(text, chips, delay_ms) {
+function addCardAiMessage(text, chips, delay_ms, onComplete) {
   // Show typing indicator immediately
   const loader = showTypingIndicator();
   const ms = delay_ms !== undefined ? Math.max(delay_ms, 0) : 0;
@@ -3489,6 +3769,7 @@ function addCardAiMessage(text, chips, delay_ms) {
     if (!thread) return;
     loader.remove();
     thread.messages.push({ role: 'ai', sender: 'MyDevoted', text: text });
+    if (onComplete) onComplete(thread);
     renderConversation();
     if (chips) showConvChips(chips);
   }, totalDelay);
@@ -3624,7 +3905,12 @@ function handleHCReply(text) {
   } else if (state.step === 5) {
     state.step = 6;
     state.completed = true;
-    addCardAiMessage(`That's everything for now. I'll check back in a couple days to keep getting to know you — next time we'll talk a bit about your day-to-day so we can find ways to help.\n\nThanks, ${name}!`);
+    addCardAiMessage(`That's everything for now. I'll check back in a couple days to keep getting to know you — next time we'll talk a bit about your day-to-day so we can find ways to help.\n\nThanks, ${name}!`, null, undefined, function(thread) {
+      thread.status = 'closed';
+      thread.feedbackSeen = false;
+      thread.sessionCompleted = true;
+      updateChatBadge();
+    });
     // Update card UI
     const badge = document.getElementById('hc-badge');
     const subtitle = document.getElementById('hc-subtitle');
@@ -3900,7 +4186,12 @@ function handleVIReply(text) {
   } else if (state.step === 6) {
     if (/looks good|yes|done|good|perfect/i.test(text)) {
       state.completed = true;
-      addCardAiMessage(`You're all set, ${name}. Dr. Wagle's team will have this before your appointment. See you March 25!`);
+      addCardAiMessage(`You're all set, ${name}. Dr. Wagle's team will have this before your appointment. See you March 25!`, null, undefined, function(thread) {
+        thread.status = 'closed';
+        thread.feedbackSeen = false;
+        thread.sessionCompleted = true;
+        updateChatBadge();
+      });
       // Update card
       const badge = document.getElementById('vi-badge');
       const subtitle = document.getElementById('vi-subtitle');
@@ -4083,7 +4374,12 @@ function handleRSReply(text) {
       return;
     }
     // "That's all, thanks" or anything else
-    addCardAiMessage("You're all set. Have a great day!");
+    addCardAiMessage("You're all set. Have a great day!", null, undefined, function(thread) {
+      thread.status = 'closed';
+      thread.feedbackSeen = false;
+      thread.sessionCompleted = true;
+      updateChatBadge();
+    });
     state.step = 0;
     state.threadId = null;
     return;
